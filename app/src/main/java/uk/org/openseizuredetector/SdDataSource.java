@@ -47,9 +47,9 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 interface SdDataReceiver {
-    public void onSdDataReceived(SdData sdData);
+    void onSdDataReceived(SdData sdData);
 
-    public void onSdDataFault(SdData sdData);
+    void onSdDataFault(SdData sdData);
 }
 
 /**
@@ -66,16 +66,16 @@ public abstract class SdDataSource {
     private int mAppRestartTimeout = 10;  // Timeout before re-starting watch app (sec) if we have not received
     // data after mDataUpdatePeriod
     private int mFaultTimerPeriod = 30;  // Fault Timer Period in sec
-    private int mSettingsPeriod = 60;  // period between requesting settings in seconds.
+    private final int mSettingsPeriod = 60;  // period between requesting settings in seconds.
     public SdData mSdData;
     public String mName = "undefined";
     protected OsdUtil mUtil;
     protected Context mContext;
     protected SdDataReceiver mSdDataReceiver;
-    private String TAG = "SdDataSource";
+    private final String TAG = "SdDataSource";
 
     private short mDebug;
-    private short mFreqCutoff = 12;
+    private final short mFreqCutoff = 12;
     private short mDisplaySpectrum;
     private short mDataUpdatePeriod;
     private short mMutePeriod;
@@ -104,9 +104,9 @@ public abstract class SdDataSource {
     protected SdAlgHr mSdAlgHr;
 
     // Values for SD_MODE
-    private int SIMPLE_SPEC_FMAX = 10;
+    private final int SIMPLE_SPEC_FMAX = 10;
 
-    private int ACCEL_SCALE_FACTOR = 1000;  // Amount by which to reduce analysis results to scale to be comparable to analysis on Pebble.
+    private final int ACCEL_SCALE_FACTOR = 1000;  // Amount by which to reduce analysis results to scale to be comparable to analysis on Pebble.
 
 
     private int mAlarmCount;
@@ -114,7 +114,7 @@ public abstract class SdDataSource {
     protected String mBleDeviceName;
     private double mLastHrValue;
     private Time mHrStatusTime;
-    private double mHrFrozenPeriod = 60; // seconds
+    private final double mHrFrozenPeriod = 60; // seconds
     private boolean mHrFrozenAlarm;
     private boolean mFidgetDetectorEnabled;
     private double mFidgetPeriod;
@@ -208,7 +208,7 @@ public abstract class SdDataSource {
                 public void run() {
                     mSdData.haveSettings = false;
                 }
-            }, 0, 1000 * mSettingsPeriod);  // ask for settings less frequently than we get data
+            }, 0, 1000L * mSettingsPeriod);  // ask for settings less frequently than we get data
         } else {
             Log.v(TAG, "start(): settings timer already running.");
             mUtil.writeToSysLogFile("SDDataSource.start() - settings timer already running??");
@@ -249,8 +249,8 @@ public abstract class SdDataSource {
             }
 
         } catch (Exception e) {
-            Log.v(TAG, "Error in stop() - " + e.toString());
-            mUtil.writeToSysLogFile("SDDataSource.stop() - error - " + e.toString());
+            Log.v(TAG, "Error in stop() - " + e);
+            mUtil.writeToSysLogFile("SDDataSource.stop() - error - " + e);
         }
 
         if (mSdData.mCnnAlarmActive) {
@@ -271,7 +271,7 @@ public abstract class SdDataSource {
             i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             mContext.startActivity(i);
         } catch (Exception ex) {
-            Log.i(TAG, "exception starting install watch app activity " + ex.toString());
+            Log.i(TAG, "exception starting install watch app activity " + ex);
             showToast("Error Displaying Installation Instructions - try http://www.openseizuredetector.org.uk/?page_id=1207 instead");
         }
     }
@@ -364,7 +364,7 @@ public abstract class SdDataSource {
                         int i;
                         for (i = 0; i < 125; i++) {
                             double x, y, z;
-                            x = mSdData.rawData3D[i*3 + 0];
+                            x = mSdData.rawData3D[i * 3];
                             y = mSdData.rawData3D[i*3 + 1];
                             z = mSdData.rawData3D[i*3 + 2];
                             mSdData.rawData[i] = Math.sqrt(x*x + y*y + z*z);
@@ -386,7 +386,7 @@ public abstract class SdDataSource {
                 mWatchAppRunningCheck = true;
                 doAnalysis();
 
-                if (mSdData.haveSettings == false) {
+                if (!mSdData.haveSettings) {
                     retVal = "sendSettings";
                 } else {
                     retVal = "OK";
@@ -414,8 +414,8 @@ public abstract class SdDataSource {
                     mSdData.watchSdVersion = sdVersion;
                     mSdData.watchSdName = sdName;
                 } catch (Exception e) {
-                    Log.e(TAG, "updateFromJSON - Error Parsing V3.2 JSON String - " + e.toString());
-                    mUtil.writeToSysLogFile("updateFromJSON - Error Parsing V3.2 JSON String - " + jsonStr + " - " + e.toString());
+                    Log.e(TAG, "updateFromJSON - Error Parsing V3.2 JSON String - " + e);
+                    mUtil.writeToSysLogFile("updateFromJSON - Error Parsing V3.2 JSON String - " + jsonStr + " - " + e);
                     mUtil.writeToSysLogFile("          This is probably because of an out of date watch app - please upgrade!");
                     e.printStackTrace();
                 }
@@ -428,8 +428,8 @@ public abstract class SdDataSource {
                 retVal = "ERROR";
             }
         } catch (Exception e) {
-            Log.e(TAG, "updateFromJSON - Error Parsing JSON String - " + jsonStr + " - " + e.toString());
-            mUtil.writeToSysLogFile("updateFromJSON - Error Parsing JSON String - " + jsonStr + " - " + e.toString());
+            Log.e(TAG, "updateFromJSON - Error Parsing JSON String - " + jsonStr + " - " + e);
+            mUtil.writeToSysLogFile("updateFromJSON - Error Parsing JSON String - " + jsonStr + " - " + e);
             mUtil.writeToSysLogFile("updateFromJSON: Exception at Line Number: " + e.getCause().getStackTrace()[0].getLineNumber() + ", " + e.getCause().getStackTrace()[0].toString());
             if (accelVals == null) {
                 mUtil.writeToSysLogFile("updateFromJSON: accelVals is null when exception thrown");
@@ -587,7 +587,7 @@ public abstract class SdDataSource {
             mWatchAppRunningCheck = true;
         } catch (Exception e) {
             Log.e(TAG, "doAnalysis - Exception during Analysis");
-            mUtil.writeToSysLogFile("doAnalysis - Exception during analysis - " + e.toString());
+            mUtil.writeToSysLogFile("doAnalysis - Exception during analysis - " + e);
             mUtil.writeToSysLogFile("doAnalysis: Exception at Line Number: " + e.getCause().getStackTrace()[0].getLineNumber() + ", " + e.getCause().getStackTrace()[0].toString());
             mUtil.writeToSysLogFile("doAnalysis: mSdData.mNsamp=" + mSdData.mNsamp);
             mUtil.writeToSysLogFile("doAnalysis: alarmFreqMin=" + mAlarmFreqMin + " nMin=" + nMin);
@@ -679,7 +679,7 @@ public abstract class SdDataSource {
             Log.d(TAG, "flapCheck() - roiPower="+roiPower+", roiRatio="+roiRatio);
 
         } catch (Exception e) {
-            Log.e(TAG, "flapCheck - Exception during Analysis"+e.toString());
+            Log.e(TAG, "flapCheck - Exception during Analysis"+ e);
             roiRatio = 0;
             roiPower = 0;
         }
@@ -957,11 +957,11 @@ public abstract class SdDataSource {
             // the app is not talking to us
             // mWatchAppRunningCheck is set to true in the receiveData handler.
             if (!mWatchAppRunningCheck &&
-                    (tdiff > (mDataUpdatePeriod + mAppRestartTimeout) * 1000)) {
+                    (tdiff > (mDataUpdatePeriod + mAppRestartTimeout) * 1000L)) {
                 Log.v(TAG, "getStatus() - tdiff = " + tdiff);
                 mSdData.watchAppRunning = false;
                 // Only make audible warning beep if we have not received data for more than mFaultTimerPeriod seconds.
-                if (tdiff > (mDataUpdatePeriod + mFaultTimerPeriod) * 1000) {
+                if (tdiff > (mDataUpdatePeriod + mFaultTimerPeriod) * 1000L) {
                     Log.v(TAG, "getStatus() - Watch App Not Running");
                     mUtil.writeToSysLogFile("SDDataSource.getStatus() - Watch App not Running");
                     //mDataStatusTime.setToNow();
@@ -1004,7 +1004,7 @@ public abstract class SdDataSource {
                 Log.v(TAG, "getStatus() - no settings received yet");
             }
         } catch(Exception e) {
-            Log.e(TAG,"getStatus - Exception: "+e.toString());
+            Log.e(TAG,"getStatus - Exception: "+ e);
             Log.e(TAG,e.getMessage());
             mSdData.watchAppRunning = false;
             mSdData.roiPower = -1;
@@ -1027,7 +1027,7 @@ public abstract class SdDataSource {
             //Log.v(TAG, "faultCheck() - tdiff=" + tdiff + ", mDataUpatePeriod=" + mDataUpdatePeriod + ", mAppRestartTimeout=" + mAppRestartTimeout
             //        + ", combined = " + (mDataUpdatePeriod + mAppRestartTimeout) * 1000);
             if (!mWatchAppRunningCheck &&
-                    (tdiff > (mDataUpdatePeriod + mAppRestartTimeout) * 1000)) {
+                    (tdiff > (mDataUpdatePeriod + mAppRestartTimeout) * 1000L)) {
                 //Log.v(TAG, "faultCheck() - watch app not running so not doing anything");
                 mAlarmCount = 0;
             }
@@ -1039,15 +1039,11 @@ public abstract class SdDataSource {
                     mSdData.mHrFrozenFaultStanding = false;
                 } else {
                     tdiff = (tnow.toMillis(false) - mHrStatusTime.toMillis(false));
-                    if (tdiff > mHrFrozenPeriod * 1000.) {
-                        mSdData.mHrFrozenFaultStanding = true;
-                    } else {
-                        mSdData.mHrFrozenFaultStanding = false;
-                    }
+                    mSdData.mHrFrozenFaultStanding = tdiff > mHrFrozenPeriod * 1000.;
                 }
             }
         } catch(Exception e) {
-        Log.e(TAG,"faultCheck - Exception: "+e.toString());
+        Log.e(TAG,"faultCheck - Exception: "+ e);
         Log.e(TAG,e.getMessage());
         mSdData.watchAppRunning = false;
         mSdData.roiPower = -1;
@@ -1268,12 +1264,12 @@ public abstract class SdDataSource {
                 mUtil.writeToSysLogFile("updatePrefs() FlapAlarmRatioThresh = " + mFlapRatioThresh);
 
                 prefStr = SP.getString("FlapAlarmFreqMin", "SET_FROM_XML");
-                mFlapFreqMin = (double) Double.parseDouble(prefStr);
+                mFlapFreqMin = Double.parseDouble(prefStr);
                 Log.v(TAG, "updatePrefs() FlapAlarmFreqMin = " + mFlapFreqMin);
                 mUtil.writeToSysLogFile("updatePrefs() FlapAlarmFreqMin = " + mFlapFreqMin);
 
                 prefStr = SP.getString("FlapAlarmFreqMax", "SET_FROM_XML");
-                mFlapFreqMax = (double) Double.parseDouble(prefStr);
+                mFlapFreqMax = Double.parseDouble(prefStr);
                 Log.v(TAG, "updatePrefs() FlapAlarmFreqMax = " + mFlapFreqMax);
                 mUtil.writeToSysLogFile("updatePrefs() FlapAlarmFreqMax = " + mFlapFreqMax);
 
@@ -1343,7 +1339,7 @@ public abstract class SdDataSource {
 
         } catch (Exception ex) {
             Log.v(TAG, "updatePrefs() - Problem parsing preferences!");
-            mUtil.writeToSysLogFile("SDDataSource.updatePrefs() - ERROR " + ex.toString());
+            mUtil.writeToSysLogFile("SDDataSource.updatePrefs() - ERROR " + ex);
             Toast toast = Toast.makeText(mContext, "Problem Parsing Preferences - Something won't work - Please go back to Settings and correct it!", Toast.LENGTH_SHORT);
             toast.show();
         }

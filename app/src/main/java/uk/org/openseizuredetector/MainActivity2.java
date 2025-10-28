@@ -36,13 +36,13 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 public class MainActivity2 extends AppCompatActivity {
-    private String TAG = "MainActivity2";
-    private int okColour = Color.BLUE;
-    private int warnColour = Color.MAGENTA;
-    private int alarmColour = Color.RED;
-    private int okTextColour = Color.WHITE;
-    private int warnTextColour = Color.WHITE;
-    private int alarmTextColour = Color.BLACK;
+    private final String TAG = "MainActivity2";
+    private final int okColour = Color.BLUE;
+    private final int warnColour = Color.MAGENTA;
+    private final int alarmColour = Color.RED;
+    private final int okTextColour = Color.WHITE;
+    private final int warnTextColour = Color.WHITE;
+    private final int alarmTextColour = Color.BLACK;
 
     private ViewPager2 mFragmentPager;
     private FragmentStateAdapter mFragmentStateAdapter;
@@ -111,7 +111,7 @@ public class MainActivity2 extends AppCompatActivity {
         Log.v(TAG, "onStart - audibleAlarm = " + audibleAlarm);
 
         TextView tv;
-        tv = (TextView) findViewById(R.id.versionTv);
+        tv = findViewById(R.id.versionTv);
         String versionName = mUtil.getAppVersionName();
         tv.setText(getString(R.string.AppTitleText) + " " + versionName);
         tv.setBackgroundColor(okColour);
@@ -173,7 +173,7 @@ public class MainActivity2 extends AppCompatActivity {
                 finish();
             }
         } catch (Exception ex) {
-            Log.e(TAG, "exception starting main activity " + ex.toString());
+            Log.e(TAG, "exception starting main activity " + ex);
         }
 
         // Force the screen to stay on when the app is running
@@ -272,7 +272,7 @@ public class MainActivity2 extends AppCompatActivity {
                             AuthenticateActivity.class);
                     this.startActivity(i);
                 } catch (Exception ex) {
-                    Log.i(TAG, "exception starting export activity " + ex.toString());
+                    Log.i(TAG, "exception starting export activity " + ex);
                 }
                 return true;
             case R.id.action_about_datasharing:
@@ -287,7 +287,7 @@ public class MainActivity2 extends AppCompatActivity {
                             LogManagerControlActivity.class);
                     this.startActivity(intent);
                 } catch (Exception ex) {
-                    Log.i(TAG, "exception starting log manager activity " + ex.toString());
+                    Log.i(TAG, "exception starting log manager activity " + ex);
                 }
                 return true;
             case R.id.action_report_seizure:
@@ -298,7 +298,7 @@ public class MainActivity2 extends AppCompatActivity {
                             ReportSeizureActivity.class);
                     this.startActivity(intent);
                 } catch (Exception ex) {
-                    Log.i(TAG, "exception starting Report Seizure activity " + ex.toString());
+                    Log.i(TAG, "exception starting Report Seizure activity " + ex);
                 }
                 return true;
             case R.id.action_settings:
@@ -309,7 +309,7 @@ public class MainActivity2 extends AppCompatActivity {
                             PrefActivity.class);
                     this.startActivity(prefsIntent);
                 } catch (Exception ex) {
-                    Log.i(TAG, "exception starting settings activity " + ex.toString());
+                    Log.i(TAG, "exception starting settings activity " + ex);
                 }
                 return true;
             case R.id.action_instructions:
@@ -321,7 +321,7 @@ public class MainActivity2 extends AppCompatActivity {
                     i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                     startActivity(i);
                 } catch (Exception ex) {
-                    Log.v(TAG, "exception displaying instructions " + ex.toString());
+                    Log.v(TAG, "exception displaying instructions " + ex);
                     mUtil.showToast("ERROR Displaying Instructions");
                 }
                 return true;
@@ -335,7 +335,7 @@ public class MainActivity2 extends AppCompatActivity {
                     i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                     startActivity(i);
                 } catch (Exception ex) {
-                    Log.v(TAG, "exception displaying troubleshooting " + ex.toString());
+                    Log.v(TAG, "exception displaying troubleshooting " + ex);
                     mUtil.showToast("ERROR Displaying Troubleshooting Tips");
                 }
                 return true;
@@ -356,7 +356,7 @@ public class MainActivity2 extends AppCompatActivity {
      * sequence.
      */
     private class ScreenSlideFragmentPagerAdapter extends FragmentStateAdapter {
-        private String TAG = "ScreenSlideFragmentPagerAdapter";
+        private final String TAG = "ScreenSlideFragmentPagerAdapter";
 
         public ScreenSlideFragmentPagerAdapter(FragmentActivity fa) {
             super(fa);
@@ -459,7 +459,7 @@ public class MainActivity2 extends AppCompatActivity {
                             AuthenticateActivity.class);
                     mContext.startActivity(i);
                 } catch (Exception ex) {
-                    Log.i(TAG, "exception starting activity " + ex.toString());
+                    Log.i(TAG, "exception starting activity " + ex);
                 }
 
             }

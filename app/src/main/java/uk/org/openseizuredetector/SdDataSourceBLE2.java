@@ -68,19 +68,19 @@ import co.beeline.android.bluetooth.currenttimeservice.CurrentTimeService;
  * BLE methods to try to improve start-up/shutdown reliability.
  */
 public class SdDataSourceBLE2 extends SdDataSource {
-    private int MAX_RAW_DATA = 125;  // 5 seconds at 25 Hz.
-    private String TAG = "SdDataSourceBLE2";
+    private final int MAX_RAW_DATA = 125;  // 5 seconds at 25 Hz.
+    private final String TAG = "SdDataSourceBLE2";
     private BluetoothManager mBluetoothManager;
     private BluetoothAdapter mBluetoothAdapter;
     private String mBluetoothDeviceAddress;
     private BluetoothGatt mBluetoothGatt;
-    private int mConnectionState = STATE_DISCONNECTED;
+    private final int mConnectionState = STATE_DISCONNECTED;
 
     private int nRawData = 0;
-    private double[] rawData = new double[MAX_RAW_DATA];
-    private double[] rawData3d = new double[MAX_RAW_DATA * 3];
+    private final double[] rawData = new double[MAX_RAW_DATA];
+    private final double[] rawData3d = new double[MAX_RAW_DATA * 3];
     private int mAccFmt = 0;
-    private boolean waitForDescriptorWrite = false;
+    private final boolean waitForDescriptorWrite = false;
 
     private static final int STATE_DISCONNECTED = 0;
     private static final int STATE_CONNECTING = 1;

@@ -45,7 +45,7 @@ import static java.lang.Math.sqrt;
  * will shake during a seizure.
  */
 public class SdDataSourcePhone extends SdDataSource implements SensorEventListener {
-    private String TAG = "SdDataSourcePhone";
+    private final String TAG = "SdDataSourcePhone";
 
     private SensorManager mSensorManager;
     private Sensor mSensor;

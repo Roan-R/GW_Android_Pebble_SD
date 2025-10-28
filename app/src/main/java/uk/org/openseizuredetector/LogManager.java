@@ -94,12 +94,12 @@ public class LogManager {
     //private String mDbName = "osdData";
     final static private String mDpTableName = "datapoints";
     final static private String mEventsTableName = "events";
-    private boolean mLogRemote;
-    private boolean mLogRemoteMobile;
-    private String mAuthToken;
+    private final boolean mLogRemote;
+    private final boolean mLogRemoteMobile;
+    private final String mAuthToken;
     static private SQLiteDatabase mOsdDb = null;   // SQLite Database for data and log entries.
     private RemoteLogTimer mRemoteLogTimer;
-    private boolean mLogNDA;
+    private final boolean mLogNDA;
     public NDATimer mNDATimer;
     private long mNDATimerStartTime;  // milliseconds
     public double mNDATimeRemaining; // hours
@@ -117,8 +117,8 @@ public class LogManager {
     private String mCurrentEventRemoteId;
     private long mCurrentEventLocalId = -1;
     private int mCurrentDatapointId;
-    private long mAutoPrunePeriod = 3600;  // Prune the database every hour
-    private boolean mAutoPruneDb;
+    private final long mAutoPrunePeriod = 3600;  // Prune the database every hour
+    private final boolean mAutoPruneDb;
     private AutoPruneTimer mAutoPruneTimer;
     private SdData mSdSettingsData;
 
@@ -278,7 +278,7 @@ public class LogManager {
                 e.printStackTrace();
             }
         }
-        Log.v(TAG, "eventCursor2JSON(): returning " + eventsArray.toString());
+        Log.v(TAG, "eventCursor2JSON(): returning " + eventsArray);
         return eventsArray.toString();
     }
 
@@ -302,7 +302,7 @@ public class LogManager {
                 }
             }
         } catch (SQLException e) {
-            Log.e(TAG, "Failed to open Database: " + e.toString());
+            Log.e(TAG, "Failed to open Database: " + e);
             return false;
         }
         return true;
@@ -358,10 +358,10 @@ public class LogManager {
                 createLocalEvent(dateStr, sdData.alarmState, null, null, null, sdData.toSettingsJSON());
             }
         } catch (SQLException e) {
-            Log.e(TAG, "writeToLocalDb(): Error Writing Data: " + e.toString());
+            Log.e(TAG, "writeToLocalDb(): Error Writing Data: " + e);
             Log.e(TAG, "SQLStr was " + SQLStr);
         } catch (NullPointerException e) {
-            Log.e(TAG, "writeToLocalDb(): Null Pointer Exception: " + e.toString());
+            Log.e(TAG, "writeToLocalDb(): Null Pointer Exception: " + e);
         }
     }
 
@@ -512,7 +512,6 @@ public class LogManager {
             Log.v(TAG, "exportToCsvFile - returned " + retVal);
             callback.accept(retVal);
         }).execute();
-        return;
     }
 
 
@@ -574,7 +573,7 @@ public class LogManager {
                 String[] selectArgs = {endDateStr};
                 retVal = mOsdDb.delete(tableName, selectStr, selectArgs);
             } catch (Exception e) {
-                Log.d(TAG, "Error deleting data " + e.toString());
+                Log.d(TAG, "Error deleting data " + e);
                 retVal = 0;
             }
             Log.d(TAG, String.format("pruneLocalDb() - deleted %d records from table %s", retVal, tableName));
@@ -627,19 +626,17 @@ public class LogManager {
         String whereClause = whereClauseStatus + " AND " + whereClauseUploaded + " AND " + whereClauseDate;
 
         String[] whereArgs = new String[whereArgsStatus.length + 1];
-        for (int i = 0; i < whereArgsStatus.length; i++) {
-            whereArgs[i] = whereArgsStatus[i];
-        }
+        System.arraycopy(whereArgsStatus, 0, whereArgs, 0, whereArgsStatus.length);
         whereArgs[whereArgsStatus.length] = endDateStr;
         new SelectQueryTask(mEventsTableName, columns, whereClause, whereArgs,
                 null, null, "dataTime DESC", (Cursor cursor) -> {
-            Long recordId = new Long(-1);
+            Long recordId = Long.valueOf(-1);
             if (cursor != null) {
                 Log.v(TAG, "getNextEventToUpload - returned " + cursor.getCount() + " records");
                 cursor.moveToFirst();
                 if (cursor.getCount() == 0) {
                     Log.v(TAG, "getNextEventToUpload() - no events to Upload - exiting");
-                    recordId = new Long(-1);
+                    recordId = Long.valueOf(-1);
                 } else {
                     recordId = cursor.getLong(0);
                     Log.d(TAG, "getNextEventToUpload(): id=" + recordId);
@@ -666,13 +663,13 @@ public class LogManager {
         new SelectQueryTask(mDpTableName, columns, null, null,
                 null, null, orderByStr, (Cursor cursor) -> {
             Log.v(TAG, "getEventsNearestDatapointToDate - returned " + cursor);
-            Long recordId = new Long(-1);
+            Long recordId = Long.valueOf(-1);
             if (cursor != null) {
                 Log.v(TAG, "getNearestDatapointToDate - returned " + cursor.getCount() + " records");
                 cursor.moveToFirst();
                 if (cursor.getCount() == 0) {
                     Log.v(TAG, "getNearestDatapointToDate() - no events to Upload - exiting");
-                    recordId = new Long(-1);
+                    recordId = Long.valueOf(-1);
                 } else {
                     String recordStr = cursor.getString(3);
                     recordId = cursor.getLong(0);
@@ -778,13 +775,13 @@ public class LogManager {
                 resultSet.moveToFirst();
                 return (resultSet);
             } catch (SQLException e) {
-                Log.e(TAG, "SelectQueryTask.doInBackground(): Error selecting Data: " + e.toString());
+                Log.e(TAG, "SelectQueryTask.doInBackground(): Error selecting Data: " + e);
                 return (null);
             } catch (IllegalArgumentException e) {
-                Log.e(TAG, "SelectQueryTask.doInBackground(): Illegal Argument Exception: " + e.toString());
+                Log.e(TAG, "SelectQueryTask.doInBackground(): Illegal Argument Exception: " + e);
                 return (null);
             } catch (NullPointerException e) {
-                Log.e(TAG, "SelectQueryTask.doInBackground(): Null Pointer Exception: " + e.toString());
+                Log.e(TAG, "SelectQueryTask.doInBackground(): Null Pointer Exception: " + e);
                 return (null);
             }
         }
@@ -856,12 +853,12 @@ public class LogManager {
                     } catch (FileNotFoundException e) {
                         e.printStackTrace();
                         mUtil.showToast(mContext.getString(R.string.error_exporting_data));
-                        Log.e(TAG, "ExportDataTask.doInBackground() - FileNotFoundException: " + e.toString());
+                        Log.e(TAG, "ExportDataTask.doInBackground() - FileNotFoundException: " + e);
                         mCallback.accept(false);
                     } catch (IOException e) {
                         e.printStackTrace();
                         mUtil.showToast(mContext.getString(R.string.error_exporting_data));
-                        Log.e(TAG, "ExportDataTask.doInBackground() - IOException: " + e.toString());
+                        Log.e(TAG, "ExportDataTask.doInBackground() - IOException: " + e);
                         mCallback.accept(false);
                     }
 
@@ -873,13 +870,13 @@ public class LogManager {
 
                 return (true);
             } catch (SQLException e) {
-                Log.e(TAG, "ExportDataTask.doInBackground(): Error selecting Data: " + e.toString());
+                Log.e(TAG, "ExportDataTask.doInBackground(): Error selecting Data: " + e);
                 return (null);
             } catch (IllegalArgumentException e) {
-                Log.e(TAG, "ExportDataTask.doInBackground(): Illegal Argument Exception: " + e.toString());
+                Log.e(TAG, "ExportDataTask.doInBackground(): Illegal Argument Exception: " + e);
                 return (null);
             } catch (NullPointerException e) {
-                Log.e(TAG, "SelectQueryTask.doInBackground(): Null Pointer Exception: " + e.toString());
+                Log.e(TAG, "SelectQueryTask.doInBackground(): Null Pointer Exception: " + e);
                 return (null);
             }
         }
@@ -925,7 +922,7 @@ public class LogManager {
                         }
                         fileOutputStream.write("\n".getBytes(StandardCharsets.UTF_8));
                     } catch (IOException e) {
-                        Log.e(TAG, "exportToFile() - ERROR Writing File: " + e.toString());
+                        Log.e(TAG, "exportToFile() - ERROR Writing File: " + e);
                         mUtil.showToast("ERROR WRITING FILE");
                         return (-1);
                     }
@@ -939,7 +936,7 @@ public class LogManager {
                 Log.v(TAG, "createEventCallback(): Error Creating JSON Object from string ");
                 dataObj = null;
                 mUtil.showToast(mContext.getString(R.string.error_exporting_data));
-                Log.e(TAG, "exportToFile() - JSONException: " + e.toString());
+                Log.e(TAG, "exportToFile() - JSONException: " + e);
                 return (-1);
             }
         }
@@ -1034,7 +1031,7 @@ public class LogManager {
         // First try uploading full alarms, and only if we do not have any of those, upload warnings.
         //boolean warningsArr[] = {false, true};
         // Upload everything - alarms and warnings - we can sort it out in post-processing the data!
-        boolean warningsArr[] = {true};
+        boolean[] warningsArr = {true};
         for (int n = 0; n < warningsArr.length; n++) {
             boolean warningsVal = warningsArr[n];
             Log.i(TAG, "uploadSdData(): warningsVal=" + warningsVal);
@@ -1125,14 +1122,14 @@ public class LogManager {
                     Log.e(TAG, "createEventCallback() - eventObj is null - failed to create event");
                     mUtil.showToast(mContext.getString(R.string.error_creating_remote_event_msg));
                 } else {
-                    Log.v(TAG, "createEventCallback() - eventObj=" + eventObj.toString());
+                    Log.v(TAG, "createEventCallback() - eventObj=" + eventObj);
                     Date eventDate;
                     String eventDateStr = "";
                     try {
                         String dateStr = eventObj.getString("dataTime");
                         eventDate = mUtil.string2date(dateStr);
                     } catch (JSONException | NullPointerException e) {
-                        Log.e(TAG, "createEventCallback() - Error parsing JSONObject: " + eventObj.toString());
+                        Log.e(TAG, "createEventCallback() - Error parsing JSONObject: " + eventObj);
                         finishUpload();
                         return;
                     }

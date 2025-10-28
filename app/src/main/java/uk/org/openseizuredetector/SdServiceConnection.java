@@ -35,7 +35,7 @@ import android.util.Log;
  * Defines callbacks for service binding, passed to bindService()
  */
 public class SdServiceConnection implements ServiceConnection {
-    private String TAG = "SdServiceConnection";
+    private final String TAG = "SdServiceConnection";
     public SdServer mSdServer = null;
     public boolean mBound = false;
     public Context mContext;
@@ -87,9 +87,7 @@ public class SdServiceConnection implements ServiceConnection {
     public boolean hasSdSettings() {
         if (mSdServer != null) {
             if (mSdServer.mSdData != null) {
-                if (mSdServer.mSdData.haveSettings) {
-                    return true;
-                }
+                return mSdServer.mSdData.haveSettings;
             }
         }
         return false;
@@ -103,9 +101,7 @@ public class SdServiceConnection implements ServiceConnection {
     public boolean watchConnected() {
         if (mSdServer != null) {
             if (mSdServer.mSdData != null) {
-                if (mSdServer.mSdData.watchConnected) {
-                    return true;
-                }
+                return mSdServer.mSdData.watchConnected;
             }
         }
         return false;
@@ -119,9 +115,7 @@ public class SdServiceConnection implements ServiceConnection {
     public boolean pebbleAppRunning() {
         if (mSdServer != null) {
             if (mSdServer.mSdData != null) {
-                if (mSdServer.mSdData.watchAppRunning) {
-                    return true;
-                }
+                return mSdServer.mSdData.watchAppRunning;
             }
         }
         return false;

@@ -131,7 +131,7 @@ public class FragmentOsdBaseClass extends Fragment {
     protected void updateUi() {
         Log.d(TAG, "updateUi()");
         TextView tv;
-        tv = (TextView) mRootView.findViewById(R.id.fragment_sddata_viewer_tv1);
+        tv = mRootView.findViewById(R.id.fragment_sddata_viewer_tv1);
         if (mConnection.mBound) {
             tv.setText("Bound to Server");
         } else {

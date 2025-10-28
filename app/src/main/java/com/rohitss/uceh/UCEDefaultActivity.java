@@ -57,7 +57,7 @@ import uk.org.openseizuredetector.R;
 public final class UCEDefaultActivity extends AppCompatActivity {
     private File txtFile;
     private String strCurrentErrorLog;
-    private String TAG = "UCEDefaultActivity";
+    private final String TAG = "UCEDefaultActivity";
 
     @SuppressLint("PrivateResource")
     @Override
@@ -324,9 +324,6 @@ public final class UCEDefaultActivity extends AppCompatActivity {
 
     public boolean isExternalStorageWritable() {
         String state = Environment.getExternalStorageState();
-        if (Environment.MEDIA_MOUNTED.equals(state)) {
-            return true;
-        }
-        return false;
+        return Environment.MEDIA_MOUNTED.equals(state);
     }
 }

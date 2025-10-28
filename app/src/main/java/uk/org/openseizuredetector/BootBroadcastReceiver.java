@@ -39,7 +39,7 @@ import android.widget.Toast;
  */
 
 public class BootBroadcastReceiver extends BroadcastReceiver {
-    private String TAG = "BroadcastReceiver";
+    private final String TAG = "BroadcastReceiver";
 
     @Override
     public void onReceive(Context context, Intent intent) {

@@ -80,12 +80,12 @@ public class BLEScanActivity extends ListActivity {
     // Stops scanning after 10 seconds.
     private static final long SCAN_PERIOD = 10000;
 
-    private int okColour = Color.BLUE;
-    private int warnColour = Color.MAGENTA;
-    private int alarmColour = Color.RED;
-    private int okTextColour = Color.WHITE;
-    private int warnTextColour = Color.WHITE;
-    private int alarmTextColour = Color.BLACK;
+    private final int okColour = Color.BLUE;
+    private final int warnColour = Color.MAGENTA;
+    private final int alarmColour = Color.RED;
+    private final int okTextColour = Color.WHITE;
+    private final int warnTextColour = Color.WHITE;
+    private final int alarmTextColour = Color.BLACK;
 
 
     @Override
@@ -166,7 +166,7 @@ public class BLEScanActivity extends ListActivity {
         Log.i(TAG,"onResume()");
         SharedPreferences SP = PreferenceManager
                 .getDefaultSharedPreferences(this);
-        TextView tv = (TextView) findViewById(R.id.current_ble_device_tv);
+        TextView tv = findViewById(R.id.current_ble_device_tv);
         try {
             String bleAddr = SP.getString("BLE_Device_Addr", "none");
             String bleName = SP.getString("BLE_Device_Name", "none");
@@ -179,7 +179,7 @@ public class BLEScanActivity extends ListActivity {
             tv.setBackgroundColor(warnColour);
         }
 
-        tv = (TextView) findViewById(R.id.ble_present_tv);
+        tv = findViewById(R.id.ble_present_tv);
         if (mBluetoothAdapter == null) {
             tv.setText("ERROR - Bluetooth Adapter Not Present");
             tv.setTextColor(alarmTextColour);
@@ -191,7 +191,7 @@ public class BLEScanActivity extends ListActivity {
         }
         // Ensures Bluetooth is enabled on the device.  If Bluetooth is not currently enabled,
         // fire an intent to display a dialog asking the user to grant permission to enable it.
-        tv = (TextView) findViewById(R.id.ble_adapter_tv);
+        tv = findViewById(R.id.ble_adapter_tv);
         if (!mBluetoothAdapter.isEnabled()) {
             tv.setText("ERROR - Bluetooth NOT Enabled");
             tv.setTextColor(alarmTextColour);
@@ -212,7 +212,7 @@ public class BLEScanActivity extends ListActivity {
         }
 
 
-        tv = (TextView) findViewById(R.id.ble_perm1_tv);
+        tv = findViewById(R.id.ble_perm1_tv);
         if (mUtil.areBtPermissionsOk()) {
             tv.setText("Permissions required for Bluetooth Granted OK");
             tv.setBackgroundColor(okColour);
@@ -287,7 +287,7 @@ public class BLEScanActivity extends ListActivity {
         } else {
             Log.i(TAG, "requestBTPermissions() - showing rationale (if necessary)");
             boolean showRationale = false;
-            String btPermissions[] = mUtil.getRequiredBtPermissions();
+            String[] btPermissions = mUtil.getRequiredBtPermissions();
             for (int i = 0; i < btPermissions.length; i++) {
                 if (ActivityCompat.shouldShowRequestPermissionRationale(activity,
                         btPermissions[i])) {
@@ -365,32 +365,32 @@ public class BLEScanActivity extends ListActivity {
                 public void run() {
                     stopScan();
                     invalidateOptionsMenu();
-                    TextView tv = (TextView) (findViewById(R.id.ble_scan_status_tv));
+                    TextView tv = findViewById(R.id.ble_scan_status_tv);
                     tv.setText("Stopped");
                     tv.setTextColor(okTextColour);
                     tv.setBackgroundColor(okColour);
 
 
-                    Button b = (Button) findViewById(R.id.startScanButton);
+                    Button b = findViewById(R.id.startScanButton);
                     b.setEnabled(true);
 
                 }
             }, SCAN_PERIOD);
 
             startScan();
-            tv = (TextView) (findViewById(R.id.ble_scan_status_tv));
+            tv = findViewById(R.id.ble_scan_status_tv);
             tv.setText("Scanning");
             tv.setTextColor(warnTextColour);
             tv.setBackgroundColor(warnColour);
 
-            Button b = (Button) findViewById(R.id.startScanButton);
+            Button b = findViewById(R.id.startScanButton);
             b.setEnabled(false);
 
         } else {
             stopScan();
-            tv = (TextView) (findViewById(R.id.ble_scan_status_tv));
+            tv = findViewById(R.id.ble_scan_status_tv);
             tv.setText("Stopped");
-            Button b = (Button) findViewById(R.id.startScanButton);
+            Button b = findViewById(R.id.startScanButton);
             b.setEnabled(true);
         }
         invalidateOptionsMenu();
@@ -398,8 +398,8 @@ public class BLEScanActivity extends ListActivity {
 
     // Adapter for holding devices found through scanning.
     private class LeDeviceListAdapter extends BaseAdapter {
-        private ArrayList<BluetoothDevice> mLeDevices;
-        private LayoutInflater mInflator;
+        private final ArrayList<BluetoothDevice> mLeDevices;
+        private final LayoutInflater mInflator;
 
         public LeDeviceListAdapter() {
             super();
@@ -449,8 +449,8 @@ public class BLEScanActivity extends ListActivity {
             if (view == null) {
                 view = mInflator.inflate(R.layout.ble_list_item_device, null);
                 viewHolder = new ViewHolder();
-                viewHolder.deviceAddress = (TextView) view.findViewById(R.id.device_address);
-                viewHolder.deviceName = (TextView) view.findViewById(R.id.device_name);
+                viewHolder.deviceAddress = view.findViewById(R.id.device_address);
+                viewHolder.deviceName = view.findViewById(R.id.device_name);
                 view.setTag(viewHolder);
             } else {
                 viewHolder = (ViewHolder) view.getTag();
@@ -469,7 +469,7 @@ public class BLEScanActivity extends ListActivity {
     }
 
     // Device scan callback.
-    private ScanCallback mLeScanCallback =
+    private final ScanCallback mLeScanCallback =
             new ScanCallback() {
                 @Override
                 public void onScanResult(int callbackType, ScanResult result) {

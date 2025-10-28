@@ -10,6 +10,7 @@ import java.net.SocketTimeoutException;
 import java.net.URLDecoder;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
+import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -90,7 +91,7 @@ public abstract class NanoHTTPD {
     private final String hostname;
     private final int myPort;
     private ServerSocket myServerSocket;
-    private Set<Socket> openConnections = new HashSet<Socket>();
+    private final Set<Socket> openConnections = new HashSet<Socket>();
     private Thread myThread;
     /**
      * Pluggable strategy for asynchronously executing requests.
@@ -505,8 +506,8 @@ public abstract class NanoHTTPD {
      * the directory specified.</p>
      */
     public static class DefaultTempFile implements TempFile {
-        private File file;
-        private OutputStream fstream;
+        private final File file;
+        private final OutputStream fstream;
 
         public DefaultTempFile(String tempdir) throws IOException {
             file = File.createTempFile("NanoHTTPD-", "", new File(tempdir));
@@ -549,7 +550,7 @@ public abstract class NanoHTTPD {
         /**
          * Headers for the HTTP response. Use addHeader() to add lines.
          */
-        private Map<String, String> header = new HashMap<String, String>();
+        private final Map<String, String> header = new HashMap<String, String>();
         /**
          * The request method that spawned this response.
          */
@@ -581,11 +582,7 @@ public abstract class NanoHTTPD {
         public Response(IStatus status, String mimeType, String txt) {
             this.status = status;
             this.mimeType = mimeType;
-            try {
-                this.data = txt != null ? new ByteArrayInputStream(txt.getBytes("UTF-8")) : null;
-            } catch (java.io.UnsupportedEncodingException uee) {
-                uee.printStackTrace();
-            }
+            this.data = txt != null ? new ByteArrayInputStream(txt.getBytes(StandardCharsets.UTF_8)) : null;
         }
 
         /**
@@ -680,7 +677,7 @@ public abstract class NanoHTTPD {
                 outputStream.write(buff, 0, read);
                 outputStream.write(CRLF);
             }
-            outputStream.write(String.format("0\r\n\r\n").getBytes());
+            outputStream.write("0\r\n\r\n".getBytes());
         }
 
         private void sendAsFixedLength(OutputStream outputStream, int pending) throws IOException {
@@ -762,7 +759,7 @@ public abstract class NanoHTTPD {
 
             @Override
             public String getDescription() {
-                return "" + this.requestStatus + " " + description;
+                return this.requestStatus + " " + description;
             }
         }
     }
@@ -830,7 +827,7 @@ public abstract class NanoHTTPD {
         public static final int BUFSIZE = 8192;
         private final TempFileManager tempFileManager;
         private final OutputStream outputStream;
-        private PushbackInputStream inputStream;
+        private final PushbackInputStream inputStream;
         private int splitbyte;
         private int rlen;
         private String uri;
@@ -850,7 +847,7 @@ public abstract class NanoHTTPD {
             this.tempFileManager = tempFileManager;
             this.inputStream = new PushbackInputStream(inputStream, BUFSIZE);
             this.outputStream = outputStream;
-            String remoteIp = inetAddress.isLoopbackAddress() || inetAddress.isAnyLocalAddress() ? "127.0.0.1" : inetAddress.getHostAddress().toString();
+            String remoteIp = inetAddress.isLoopbackAddress() || inetAddress.isAnyLocalAddress() ? "127.0.0.1" : inetAddress.getHostAddress();
             headers = new HashMap<String, String>();
 
             headers.put("remote-addr", remoteIp);
@@ -1000,7 +997,7 @@ public abstract class NanoHTTPD {
 
                         String boundaryStartString = "boundary=";
                         int boundaryContentStart = contentTypeHeader.indexOf(boundaryStartString) + boundaryStartString.length();
-                        String boundary = contentTypeHeader.substring(boundaryContentStart, contentTypeHeader.length());
+                        String boundary = contentTypeHeader.substring(boundaryContentStart);
                         if (boundary.startsWith("\"") && boundary.endsWith("\"")) {
                             boundary = boundary.substring(1, boundary.length() - 1);
                         }
@@ -1009,7 +1006,7 @@ public abstract class NanoHTTPD {
                     } else {
                         String postLine = "";
                         StringBuilder postLineBuffer = new StringBuilder();
-                        char pbuf[] = new char[512];
+                        char[] pbuf = new char[512];
                         int read = in.read(pbuf);
                         while (read >= 0 && !postLine.endsWith("\r\n")) {
                             postLine = String.valueOf(pbuf, 0, read);
@@ -1312,7 +1309,9 @@ public abstract class NanoHTTPD {
     }
 
     public static class Cookie {
-        private String n, v, e;
+        private final String n;
+        private final String v;
+        private final String e;
 
         public Cookie(String name, String value, String expires) {
             n = name;
@@ -1352,8 +1351,8 @@ public abstract class NanoHTTPD {
      * @author LordFokas
      */
     public class CookieHandler implements Iterable<String> {
-        private HashMap<String, String> cookies = new HashMap<String, String>();
-        private ArrayList<Cookie> queue = new ArrayList<Cookie>();
+        private final HashMap<String, String> cookies = new HashMap<String, String>();
+        private final ArrayList<Cookie> queue = new ArrayList<Cookie>();
 
         public CookieHandler(Map<String, String> httpHeaders) {
             String raw = httpHeaders.get("cookie");

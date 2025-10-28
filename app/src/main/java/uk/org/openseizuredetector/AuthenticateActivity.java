@@ -30,7 +30,7 @@ import org.json.JSONObject;
 import java.util.Arrays;
 
 public class AuthenticateActivity extends AppCompatActivity {
-    private String TAG = "AuthenticateActivity";
+    private final String TAG = "AuthenticateActivity";
     private OsdUtil mUtil;
     private EditText mUnameEt;
     private EditText mPasswdEt;
@@ -55,14 +55,14 @@ public class AuthenticateActivity extends AppCompatActivity {
         }
 
         Button cancelBtn =
-                (Button) findViewById(R.id.cancelBtn);
+                findViewById(R.id.cancelBtn);
         cancelBtn.setOnClickListener(onCancel);
-        Button loginBtn = (Button) findViewById(R.id.loginBtn);
+        Button loginBtn = findViewById(R.id.loginBtn);
         loginBtn.setOnClickListener(onLogin);
         Button logoutCancelBtn =
-                (Button) findViewById(R.id.logoutCancelBtn);
+                findViewById(R.id.logoutCancelBtn);
         logoutCancelBtn.setOnClickListener(onCancel);
-        Button logoutBtn = (Button) findViewById(R.id.logoutBtn);
+        Button logoutBtn = findViewById(R.id.logoutBtn);
         logoutBtn.setOnClickListener(onLogout);
 
         // Components required only for osdapi backend
@@ -70,16 +70,16 @@ public class AuthenticateActivity extends AppCompatActivity {
         } else {
             mConnection = new SdServiceConnection(getApplicationContext());
 
-            Button registerBtn = (Button) findViewById(R.id.RegisterBtn);
+            Button registerBtn = findViewById(R.id.RegisterBtn);
             registerBtn.setOnClickListener(onRegister);
-            Button resetPasswordBtn = (Button) findViewById(R.id.ResetPasswordBtn);
+            Button resetPasswordBtn = findViewById(R.id.ResetPasswordBtn);
             resetPasswordBtn.setOnClickListener(onResetPassword);
 
-            mUnameEt = (EditText) findViewById(R.id.username);
-            mPasswdEt = (EditText) findViewById(R.id.password);
+            mUnameEt = findViewById(R.id.username);
+            mPasswdEt = findViewById(R.id.password);
         }
 
-        Button aboutDataSharingBtn = (Button) findViewById(R.id.aboutDataSharingBtn);
+        Button aboutDataSharingBtn = findViewById(R.id.aboutDataSharingBtn);
         aboutDataSharingBtn.setOnClickListener(
                 new View.OnClickListener() {
                     @Override
@@ -92,7 +92,7 @@ public class AuthenticateActivity extends AppCompatActivity {
                     }
                 }
         );
-        Button privacyPolicyBtn = (Button) findViewById(R.id.privacyPolicyBtn);
+        Button privacyPolicyBtn = findViewById(R.id.privacyPolicyBtn);
         privacyPolicyBtn.setOnClickListener(
                 new View.OnClickListener() {
                     @Override
@@ -152,13 +152,13 @@ public class AuthenticateActivity extends AppCompatActivity {
     private void initialiseServiceConnection() {
         Log.v(TAG, "initialiseServiceConnection()");
         mLm = mConnection.mSdServer.mLm;
-        mWac = mConnection.mSdServer.mLm.mWac;
+        mWac = LogManager.mWac;
         updateUi();
     }
 
 
     // Called after the Firebase Auth UI has completed
-    private ActivityResultLauncher<Intent> signInLauncher = registerForActivityResult(
+    private final ActivityResultLauncher<Intent> signInLauncher = registerForActivityResult(
             new FirebaseAuthUIActivityResultContract(),
             (result) -> {
                 Log.i(TAG, "FirebaseAuthUIActivityResult - " + result.toString());
@@ -170,9 +170,9 @@ public class AuthenticateActivity extends AppCompatActivity {
 
     private void updateUi() {
         Log.v(TAG, "updateUi()");
-        LinearLayout loginLl = (LinearLayout) findViewById(R.id.login_ui);
-        LinearLayout osdApiLoginLl = (LinearLayout) findViewById(R.id.login_osdapi_ui);
-        LinearLayout logoutLl = (LinearLayout) findViewById(R.id.logout_ui);
+        LinearLayout loginLl = findViewById(R.id.login_ui);
+        LinearLayout osdApiLoginLl = findViewById(R.id.login_osdapi_ui);
+        LinearLayout logoutLl = findViewById(R.id.logout_ui);
 
         if (mWac == null) {
             Log.i(TAG, "mWac is null - not updating UI");
@@ -190,9 +190,9 @@ public class AuthenticateActivity extends AppCompatActivity {
                 try {
                     String userId = profileObj.getString("id");
                     String userName = profileObj.getString("username");
-                    TextView tv2 = (TextView) findViewById(R.id.userIdTv);
+                    TextView tv2 = findViewById(R.id.userIdTv);
                     tv2.setText(userId);
-                    tv2 = (TextView) findViewById(R.id.usernameTv);
+                    tv2 = findViewById(R.id.usernameTv);
                     tv2.setText(userName);
                 } catch (JSONException e) {
                     Log.e(TAG, "Error Parsing profileObj: " + e.getMessage());

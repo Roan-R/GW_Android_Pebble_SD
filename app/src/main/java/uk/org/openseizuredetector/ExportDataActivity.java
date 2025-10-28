@@ -105,16 +105,16 @@ public class ExportDataActivity extends AppCompatActivity
         mHandler = new Handler();
         mUtil = new OsdUtil(this, mHandler);
 
-        mDateBtn = (Button) findViewById(R.id.dateBtn);
+        mDateBtn = findViewById(R.id.dateBtn);
         mDateBtn.setOnClickListener(this);
-        mTimeBtn = (Button) findViewById(R.id.timeBtn);
+        mTimeBtn = findViewById(R.id.timeBtn);
         mTimeBtn.setOnClickListener(this);
-        mExportBtn = (Button) findViewById(R.id.exportBtn);
+        mExportBtn = findViewById(R.id.exportBtn);
         mExportBtn.setOnClickListener(this);
         mExportBtn.setEnabled(false);
-        mDateTxt = (EditText) findViewById(R.id.endDateText);
-        mTimeTxt = (EditText) findViewById(R.id.endTimeText);
-        mDurationTxt = (EditText) findViewById(R.id.durationText);
+        mDateTxt = findViewById(R.id.endDateText);
+        mTimeTxt = findViewById(R.id.endTimeText);
+        mDurationTxt = findViewById(R.id.durationText);
 
         // Get Current Date
         final Calendar c = Calendar.getInstance();
@@ -237,7 +237,7 @@ public class ExportDataActivity extends AppCompatActivity
     }
 
     public void showProgressBar() {
-        ProgressBar pb = (ProgressBar) findViewById(R.id.exportPb);
+        ProgressBar pb = findViewById(R.id.exportPb);
         pb.setIndeterminate(true);
         pb.setVisibility(View.VISIBLE);
         mExportBtn.setEnabled(false);
@@ -247,7 +247,7 @@ public class ExportDataActivity extends AppCompatActivity
     public void hideProgressBar() {
         runOnUiThread(new Runnable() {
             public void run() {
-                ProgressBar pb = (ProgressBar) findViewById(R.id.exportPb);
+                ProgressBar pb = findViewById(R.id.exportPb);
                 pb.setIndeterminate(true);
                 pb.setVisibility(View.INVISIBLE);
                 mExportBtn.setEnabled(true);

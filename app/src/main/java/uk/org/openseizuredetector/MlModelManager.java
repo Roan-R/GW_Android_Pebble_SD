@@ -29,7 +29,7 @@ import java.util.Map;
 public class MlModelManager {
     protected Context mContext;
     protected OsdUtil mUtil;
-    private String TAG = "MlModelManager";
+    private final String TAG = "MlModelManager";
 
     public boolean mServerConnectionOk = false;
     public boolean mModelReady = false;
@@ -38,7 +38,7 @@ public class MlModelManager {
     RequestQueue mQueue;
 
     public interface JSONObjectCallback {
-        public void accept(JSONObject retValObj);
+        void accept(JSONObject retValObj);
     }
 
 
@@ -76,7 +76,7 @@ public class MlModelManager {
                             JSONObject retObj = new JSONObject(response);
                             callback.accept(retObj);
                         } catch (JSONException e) {
-                            Log.e(TAG, "getMlModelIndex.onRespons(): Error: " + e.getMessage() + "," + e.toString());
+                            Log.e(TAG, "getMlModelIndex.onRespons(): Error: " + e.getMessage() + "," + e);
                             callback.accept(null);
                         }
                     }
@@ -86,7 +86,7 @@ public class MlModelManager {
                     public void onErrorResponse(VolleyError error) {
                         mServerConnectionOk = false;
                         if (error != null) {
-                            Log.e(TAG, "getMlModelIndex.onErrorResponse(): " + error.toString() + ", message:" + error.getMessage());
+                            Log.e(TAG, "getMlModelIndex.onErrorResponse(): " + error + ", message:" + error.getMessage());
                         } else {
                             Log.e(TAG, "getMlModelIndex.onErrorResponse() - returned null response");
                         }

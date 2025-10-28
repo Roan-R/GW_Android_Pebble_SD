@@ -18,6 +18,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -30,8 +31,8 @@ public class WebApiConnection_osdapi extends WebApiConnection {
     public String retVal;
     public int retCode;
     public boolean mServerConnectionOk = false;
-    private String mUrlBase = "https://osdApi.ddns.net";
-    private String TAG = "WebApiConnection_osdapi";
+    private final String mUrlBase = "https://osdApi.ddns.net";
+    private final String TAG = "WebApiConnection_osdapi";
     RequestQueue mQueue;
 
     public WebApiConnection_osdapi(Context context) {
@@ -85,7 +86,7 @@ public class WebApiConnection_osdapi extends WebApiConnection {
                     @Override
                     public void onErrorResponse(VolleyError error) {
                         if (error != null) {
-                            Log.e(TAG, "Login Error: " + error.toString() + ", message:" + error.getMessage());
+                            Log.e(TAG, "Login Error: " + error + ", message:" + error.getMessage());
                         } else {
                             Log.e(TAG, "Login Error:  Returned null response");
                         }
@@ -163,7 +164,7 @@ public class WebApiConnection_osdapi extends WebApiConnection {
                             JSONObject retObj = new JSONObject(response);
                             retVal = retObj.getString("id");
                         } catch (JSONException e) {
-                            Log.e(TAG, "createEvent.onResponse(): Error: " + e.getMessage() + "," + e.toString());
+                            Log.e(TAG, "createEvent.onResponse(): Error: " + e.getMessage() + "," + e);
                             retVal = null;
                         }
                         callback.accept(retVal);
@@ -174,7 +175,7 @@ public class WebApiConnection_osdapi extends WebApiConnection {
                     public void onErrorResponse(VolleyError error) {
                         mServerConnectionOk = false;
                         if (error != null) {
-                            Log.e(TAG, "createEvent Error: " + error.toString() + ", message:" + error.getMessage());
+                            Log.e(TAG, "createEvent Error: " + error + ", message:" + error.getMessage());
                             callback.accept(null);
                         } else {
                             Log.e(TAG, "createEvent Error - null response");
@@ -189,7 +190,7 @@ public class WebApiConnection_osdapi extends WebApiConnection {
                 // params.put("name",sname); // passing parameters to server
                 String authToken = getStoredToken();
                 params.put("Authorization: Token " + authToken, authToken);
-                Log.v(TAG, "getParams: params=" + params.toString());
+                Log.v(TAG, "getParams: params=" + params);
                 return params;
             }
 
@@ -203,12 +204,7 @@ public class WebApiConnection_osdapi extends WebApiConnection {
 
             @Override
             public byte[] getBody() throws AuthFailureError {
-                try {
-                    return dataStr == null ? null : dataStr.getBytes("utf-8");
-                } catch (UnsupportedEncodingException uee) {
-                    VolleyLog.wtf("Unsupported Encoding while trying to get the bytes of %s using %s", dataStr, "utf-8");
-                    return null;
-                }
+                return dataStr == null ? null : dataStr.getBytes(StandardCharsets.UTF_8);
             }
         };
 
@@ -237,7 +233,7 @@ public class WebApiConnection_osdapi extends WebApiConnection {
                             retObj.put("alarmStateStr", mUtil.alarmStatusToString(retObj.getInt("osdAlarmState")));
                             callback.accept(retObj);
                         } catch (JSONException e) {
-                            Log.e(TAG, "getEventTypes.onRespons(): Error: " + e.getMessage() + "," + e.toString());
+                            Log.e(TAG, "getEventTypes.onRespons(): Error: " + e.getMessage() + "," + e);
                             callback.accept(null);
                         }
                         mServerConnectionOk = true;
@@ -247,7 +243,7 @@ public class WebApiConnection_osdapi extends WebApiConnection {
                     @Override
                     public void onErrorResponse(VolleyError error) {
                         if (error != null) {
-                            Log.e(TAG, "Create Event Error: " + error.toString() + ", message:" + error.getMessage());
+                            Log.e(TAG, "Create Event Error: " + error + ", message:" + error.getMessage());
                         } else {
                             Log.e(TAG, "Create Event Error: returned null response");
                         }
@@ -297,7 +293,7 @@ public class WebApiConnection_osdapi extends WebApiConnection {
                             retObj.put("events", eventArray);
                             callback.accept(retObj);
                         } catch (JSONException e) {
-                            Log.e(TAG, "getEventTypes.onRespons(): Error: " + e.getMessage() + "," + e.toString());
+                            Log.e(TAG, "getEventTypes.onRespons(): Error: " + e.getMessage() + "," + e);
                             callback.accept(null);
                         }
                     }
@@ -309,7 +305,7 @@ public class WebApiConnection_osdapi extends WebApiConnection {
                         mServerConnectionOk = false;
                         if (error != null) {
                             if (error.networkResponse != null) {
-                                Log.e(TAG, "getEvents(): Error: " + error.toString() + ", message:" + error.getMessage());
+                                Log.e(TAG, "getEvents(): Error: " + error + ", message:" + error.getMessage());
                             } else {
                                 Log.e(TAG, "getEvents(): Error: - request returned null networkResponse");
                             }
@@ -375,7 +371,7 @@ public class WebApiConnection_osdapi extends WebApiConnection {
                             JSONObject retObj = new JSONObject(response);
                             callback.accept(retObj);
                         } catch (JSONException e) {
-                            Log.e(TAG, "updateEvent.onResponse(): Error: " + e.getMessage() + "," + e.toString());
+                            Log.e(TAG, "updateEvent.onResponse(): Error: " + e.getMessage() + "," + e);
                             callback.accept(null);
                         }
                     }
@@ -385,7 +381,7 @@ public class WebApiConnection_osdapi extends WebApiConnection {
                     public void onErrorResponse(VolleyError error) {
                         mServerConnectionOk = false;
                         if (error != null) {
-                            Log.e(TAG, "updateEvent.onErrorResponse():  Error: " + error.toString() + ", message:" + error.getMessage());
+                            Log.e(TAG, "updateEvent.onErrorResponse():  Error: " + error + ", message:" + error.getMessage());
                         } else {
                             Log.e(TAG, "updateEvent.onErrorResponse():  Error - returned null response");
                         }
@@ -399,7 +395,7 @@ public class WebApiConnection_osdapi extends WebApiConnection {
                 // params.put("name",sname); // passing parameters to server
                 String authToken = getStoredToken();
                 params.put("Authorization: Token " + authToken, authToken);
-                Log.v(TAG, "getParams: params=" + params.toString());
+                Log.v(TAG, "getParams: params=" + params);
                 //params.put("eventType", String.valueOf(eventType));
                 //params.put("dataTime", dateFormat.format(eventDate));
                 //params.put("desc", eventDesc);
@@ -416,12 +412,7 @@ public class WebApiConnection_osdapi extends WebApiConnection {
 
             @Override
             public byte[] getBody() throws AuthFailureError {
-                try {
-                    return dataStr == null ? null : dataStr.getBytes("utf-8");
-                } catch (UnsupportedEncodingException uee) {
-                    VolleyLog.wtf("Unsupported Encoding while trying to get the bytes of %s using %s", dataStr, "utf-8");
-                    return null;
-                }
+                return dataStr == null ? null : dataStr.getBytes(StandardCharsets.UTF_8);
             }
         };
 
@@ -470,7 +461,7 @@ public class WebApiConnection_osdapi extends WebApiConnection {
                     public void onErrorResponse(VolleyError error) {
                         mServerConnectionOk = false;
                         if (error != null) {
-                            Log.e(TAG, "Create Datapoint Error: " + error.toString() + ", message:" + error.getMessage());
+                            Log.e(TAG, "Create Datapoint Error: " + error + ", message:" + error.getMessage());
                             callback.accept(null);
                         } else {
                             Log.e(TAG, "Create Datapoint Error - returned null respones");
@@ -485,7 +476,7 @@ public class WebApiConnection_osdapi extends WebApiConnection {
                 // params.put("name",sname); // passing parameters to server
                 String authToken = getStoredToken();
                 params.put("Authorization: Token " + authToken, authToken);
-                Log.v(TAG, "getParams: params=" + params.toString());
+                Log.v(TAG, "getParams: params=" + params);
                 return params;
             }
 
@@ -499,12 +490,7 @@ public class WebApiConnection_osdapi extends WebApiConnection {
 
             @Override
             public byte[] getBody() throws AuthFailureError {
-                try {
-                    return dataStr == null ? null : dataStr.getBytes("utf-8");
-                } catch (UnsupportedEncodingException uee) {
-                    VolleyLog.wtf("Unsupported Encoding while trying to get the bytes of %s using %s", dataStr, "utf-8");
-                    return null;
-                }
+                return dataStr == null ? null : dataStr.getBytes(StandardCharsets.UTF_8);
             }
         };
 
@@ -539,7 +525,7 @@ public class WebApiConnection_osdapi extends WebApiConnection {
                             JSONObject retObj = new JSONObject(response);
                             callback.accept(retObj);
                         } catch (JSONException e) {
-                            Log.e(TAG, "getUserProfile.onResponse(): Error: " + e.getMessage() + "," + e.toString());
+                            Log.e(TAG, "getUserProfile.onResponse(): Error: " + e.getMessage() + "," + e);
                             callback.accept(null);
                         }
                         mServerConnectionOk = true;
@@ -549,7 +535,7 @@ public class WebApiConnection_osdapi extends WebApiConnection {
                     @Override
                     public void onErrorResponse(VolleyError error) {
                         if (error != null) {
-                            Log.e(TAG, "Create Event Error: " + error.toString() + ", message:" + error.getMessage());
+                            Log.e(TAG, "Create Event Error: " + error + ", message:" + error.getMessage());
                         } else {
                             Log.e(TAG, "Create Event Error: returned null response");
                         }
@@ -598,7 +584,7 @@ public class WebApiConnection_osdapi extends WebApiConnection {
                             JSONObject retObj = new JSONObject(response);
                             callback.accept(retObj);
                         } catch (JSONException e) {
-                            Log.e(TAG, "getEventTypes.onRespons(): Error: " + e.getMessage() + "," + e.toString());
+                            Log.e(TAG, "getEventTypes.onRespons(): Error: " + e.getMessage() + "," + e);
                             callback.accept(null);
                         }
                     }
@@ -608,7 +594,7 @@ public class WebApiConnection_osdapi extends WebApiConnection {
                     public void onErrorResponse(VolleyError error) {
                         mServerConnectionOk = false;
                         if (error != null) {
-                            Log.e(TAG, "getEventTypes.onErrorResponse(): " + error.toString() + ", message:" + error.getMessage());
+                            Log.e(TAG, "getEventTypes.onErrorResponse(): " + error + ", message:" + error.getMessage());
                         } else {
                             Log.e(TAG, "getEventTypes.onErrorResponse() - returned null response");
                         }
@@ -652,7 +638,7 @@ public class WebApiConnection_osdapi extends WebApiConnection {
                             JSONObject retObj = new JSONObject(response);
                             callback.accept(retObj);
                         } catch (JSONException e) {
-                            Log.e(TAG, "getCNNModelInfo.onRespons(): Error: " + e.getMessage() + "," + e.toString());
+                            Log.e(TAG, "getCNNModelInfo.onRespons(): Error: " + e.getMessage() + "," + e);
                             callback.accept(null);
                         }
                     }
@@ -662,7 +648,7 @@ public class WebApiConnection_osdapi extends WebApiConnection {
                     public void onErrorResponse(VolleyError error) {
                         mServerConnectionOk = false;
                         if (error != null) {
-                            Log.e(TAG, "getCNNModelInfo.onErrorResponse(): " + error.toString() + ", message:" + error.getMessage());
+                            Log.e(TAG, "getCNNModelInfo.onErrorResponse(): " + error + ", message:" + error.getMessage());
                         } else {
                             Log.e(TAG, "getCNNModelInfo.onErrorResponse() - returned null response");
                         }

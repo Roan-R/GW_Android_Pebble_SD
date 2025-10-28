@@ -11,9 +11,9 @@ public class CircBuf {
      */
     private final static String TAG = "CircBuf";
 
-    private double[] mBuff;
-    private double mErrVal;
-    private int mBuffLen;
+    private final double[] mBuff;
+    private final double mErrVal;
+    private final int mBuffLen;
     private int mHead;
     private int mTail;
     private boolean mIsFull;
@@ -88,7 +88,7 @@ public class CircBuf {
          */
         double hrSum = 0.;
         int hrCount = 0;
-        double valArr[] = getVals();
+        double[] valArr = getVals();
         double retVal;
         for (int n = 0; n < valArr.length; n++) {
             if (valArr[n] != mErrVal) {

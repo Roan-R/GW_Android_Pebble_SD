@@ -36,7 +36,7 @@ public class WebApiConnection_firebase extends WebApiConnection {
     public String retVal;
     public int retCode;
     public boolean mServerConnectionOk = false;
-    private String TAG = "WebApiConnection_firebase";
+    private final String TAG = "WebApiConnection_firebase";
     private String mAuthToken;
     private Context mContext;
     private OsdUtil mUtil;
@@ -73,13 +73,9 @@ public class WebApiConnection_firebase extends WebApiConnection {
     public boolean isLoggedIn() {
         FirebaseAuth auth = FirebaseAuth.getInstance();
         if (auth != null) {
-            if (auth.getCurrentUser() != null) {
-                //Log.v(TAG, "isLoggedIn(): Firebase Logged in OK");
-                return (true);
-            } else {
-                //Log.v(TAG, "isLoggedIn(): Current user is null - Firebase not logged in");
-                return (false);
-            }
+            //Log.v(TAG, "isLoggedIn(): Firebase Logged in OK");
+            //Log.v(TAG, "isLoggedIn(): Current user is null - Firebase not logged in");
+            return auth.getCurrentUser() != null;
         } else {
             //Log.v(TAG, "isLoggedIn(): Firebase not logged in");
             return (false);
@@ -113,7 +109,6 @@ public class WebApiConnection_firebase extends WebApiConnection {
     }
 
     public void setStoredToken(String s) {
-        return;
     }
 
 
@@ -242,7 +237,7 @@ public class WebApiConnection_firebase extends WebApiConnection {
                                 retObj.put("events", eventArray);
                                 callback.accept(retObj);
                             } catch (JSONException e) {
-                                Log.e(TAG, "getEvents.onResponse(): Error: " + e.getMessage() + "," + e.toString());
+                                Log.e(TAG, "getEvents.onResponse(): Error: " + e.getMessage() + "," + e);
                                 callback.accept(null);
                             }
 
@@ -281,11 +276,11 @@ public class WebApiConnection_firebase extends WebApiConnection {
             eventMap.put("subType", eventObj.getString("subType"));
             eventMap.put("userId", eventObj.getString("userId"));
         } catch (JSONException e) {
-            Log.e(TAG, "updateEvent(): Error data from eventObj." + e.toString());
+            Log.e(TAG, "updateEvent(): Error data from eventObj." + e);
             e.printStackTrace();
             return false;
         }
-        Log.v(TAG, "updateEvent - map=" + eventMap.toString());
+        Log.v(TAG, "updateEvent - map=" + eventMap);
 
         try {
             DocumentReference docRef = mDb.collection("Events").document(eventId);
@@ -311,7 +306,7 @@ public class WebApiConnection_firebase extends WebApiConnection {
                     });
             return (true);
         } catch (Exception e) {
-            Log.e(TAG, "updateEvent() - ERROR: " + e.toString());
+            Log.e(TAG, "updateEvent() - ERROR: " + e);
             e.printStackTrace();
         }
         return (false);
@@ -387,10 +382,10 @@ public class WebApiConnection_firebase extends WebApiConnection {
                                     JSONArray subTypesArray = listToJSONArray((List) document.getData().get("subTypes"));
                                     retObj.put(document.getData().get("type").toString(), subTypesArray);
                                 }
-                                Log.d(TAG, "getEventTypes.onComplete() - retObj=" + retObj.toString());
+                                Log.d(TAG, "getEventTypes.onComplete() - retObj=" + retObj);
                                 callback.accept(retObj);
                             } catch (JSONException e) {
-                                Log.e(TAG, "getEventTypes.onResponse(): Error: " + e.getMessage() + "," + e.toString());
+                                Log.e(TAG, "getEventTypes.onResponse(): Error: " + e.getMessage() + "," + e);
                                 callback.accept(null);
                             }
                         } else {

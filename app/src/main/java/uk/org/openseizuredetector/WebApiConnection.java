@@ -46,20 +46,20 @@ import java.util.Map;
 public abstract class WebApiConnection {
     protected Context mContext;
     protected OsdUtil mUtil;
-    private String TAG = "WebApiConnection";
+    private final String TAG = "WebApiConnection";
     private String mAuthToken;
 
 
     public interface JSONObjectCallback {
-        public void accept(JSONObject retValObj);
+        void accept(JSONObject retValObj);
     }
 
     public interface StringCallback {
-        public void accept(String retValStr);
+        void accept(String retValStr);
     }
 
     public interface LongCallback {
-        public void accept(Long retVal);
+        void accept(Long retVal);
     }
 
     public WebApiConnection(Context context) {
@@ -154,19 +154,19 @@ public abstract class WebApiConnection {
                 public void accept(JSONObject eventObj) {
                     Log.v(TAG, "markEventsAsTypeSubtype.getEvent.callback: " + eventObj);
                     if (eventObj != null) {
-                        Log.v(TAG, "markEventsAsTypeSubtype.getEvent.callback:  eventObj=" + eventObj.toString());
+                        Log.v(TAG, "markEventsAsTypeSubtype.getEvent.callback:  eventObj=" + eventObj);
                         try {
                             eventObj.put("type", typeStr);
                             eventObj.put("subType", subTypeStr);
                             String notesStr = eventObj.getString("desc");
-                            if (notesStr == null) notesStr = new String("");
+                            if (notesStr == null) notesStr = "";
                             notesStr = notesStr + " bulk type/subtype set";
                             eventObj.put("desc", notesStr);
                             updateEvent(eventObj, new WebApiConnection.JSONObjectCallback() {
                                 @Override
                                 public void accept(JSONObject eventObj) {
                                     if (eventObj != null) {
-                                        Log.i(TAG, "markEventsAsTypeSubtype.updateEvent.callback" + eventObj.toString());
+                                        Log.i(TAG, "markEventsAsTypeSubtype.updateEvent.callback" + eventObj);
                                         // Remove the first item from the list,then call this whole procedure again to modify the next one on the list.
                                         eventList.remove(0);
                                         markEventsAsTypeSubType(eventList, typeStr, subTypeStr);
@@ -182,7 +182,6 @@ public abstract class WebApiConnection {
                         }
                     } else {
                         mUtil.showToast("Failed to Retrieve Event from Remote Database");
-                        return;
                     }
                 }
             });

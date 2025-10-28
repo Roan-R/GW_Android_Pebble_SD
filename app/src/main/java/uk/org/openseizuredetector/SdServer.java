@@ -81,18 +81,18 @@ import java.util.Timer;
  * http://developer.android.com/guide/components/services.html#ExtendingService
  */
 public class SdServer extends Service implements SdDataReceiver {
-    private String mUuidStr = "0f675b21-5a36-4fe7-9761-fd0c691651f3";  // UUID to Identify OSD.
+    private final String mUuidStr = "0f675b21-5a36-4fe7-9761-fd0c691651f3";  // UUID to Identify OSD.
 
     // Notification ID
     private final int NOTIFICATION_ID = 1;
     private final int EVENT_NOTIFICATION_ID = 2;
     private final int DATASHARE_NOTIFICATION_ID = 3;
-    private String mNotChId = "OSD Notification Channel";
-    private CharSequence mNotChName = "OSD Notification Channel";
-    private String mNotChDesc = "OSD Notification Channel Description";
-    private String mEventNotChId = "OSD Event Notification Channel";
-    private CharSequence mEventNotChName = "OSD Event Notification Channel";
-    private String mEventNotChDesc = "OSD Event Notification Channel Description";
+    private final String mNotChId = "OSD Notification Channel";
+    private final CharSequence mNotChName = "OSD Notification Channel";
+    private final String mNotChDesc = "OSD Notification Channel Description";
+    private final String mEventNotChId = "OSD Event Notification Channel";
+    private final CharSequence mEventNotChName = "OSD Event Notification Channel";
+    private final String mEventNotChDesc = "OSD Event Notification Channel Description";
 
     private NotificationManager mNM;
     private NotificationCompat.Builder mNotificationBuilder;
@@ -102,7 +102,7 @@ public class SdServer extends Service implements SdDataReceiver {
     private final static String TAG = "SdServer";
     //private Timer dataLogTimer = null;
     private CancelAudibleTimer mCancelAudibleTimer = null;
-    private int mCancelAudiblePeriod = 10;  // Cancel Audible Period in minutes
+    private final int mCancelAudiblePeriod = 10;  // Cancel Audible Period in minutes
     private long mCancelAudibleTimeRemaining = 0;
     private FaultTimer mFaultTimer = null;
     private CheckEventsTimer mEventsTimer = null;
@@ -141,11 +141,11 @@ public class SdServer extends Service implements SdDataReceiver {
     public boolean mLogNDA = false;
 
     private String mAuthToken = null;
-    private long mEventsTimerPeriod = 600; // Number of seconds between checks to see if there are unvalidated remote events.
+    private final long mEventsTimerPeriod = 600; // Number of seconds between checks to see if there are unvalidated remote events.
     private long mEventDuration = 120;   // event duration in seconds - uploads datapoints that cover this time range centred on the event time.
     public long mDataRetentionPeriod = 1; // Prunes the local db so it only retains data younger than this duration (in days)
-    private long mRemoteLogPeriod = 6; // Period in seconds between uploads to the remote server.
-    private long mAutoPrunePeriod = 3600;  // Prune the database every hour
+    private final long mRemoteLogPeriod = 6; // Period in seconds between uploads to the remote server.
+    private final long mAutoPrunePeriod = 3600;  // Prune the database every hour
     private boolean mAutoPruneDb;
 
     private String mOSDUrl = "";
@@ -385,7 +385,7 @@ public class SdServer extends Service implements SdDataReceiver {
                 mWakeLock.release();
                 Log.d(TAG, "Released Wake Lock to allow device to sleep.");
             } catch (Exception e) {
-                Log.e(TAG, "Error Releasing Wakelock - " + e.toString());
+                Log.e(TAG, "Error Releasing Wakelock - " + e);
                 mUtil.writeToSysLogFile("SdServer.onDestroy() - Error releasing wakelock.");
                 mUtil.showToast(getString(R.string.ErrorReleasingWakelockMsg));
             }
@@ -463,14 +463,14 @@ public class SdServer extends Service implements SdDataReceiver {
             stopSelf();
 
         } catch (Exception e) {
-            Log.e(TAG, "Error in onDestroy() - " + e.toString());
-            mUtil.writeToSysLogFile("SdServer.onDestroy() -error " + e.toString());
+            Log.e(TAG, "Error in onDestroy() - " + e);
+            mUtil.writeToSysLogFile("SdServer.onDestroy() -error " + e);
         }
 
         if (mLm != null) {
             Log.d(TAG, "Closing Down Log Manager");
             mLm.stop();
-            mLm.close();
+            LogManager.close();
         }
 
         super.onDestroy();
@@ -557,7 +557,7 @@ public class SdServer extends Service implements SdDataReceiver {
                     .build();
             if (mMp3Alarm) {
                 if (soundUri != null) {
-                    Log.v(TAG, "showNotification - setting Notification Sound to " + soundUri.toString());
+                    Log.v(TAG, "showNotification - setting Notification Sound to " + soundUri);
                     mNotificationBuilder.setSound(soundUri);
                 }
             }
@@ -1040,7 +1040,7 @@ public class SdServer extends Service implements SdDataReceiver {
         runOnUiThread(new Runnable() {
             public void run() {
                 mSmsTimer =
-                        new SmsTimer(mSmsTimerSecs * 1000, 1000);
+                        new SmsTimer(mSmsTimerSecs * 1000L, 1000);
                 mSmsTimer.start();
             }
         });
@@ -1075,7 +1075,7 @@ public class SdServer extends Service implements SdDataReceiver {
             runOnUiThread(new Runnable() {
                 public void run() {
                     mLatchAlarmTimer =
-                            new LatchAlarmTimer(mLatchAlarmPeriod * 1000, 1000);
+                            new LatchAlarmTimer(mLatchAlarmPeriod * 1000L, 1000);
                     mLatchAlarmTimer.start();
                 }
             });
@@ -1120,7 +1120,7 @@ public class SdServer extends Service implements SdDataReceiver {
             mCancelAudible = true;
             mCancelAudibleTimer =
                     // conver to ms.
-                    new CancelAudibleTimer(mCancelAudiblePeriod * 60 * 1000, 1000);
+                    new CancelAudibleTimer((long) mCancelAudiblePeriod * 60 * 1000, 1000);
             mCancelAudibleTimer.start();
         }
     }
@@ -1150,7 +1150,7 @@ public class SdServer extends Service implements SdDataReceiver {
             try {
                 webServer.start();
             } catch (IOException ioe) {
-                Log.e(TAG, "startWebServer(): Error: " + ioe.toString());
+                Log.e(TAG, "startWebServer(): Error: " + ioe);
             }
             Log.i(TAG, "startWebServer(): Web server initialized.");
         } else {
@@ -1369,8 +1369,8 @@ public class SdServer extends Service implements SdDataReceiver {
 
             mUseNewUi = SP.getBoolean("UseNewUi", false);
         } catch (Exception ex) {
-            Log.v(TAG, "updatePrefs() - Problem parsing preferences!" + ex.toString());
-            mUtil.writeToSysLogFile("SdServer.updatePrefs() - Error " + ex.toString());
+            Log.v(TAG, "updatePrefs() - Problem parsing preferences!" + ex);
+            mUtil.writeToSysLogFile("SdServer.updatePrefs() - Error " + ex);
             mUtil.showToast(getString(R.string.problem_parsing_preferences));
         }
     }
@@ -1428,7 +1428,7 @@ public class SdServer extends Service implements SdDataReceiver {
             // SmsManager sm = SmsManager.getDefault();
             for (int i = 0; i < mSMSNumbers.length; i++) {
                 Log.i(TAG, "SmsTimer.onFinish() - Sending to " + mSMSNumbers[i]);
-                sendSMS(new String(mSMSNumbers[i]), mSMSMsgStr + " - " + dateStr + " " + shortUuidStr);
+                sendSMS(mSMSNumbers[i], mSMSMsgStr + " - " + dateStr + " " + shortUuidStr);
             }
         }
 
@@ -1481,7 +1481,7 @@ public class SdServer extends Service implements SdDataReceiver {
                 Log.w(TAG, "onSdLocationReceived() - NULL LOCATION RECEIVED");
             } else {
                 //mUtil.showToast("onSdLocationReceived() - found location" + ll.toString());
-                Log.i(TAG, "onSdLocationReceived() - found location" + ll.toString());
+                Log.i(TAG, "onSdLocationReceived() - found location" + ll);
                 if (mSMSAlarm) {
                     Log.i(TAG, "onSdLocationReceived() - Sending SMS to " + mSMSNumbers.length + " Numbers");
                     mUtil.writeToSysLogFile("SdServer.sendSMSAlarm()");
@@ -1502,7 +1502,7 @@ public class SdServer extends Service implements SdDataReceiver {
                     mUtil.showToast(messageStr);
                     for (int i = 0; i < mSMSNumbers.length; i++) {
                         Log.i(TAG, "onSdLocationReceived() - Sending to " + mSMSNumbers[i]);
-                        sendSMS(new String(mSMSNumbers[i]), messageStr);
+                        sendSMS(mSMSNumbers[i], messageStr);
                     }
                 } else {
                     Log.i(TAG, "sendSMSAlarm() - SMS Alarms Disabled - not doing anything!");
@@ -1581,7 +1581,7 @@ public class SdServer extends Service implements SdDataReceiver {
                     mFaultTimerCompleted = false;
                     mFaultTimer =
                             // convert to ms.
-                            new FaultTimer(mFaultTimerPeriod * 1000, 1000);
+                            new FaultTimer(mFaultTimerPeriod * 1000L, 1000);
                     mFaultTimer.start();
                 }
             });
@@ -1666,7 +1666,7 @@ public class SdServer extends Service implements SdDataReceiver {
 
     private void checkEvents() {
         // Retrieve events from remote database
-        if (mLm.mWac.getEvents((JSONObject remoteEventsObj) -> {
+        if (LogManager.mWac.getEvents((JSONObject remoteEventsObj) -> {
             Log.v(TAG, "checkEvents.getEvents.Callback()");
             Boolean haveUnvalidatedEvent = false;
             if (remoteEventsObj == null) {

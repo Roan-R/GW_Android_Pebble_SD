@@ -50,7 +50,7 @@ import java.util.UUID;
  * network data source.
  */
 public class SdDataSourcePebble extends SdDataSource {
-    private Handler mHandler = new Handler();
+    private final Handler mHandler = new Handler();
     private Timer mSettingsTimer;
     private Timer mStatusTimer;
     private Time mPebbleStatusTime;
@@ -59,63 +59,63 @@ public class SdDataSourcePebble extends SdDataSource {
     // data after mDataUpdatePeriod
     //private Looper mServiceLooper;
     private int mFaultTimerPeriod = 30;  // Fault Timer Period in sec
-    private int mSettingsPeriod = 60;  // period between requesting settings in seconds.
+    private final int mSettingsPeriod = 60;  // period between requesting settings in seconds.
     private PebbleKit.PebbleDataReceiver msgDataHandler = null;
 
 
-    private String TAG = "SdDataSourcePebble";
+    private final String TAG = "SdDataSourcePebble";
 
-    private UUID SD_UUID = UUID.fromString("03930f26-377a-4a3d-aa3e-f3b19e421c9d");
-    private int NSAMP = 512;   // Number of samples in fft input dataset.
+    private final UUID SD_UUID = UUID.fromString("03930f26-377a-4a3d-aa3e-f3b19e421c9d");
+    private final int NSAMP = 512;   // Number of samples in fft input dataset.
 
-    private int KEY_DATA_TYPE = 1;
-    private int KEY_ALARMSTATE = 2;
-    private int KEY_MAXVAL = 3;
-    private int KEY_MAXFREQ = 4;
-    private int KEY_SPECPOWER = 5;
-    private int KEY_SETTINGS = 6;
-    private int KEY_ALARM_FREQ_MIN = 7;
-    private int KEY_ALARM_FREQ_MAX = 8;
-    private int KEY_WARN_TIME = 9;
-    private int KEY_ALARM_TIME = 10;
-    private int KEY_ALARM_THRESH = 11;
-    private int KEY_POS_MIN = 12;       // position of first data point in array
-    private int KEY_POS_MAX = 13;       // position of last data point in array.
-    private int KEY_SPEC_DATA = 14;     // Spectrum data
-    private int KEY_ROIPOWER = 15;
-    private int KEY_NMIN = 16;
-    private int KEY_NMAX = 17;
-    private int KEY_ALARM_RATIO_THRESH = 18;
-    private int KEY_BATTERY_PC = 19;
+    private final int KEY_DATA_TYPE = 1;
+    private final int KEY_ALARMSTATE = 2;
+    private final int KEY_MAXVAL = 3;
+    private final int KEY_MAXFREQ = 4;
+    private final int KEY_SPECPOWER = 5;
+    private final int KEY_SETTINGS = 6;
+    private final int KEY_ALARM_FREQ_MIN = 7;
+    private final int KEY_ALARM_FREQ_MAX = 8;
+    private final int KEY_WARN_TIME = 9;
+    private final int KEY_ALARM_TIME = 10;
+    private final int KEY_ALARM_THRESH = 11;
+    private final int KEY_POS_MIN = 12;       // position of first data point in array
+    private final int KEY_POS_MAX = 13;       // position of last data point in array.
+    private final int KEY_SPEC_DATA = 14;     // Spectrum data
+    private final int KEY_ROIPOWER = 15;
+    private final int KEY_NMIN = 16;
+    private final int KEY_NMAX = 17;
+    private final int KEY_ALARM_RATIO_THRESH = 18;
+    private final int KEY_BATTERY_PC = 19;
     //private int KEY_SET_SETTINGS =20;  // Phone is asking us to update watch app settings.
-    private int KEY_FALL_THRESH_MIN = 21;
-    private int KEY_FALL_THRESH_MAX = 22;
-    private int KEY_FALL_WINDOW = 23;
-    private int KEY_FALL_ACTIVE = 24;
-    private int KEY_DATA_UPDATE_PERIOD = 25;
-    private int KEY_MUTE_PERIOD = 26;
-    private int KEY_MAN_ALARM_PERIOD = 27;
-    private int KEY_SD_MODE = 28;
-    private int KEY_SAMPLE_FREQ = 29;
-    private int KEY_RAW_DATA = 30;
-    private int KEY_NUM_RAW_DATA = 31;
-    private int KEY_DEBUG = 32;
-    private int KEY_DISPLAY_SPECTRUM = 33;
-    private int KEY_SAMPLE_PERIOD = 34;
-    private int KEY_VERSION_MAJOR = 35;
-    private int KEY_VERSION_MINOR = 36;
-    private int KEY_FREQ_CUTOFF = 37;
+    private final int KEY_FALL_THRESH_MIN = 21;
+    private final int KEY_FALL_THRESH_MAX = 22;
+    private final int KEY_FALL_WINDOW = 23;
+    private final int KEY_FALL_ACTIVE = 24;
+    private final int KEY_DATA_UPDATE_PERIOD = 25;
+    private final int KEY_MUTE_PERIOD = 26;
+    private final int KEY_MAN_ALARM_PERIOD = 27;
+    private final int KEY_SD_MODE = 28;
+    private final int KEY_SAMPLE_FREQ = 29;
+    private final int KEY_RAW_DATA = 30;
+    private final int KEY_NUM_RAW_DATA = 31;
+    private final int KEY_DEBUG = 32;
+    private final int KEY_DISPLAY_SPECTRUM = 33;
+    private final int KEY_SAMPLE_PERIOD = 34;
+    private final int KEY_VERSION_MAJOR = 35;
+    private final int KEY_VERSION_MINOR = 36;
+    private final int KEY_FREQ_CUTOFF = 37;
 
     // Values of the KEY_DATA_TYPE entry in a message
-    private int DATA_TYPE_RESULTS = 1;   // Analysis Results
-    private int DATA_TYPE_SETTINGS = 2;  // Settings
-    private int DATA_TYPE_SPEC = 3;      // FFT Spectrum (or part of a spectrum)
-    private int DATA_TYPE_RAW = 4;       // raw accelerometer data.
+    private final int DATA_TYPE_RESULTS = 1;   // Analysis Results
+    private final int DATA_TYPE_SETTINGS = 2;  // Settings
+    private final int DATA_TYPE_SPEC = 3;      // FFT Spectrum (or part of a spectrum)
+    private final int DATA_TYPE_RAW = 4;       // raw accelerometer data.
 
     // Values for SD_MODE
-    private int SD_MODE_FFT = 0;     // The original OpenSeizureDetector mode (FFT based)
-    private int SD_MODE_RAW = 1;     // Send raw, unprocessed data to the phone.
-    private int SD_MODE_FILTER = 2;  // Use digital filter rather than FFT.
+    private final int SD_MODE_FFT = 0;     // The original OpenSeizureDetector mode (FFT based)
+    private final int SD_MODE_RAW = 1;     // Send raw, unprocessed data to the phone.
+    private final int SD_MODE_FILTER = 2;  // Use digital filter rather than FFT.
 
     private short mDebug;
     private short mDisplaySpectrum;
@@ -137,8 +137,8 @@ public class SdDataSourcePebble extends SdDataSource {
     private short mFallWindow;
 
     // raw data storage for SD_MODE_RAW
-    private int MAX_RAW_DATA = 500;
-    private double[] rawData = new double[MAX_RAW_DATA];
+    private final int MAX_RAW_DATA = 500;
+    private final double[] rawData = new double[MAX_RAW_DATA];
     private int nRawData = 0;
 
     public SdDataSourcePebble(Context context, Handler handler,
@@ -192,7 +192,7 @@ public class SdDataSourcePebble extends SdDataSource {
                     //mUtil.writeToSysLogFile("SdDataSourcePebble.mSettingsTimer timed out.");
                     getPebbleSdSettings();
                 }
-            }, 0, 1000 * mSettingsPeriod);  // ask for settings less frequently than we get data
+            }, 0, 1000L * mSettingsPeriod);  // ask for settings less frequently than we get data
         } else {
             Log.v(TAG, "start(): settings timer already running.");
             mUtil.writeToSysLogFile("SdDataSourcePebble.start() - settings timer already running??");
@@ -228,8 +228,8 @@ public class SdDataSourcePebble extends SdDataSource {
             stopPebbleServer();
 
         } catch (Exception e) {
-            Log.v(TAG, "Error in stop() - " + e.toString());
-            mUtil.writeToSysLogFile("SdDataSourcePebble.stop() - error - " + e.toString());
+            Log.v(TAG, "Error in stop() - " + e);
+            mUtil.writeToSysLogFile("SdDataSourcePebble.stop() - error - " + e);
         }
     }
 
@@ -343,7 +343,7 @@ public class SdDataSourcePebble extends SdDataSource {
 
         } catch (Exception ex) {
             Log.v(TAG, "updatePrefs() - Problem parsing preferences! - prefStr=" + prefStr);
-            mUtil.writeToSysLogFile("SdDataSourcePebble.updatePrefs() - ERROR " + ex.toString());
+            mUtil.writeToSysLogFile("SdDataSourcePebble.updatePrefs() - ERROR " + ex);
             Toast toast = Toast.makeText(mContext, "Problem Parsing Preferences - Something won't work - Please go back to Settings and correct it!", Toast.LENGTH_SHORT);
             toast.show();
         }
@@ -396,9 +396,7 @@ public class SdDataSourcePebble extends SdDataSource {
                                 .asIntBuffer();
                         int[] intArray = new int[intBuf.remaining()];
                         intBuf.get(intArray);
-                        for (int i = 0; i < intArray.length; i++) {
-                            mSdData.simpleSpec[i] = intArray[i];
-                        }
+                        System.arraycopy(intArray, 0, mSdData.simpleSpec, 0, intArray.length);
                     } else {
                         Log.v(TAG, "***** zero length spectrum received - error!!!!");
                     }
@@ -483,8 +481,8 @@ public class SdDataSourcePebble extends SdDataSource {
             mContext.unregisterReceiver(msgDataHandler);
             stopWatchApp();
         } catch (Exception e) {
-            Log.v(TAG, "stopServer() - error " + e.toString());
-            mUtil.writeToSysLogFile("SdDataSourcePebble.stopServer() - error " + e.toString());
+            Log.v(TAG, "stopServer() - error " + e);
+            mUtil.writeToSysLogFile("SdDataSourcePebble.stopServer() - error " + e);
         }
     }
 
@@ -680,7 +678,7 @@ public class SdDataSourcePebble extends SdDataSource {
         // the app is not talking to us
         // mPebbleAppRunningCheck is set to true in the receiveData handler.
         if (!mPebbleAppRunningCheck &&
-                (tdiff > (mDataUpdatePeriod + mAppRestartTimeout) * 1000)) {
+                (tdiff > (mDataUpdatePeriod + mAppRestartTimeout) * 1000L)) {
             Log.v(TAG, "getStatus() - tdiff = " + tdiff);
             mSdData.watchAppRunning = false;
             //Log.v(TAG, "getStatus() - Pebble App Not Running - Attempting to Re-Start");
@@ -689,7 +687,7 @@ public class SdDataSourcePebble extends SdDataSource {
             //mPebbleStatusTime = tnow;  // set status time to now so we do not re-start app repeatedly.
             //getWatchSdSettings();
             // Only make audible warning beep if we have not received data for more than mFaultTimerPeriod seconds.
-            if (tdiff > (mDataUpdatePeriod + mFaultTimerPeriod) * 1000) {
+            if (tdiff > (mDataUpdatePeriod + mFaultTimerPeriod) * 1000L) {
                 Log.v(TAG, "getStatus() - Pebble App Not Running - Attempting to Re-Start");
                 mUtil.writeToSysLogFile("SdDataSourcePebble.getStatus() - Pebble App not Running - Attempting to Re-Start");
                 startWatchApp();
@@ -748,14 +746,14 @@ public class SdDataSourcePebble extends SdDataSource {
             mContext.startActivity(pebbleAppIntent);
         } catch (Exception ex1) {
             // and if original pebble app fails, try Pebble Time app...
-            Log.v(TAG, "exception starting original pebble App - trying pebble time..." + ex1.toString());
+            Log.v(TAG, "exception starting original pebble App - trying pebble time..." + ex1);
             mUtil.writeToSysLogFile("SdDataSourcePebble.startPebbleApp() - Error starting original pebble app - trying Pebble Time App instead");
             try {
                 pebbleAppIntent = pm.getLaunchIntentForPackage("com.getpebble.android.basalt");
                 mContext.startActivity(pebbleAppIntent);
             } catch (Exception ex2) {
                 // and if that fails, open play store so the user can install it:
-                Log.v(TAG, "exception starting Pebble Time App." + ex2.toString());
+                Log.v(TAG, "exception starting Pebble Time App." + ex2);
                 mUtil.writeToSysLogFile("SdDataSourcePebble.startPebbleApp() - Error starting Pebble Time App - Is it installed?");
                 this.showToast("Error Launching Pebble or Pebble Time App - Please make sure it is installed...");
                 final String appPackageName = "com.getpebble.android.basalt";

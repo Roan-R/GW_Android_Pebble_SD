@@ -102,16 +102,16 @@ public class FragmentWatchSig extends FragmentOsdBaseClass {
     @Override
     protected void updateUi() {
         Log.d(TAG, "updateUi()");
-        tvCurrSigStren = (TextView) mRootView.findViewById(R.id.current_sig_strength_tv);
+        tvCurrSigStren = mRootView.findViewById(R.id.current_sig_strength_tv);
         if (mConnection.mBound) {
             if (Objects.nonNull(tvCurrSigStren))
                 tvCurrSigStren.setText(String.valueOf((int) mConnection.mSdServer.mSdData.watchSignalStrength));
-            double histArr[] = mConnection.mSdServer.mSdData.watchSignalStrengthBuff.getVals();
+            double[] histArr = mConnection.mSdServer.mSdData.watchSignalStrengthBuff.getVals();
             int nHist = histArr.length;
             if (Objects.nonNull(histArr) && nHist > 0) {
                 Log.v(TAG, "nHist=" + nHist);
                 lineDataSet.clear();
-                String xVals[] = new String[nHist];
+                String[] xVals = new String[nHist];
                 for (int i = 0; i < nHist; i++) {
                     //Log.d(TAG,"i="+i+", HR="+hrHistArr[i]);
                     xVals[i] = String.valueOf(i);
@@ -139,7 +139,6 @@ public class FragmentWatchSig extends FragmentOsdBaseClass {
 
         } else {
             Log.w(TAG,"not Bound to Server");
-            return;
         }
 
 

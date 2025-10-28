@@ -18,7 +18,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 interface SdLocationReceiver {
-    public void onSdLocationReceived(Location ll);
+    void onSdLocationReceived(Location ll);
 }
 
 
@@ -86,7 +86,7 @@ public class LocationFinder implements LocationListener {
                 mLocationManager.removeUpdates(mLocationListener);
                 mSdLocationReceiver.onSdLocationReceived(mLastLocation);
             }
-        }, mTimeoutPeriod * 1000);
+        }, mTimeoutPeriod * 1000L);
 
     }
 

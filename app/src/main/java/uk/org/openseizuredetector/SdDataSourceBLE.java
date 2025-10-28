@@ -64,8 +64,8 @@ import co.beeline.android.bluetooth.currenttimeservice.CurrentTimeService;
  * waits to be notified of data being available.
  */
 public class SdDataSourceBLE extends SdDataSource {
-    private int MAX_RAW_DATA = 125;  // 5 seconds at 25 Hz.
-    private String TAG = "SdDataSourceBLE";
+    private final int MAX_RAW_DATA = 125;  // 5 seconds at 25 Hz.
+    private final String TAG = "SdDataSourceBLE";
     private BluetoothManager mBluetoothManager;
     private BluetoothAdapter mBluetoothAdapter;
     private String mBluetoothDeviceAddress;
@@ -73,8 +73,8 @@ public class SdDataSourceBLE extends SdDataSource {
     private int mConnectionState = STATE_DISCONNECTED;
 
     private int nRawData = 0;
-    private double[] rawData = new double[MAX_RAW_DATA];
-    private double[] rawData3d = new double[MAX_RAW_DATA * 3];
+    private final double[] rawData = new double[MAX_RAW_DATA];
+    private final double[] rawData3d = new double[MAX_RAW_DATA * 3];
     private int mAccFmt = 0;
     private boolean waitForDescriptorWrite = false;
 
@@ -194,7 +194,6 @@ public class SdDataSourceBLE extends SdDataSource {
         }
         if (device == null) {
             Log.w(TAG, "bleConnect(): Device not found.  Unable to connect.");
-            return;
         } else {
             // We want to directly connect to the device, so we are setting the autoConnect
             // parameter to false.
@@ -484,7 +483,7 @@ public class SdDataSourceBLE extends SdDataSource {
                 if (heartRate == 255 || heartRate == 0) {
                     mSdData.mHR = -1;
                 } else {
-                    mSdData.mHR = (double) heartRate;
+                    mSdData.mHR = heartRate;
                 }
                 Log.d(TAG, String.format("onDataReceived(): CHAR_HEART_RATE_MEASUREMENT: %d", heartRate));
             } else if (characteristic.getUuid().toString().equals(CHAR_OSD_ACC_DATA)

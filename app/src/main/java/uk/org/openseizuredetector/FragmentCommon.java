@@ -39,7 +39,7 @@ public class FragmentCommon extends FragmentOsdBaseClass {
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         // Deal with the 'AcceptAlarm Button'
-        Button button = (Button) mRootView.findViewById(R.id.acceptAlarmButton);
+        Button button = mRootView.findViewById(R.id.acceptAlarmButton);
         button.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 Log.v(TAG, "acceptAlarmButton.onClick()");
@@ -58,7 +58,7 @@ public class FragmentCommon extends FragmentOsdBaseClass {
         });
 
         // Deal with the 'Cancel Audible Button'
-        button = (Button) mRootView.findViewById(R.id.cancelAudibleButton);
+        button = mRootView.findViewById(R.id.cancelAudibleButton);
         button.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 Log.v(TAG, "cancelAudibleButton.onClick()");
@@ -69,7 +69,7 @@ public class FragmentCommon extends FragmentOsdBaseClass {
         });
 
         // Deal with the 'Raise Alarm'
-        button = (Button) mRootView.findViewById(R.id.manualAlarmButton);
+        button = mRootView.findViewById(R.id.manualAlarmButton);
         button.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 Log.v(TAG, "manualAlarmButton.onClick()");
@@ -86,7 +86,7 @@ public class FragmentCommon extends FragmentOsdBaseClass {
         TextView tv;
 
         if (mUtil.isServerRunning()) {
-            tv = (TextView) mRootView.findViewById(R.id.serverStatusTv);
+            tv = mRootView.findViewById(R.id.serverStatusTv);
             if (mConnection.mBound) {
                 if (mConnection.mSdServer.mLogNDA)
                     tv.setText(getString(R.string.ServerRunningOK) + " - NDA Logging");
@@ -95,7 +95,7 @@ public class FragmentCommon extends FragmentOsdBaseClass {
                 tv.setBackgroundColor(okColour);
                 tv.setTextColor(okTextColour);
 
-                tv = (TextView) mRootView.findViewById(R.id.data_time_tv);
+                tv = mRootView.findViewById(R.id.data_time_tv);
                 Time tnow = new Time(Time.getCurrentTimezone());
                 tnow.setToNow();
                 double tdiff;
@@ -106,7 +106,7 @@ public class FragmentCommon extends FragmentOsdBaseClass {
                 tv.setTextColor(okTextColour);
 
 
-                tv = (TextView) mRootView.findViewById(R.id.alarmTv);
+                tv = mRootView.findViewById(R.id.alarmTv);
                 if ((mConnection.mSdServer.mSdData.alarmState == 0)
                         && !mConnection.mSdServer.mSdData.alarmStanding
                         && !mConnection.mSdServer.mSdData.fallAlarmStanding) {
@@ -148,11 +148,11 @@ public class FragmentCommon extends FragmentOsdBaseClass {
                 }
 
 
-                tv = (TextView) mRootView.findViewById(R.id.algsTv);
+                tv = mRootView.findViewById(R.id.algsTv);
                 tv.setText(R.string.algorithms);
                 tv.setBackgroundColor(okColour);
                 tv.setTextColor(okTextColour);
-                tv = (TextView) mRootView.findViewById(R.id.osdAlgTv);
+                tv = mRootView.findViewById(R.id.osdAlgTv);
                 tv.setText("OSD ");
                 if (mConnection.mSdServer.mSdData.mOsdAlarmActive) {
                     tv.setBackgroundColor(okColour);
@@ -163,7 +163,7 @@ public class FragmentCommon extends FragmentOsdBaseClass {
                     tv.setTextColor(warnTextColour);
                     tv.setPaintFlags(tv.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
                 }
-                tv = (TextView) mRootView.findViewById(R.id.cnnAlgTv);
+                tv = mRootView.findViewById(R.id.cnnAlgTv);
                 tv.setText("CNN ");
                 if (mConnection.mSdServer.mSdData.mCnnAlarmActive) {
                     tv.setBackgroundColor(okColour);
@@ -174,7 +174,7 @@ public class FragmentCommon extends FragmentOsdBaseClass {
                     tv.setTextColor(Color.GRAY);
                     tv.setPaintFlags(tv.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
                 }
-                tv = (TextView) mRootView.findViewById(R.id.hrAlgTv);
+                tv = mRootView.findViewById(R.id.hrAlgTv);
                 tv.setText("HR ");
                 if (mConnection.mSdServer.mSdData.mHRAlarmActive) {
                     tv.setBackgroundColor(okColour);
@@ -185,7 +185,7 @@ public class FragmentCommon extends FragmentOsdBaseClass {
                     tv.setTextColor(Color.GRAY);
                     tv.setPaintFlags(tv.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
                 }
-                tv = (TextView) mRootView.findViewById(R.id.o2AlgTv);
+                tv = mRootView.findViewById(R.id.o2AlgTv);
                 tv.setText("O2 ");
                 if (mConnection.mSdServer.mSdData.mO2SatAlarmActive) {
                     tv.setBackgroundColor(okColour);
@@ -197,7 +197,7 @@ public class FragmentCommon extends FragmentOsdBaseClass {
                     tv.setPaintFlags(tv.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
                 }
 
-                tv = (TextView) mRootView.findViewById(R.id.dataSourceInfoTv);
+                tv = mRootView.findViewById(R.id.dataSourceInfoTv);
                 tv.setBackgroundColor(okColour);
                 tv.setTextColor(okTextColour);
                 if (mConnection.mSdServer.mSdDataSourceName.equals("Phone")) {
@@ -215,7 +215,7 @@ public class FragmentCommon extends FragmentOsdBaseClass {
 
             }
         } else {
-            tv = (TextView) mRootView.findViewById(R.id.serverStatusTv);
+            tv = mRootView.findViewById(R.id.serverStatusTv);
             tv.setText(R.string.ServerStopped);
             tv.setBackgroundColor(warnColour);
             tv.setTextColor(warnTextColour);
@@ -230,7 +230,7 @@ public class FragmentCommon extends FragmentOsdBaseClass {
 
 
         // deal with latch alarms button
-        Button acceptAlarmButton = (Button) mRootView.findViewById(R.id.acceptAlarmButton);
+        Button acceptAlarmButton = mRootView.findViewById(R.id.acceptAlarmButton);
 
         if (mConnection.mBound) {
             if ((mConnection.mSdServer.mSmsTimer != null)
@@ -244,12 +244,8 @@ public class FragmentCommon extends FragmentOsdBaseClass {
                 acceptAlarmButton.setText(R.string.AcceptAlarm);
                 acceptAlarmButton.setBackgroundColor(Color.GRAY);
                 if (mConnection.mBound)
-                    if ((mConnection.mSdServer.isLatchAlarms())
-                            || mConnection.mSdServer.mSdData.mFallActive) {
-                        acceptAlarmButton.setEnabled(true);
-                    } else {
-                        acceptAlarmButton.setEnabled(false);
-                    }
+                    acceptAlarmButton.setEnabled((mConnection.mSdServer.isLatchAlarms())
+                            || mConnection.mSdServer.mSdData.mFallActive);
             }
         } else {
             // acceptAlarmButton.setText(getString(R.string.AcceptAlarm));
@@ -259,7 +255,7 @@ public class FragmentCommon extends FragmentOsdBaseClass {
 
         // Deal with Cancel Audible button
         Button cancelAudibleButton =
-                (Button) mRootView.findViewById(R.id.cancelAudibleButton);
+                mRootView.findViewById(R.id.cancelAudibleButton);
         if (mConnection.mBound)
             if (mConnection.mSdServer.isAudibleCancelled()) {
                 cancelAudibleButton.setText(getString(R.string.AudibleAlarmsCancelledFor)
