@@ -730,13 +730,12 @@ public class StartupActivity extends AppCompatActivity {
     }
 
     private void showBatteryOptimisationWarningDialog() {
-        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(
-                this);
+        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
         final SpannableString s = new SpannableString(
                 getString(R.string.battery_usage_optimisation_dialog_text)
         );
-        // This makes the links display as links, but they do not respond to clicks for some reason...
         Linkify.addLinks(s, Linkify.ALL);
+
         alertDialogBuilder
                 .setTitle(R.string.battery_usage_optimisation_dialog_title)
                 .setMessage(s)
@@ -747,10 +746,24 @@ public class StartupActivity extends AppCompatActivity {
                         mBatteryOptDialogDisplayed = false;
                     }
                 });
-        mBatteryOptDialog = alertDialogBuilder.create();
+
+        // Create the dialog ONCE
+        final AlertDialog dialog = alertDialogBuilder.create();
+
+        // Assign it to your member variable (if you need to)
+        mBatteryOptDialog = dialog;
+
         Log.i(TAG, "Displaying Update Dialog");
-        mBatteryOptDialog.show();
+
+        // Show the dialog ONCE
+        dialog.show();
         mBatteryOptDialogDisplayed = true;
+
+        // Now, get the button from the dialog you just showed
+        Button positiveButton = dialog.getButton(DialogInterface.BUTTON_POSITIVE);
+        if (positiveButton != null) {
+            positiveButton.setTextColor(Color.parseColor("#FF9F1C"));
+        }
     }
 
     /*****************************************************************************/
