@@ -37,11 +37,11 @@ import java.util.TimerTask;
 
 public class MainActivity2 extends AppCompatActivity {
     private final String TAG = "MainActivity2";
-    private final int okColour = Color.BLUE;
-    private final int warnColour = Color.MAGENTA;
-    private final int alarmColour = Color.RED;
-    private final int okTextColour = Color.WHITE;
-    private final int warnTextColour = Color.WHITE;
+    private final int okColour = Color.parseColor("#CBF3F0");
+    private final int warnColour = Color.parseColor("#FFBF69");
+    private final int alarmColour = Color.parseColor("#FFBF69");
+    private final int okTextColour = Color.BLACK;
+    private final int warnTextColour = Color.BLACK;
     private final int alarmTextColour = Color.BLACK;
 
     private ViewPager2 mFragmentPager;

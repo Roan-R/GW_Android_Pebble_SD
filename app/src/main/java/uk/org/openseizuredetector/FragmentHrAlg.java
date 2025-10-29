@@ -78,14 +78,14 @@ public class FragmentHrAlg extends FragmentOsdBaseClass {
         xAxis.setDrawLabels(true);
         // Note:  the default text colour is BLACK, so does not show up on black background!!!
         //  This took a lot of finding....
-        xAxis.setTextColor(Color.WHITE);
+        xAxis.setTextColor(Color.BLACK);
 
         YAxis yAxis = mLineChart.getAxisLeft();
         yAxis.setAxisMinValue(40f);
         yAxis.setAxisMaxValue(240f);
         yAxis.setDrawGridLines(true);
         yAxis.setDrawLabels(true);
-        yAxis.setTextColor(Color.WHITE);
+        yAxis.setTextColor(Color.BLACK);
         // Inhibit the decimal part of the y axis labels.
         yAxis.setValueFormatter(new ValueFormatter() {
             @Override

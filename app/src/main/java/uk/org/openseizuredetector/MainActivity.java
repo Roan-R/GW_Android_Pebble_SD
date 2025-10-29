@@ -73,11 +73,11 @@ import java.util.TimerTask;
 
 public class MainActivity extends AppCompatActivity {
     static final String TAG = "MainActivity";
-    private final int okColour = Color.BLUE;
-    private final int warnColour = Color.MAGENTA;
-    private final int alarmColour = Color.RED;
-    private final int okTextColour = Color.WHITE;
-    private final int warnTextColour = Color.WHITE;
+    private final int okColour = Color.parseColor("#2EC4B6");
+    private final int warnColour = Color.parseColor("#FF9F1C");
+    private final int alarmColour = Color.parseColor("#FF9F1C");
+    private final int okTextColour = Color.BLACK;
+    private final int warnTextColour = Color.BLACK;
     private final int alarmTextColour = Color.BLACK;
     private OsdUtil mUtil;
     private SdServiceConnection mConnection;
@@ -1021,7 +1021,7 @@ public class MainActivity extends AppCompatActivity {
                             (i > mConnection.mSdServer.mSdData.alarmFreqMax)) {
                         barColours[i] = Color.GRAY;
                     } else {
-                        barColours[i] = Color.RED;
+                        barColours[i] = Color.parseColor("#FFBF69");
                     }
                 }
                 barDataSet.setColors(barColours);
@@ -1048,7 +1048,7 @@ public class MainActivity extends AppCompatActivity {
             xAxis.setDrawLabels(true);
             // Note:  the default text colour is BLACK, so does not show up on black background!!!
             //  This took a lot of finding....
-            xAxis.setTextColor(Color.WHITE);
+            xAxis.setTextColor(Color.BLACK);
             xAxis.setDrawGridLines(false);
 
             YAxis yAxis = mChart.getAxisLeft();
@@ -1056,7 +1056,7 @@ public class MainActivity extends AppCompatActivity {
             yAxis.setAxisMaxValue(3000f);
             yAxis.setDrawGridLines(true);
             yAxis.setDrawLabels(true);
-            yAxis.setTextColor(Color.WHITE);
+            yAxis.setTextColor(Color.BLACK);
             yAxis.setValueFormatter(new ValueFormatter() {
                 @Override
                 public String getFormattedValue(float v) {

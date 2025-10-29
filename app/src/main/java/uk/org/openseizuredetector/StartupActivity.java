@@ -66,10 +66,10 @@ import java.util.TimerTask;
  */
 public class StartupActivity extends AppCompatActivity {
     private static final String TAG = "StartupActivity";
-    private final int okColour = Color.BLUE;
-    private final int warnColour = Color.MAGENTA;
-    private final int alarmColour = Color.RED;
-    private final int okTextColour = Color.WHITE;
+    private final int okColour = Color.parseColor("#2EC4B6");
+    private final int warnColour = Color.parseColor("#FF9F1C");
+    private final int alarmColour = Color.parseColor("#FF9F1C");
+    private final int okTextColour = Color.BLACK;
     private final int warnTextColour = Color.BLACK;
     private final int alarmTextColour = Color.BLACK;
 

@@ -149,7 +149,7 @@ public class FragmentOsdAlg extends FragmentOsdBaseClass {
                             (i > mConnection.mSdServer.mSdData.alarmFreqMax)) {
                         barColours[i] = Color.GRAY;
                     } else {
-                        barColours[i] = Color.RED;
+                        barColours[i] = Color.parseColor("#FFBF69");
                     }
                 }
                 barDataSet.setColors(barColours);
@@ -176,7 +176,7 @@ public class FragmentOsdAlg extends FragmentOsdBaseClass {
             xAxis.setDrawLabels(true);
             // Note:  the default text colour is BLACK, so does not show up on black background!!!
             //  This took a lot of finding....
-            xAxis.setTextColor(Color.WHITE);
+            xAxis.setTextColor(Color.BLACK);
             xAxis.setDrawGridLines(false);
 
             YAxis yAxis = mChart.getAxisLeft();
@@ -184,7 +184,7 @@ public class FragmentOsdAlg extends FragmentOsdBaseClass {
             yAxis.setAxisMaxValue(3000f);
             yAxis.setDrawGridLines(true);
             yAxis.setDrawLabels(true);
-            yAxis.setTextColor(Color.WHITE);
+            yAxis.setTextColor(Color.BLACK);
             yAxis.setValueFormatter(new ValueFormatter() {
                 @Override
                 public String getFormattedValue(float v) {

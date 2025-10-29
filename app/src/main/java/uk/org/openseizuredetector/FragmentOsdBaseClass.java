@@ -26,11 +26,11 @@ public class FragmentOsdBaseClass extends Fragment {
     Timer mUiTimer;
     protected View mRootView;
 
-    protected int okColour = Color.BLUE;
-    protected int warnColour = Color.MAGENTA;
-    protected int alarmColour = Color.RED;
-    protected int okTextColour = Color.WHITE;
-    protected int warnTextColour = Color.WHITE;
+    protected int okColour = Color.parseColor("#CBF3F0");
+    protected int warnColour = Color.parseColor("#FFBF69");
+    protected int alarmColour = Color.parseColor("#FFBF69");
+    protected int okTextColour = Color.BLACK;
+    protected int warnTextColour = Color.BLACK;
     protected int alarmTextColour = Color.BLACK;
 
 

@@ -79,6 +79,7 @@
                         android:id="@+id/select_date_button"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:backgroundTint="@color/colorPrimaryDark"
                         android:text="@string/select_date" />
                 </LinearLayout>
 
@@ -114,6 +115,7 @@
                         android:id="@+id/select_time_button"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:backgroundTint="@color/colorPrimaryDark"
                         android:text="@string/select_time" />
                 </LinearLayout>
 
@@ -173,12 +175,14 @@
                         android:id="@+id/loginBtn"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:backgroundTint="@color/colorPrimaryDark"
                         android:text="@string/okBtnTxt" />
 
                     <Button
                         android:id="@+id/cancelBtn"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:backgroundTint="@color/colorPrimaryDark"
                         android:text="@string/cancelBtnTxt" />
                 </LinearLayout>
 
