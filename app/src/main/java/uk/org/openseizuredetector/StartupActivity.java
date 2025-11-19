@@ -568,9 +568,7 @@ public class StartupActivity extends AppCompatActivity {
                             Boolean useNewUi = SP.getBoolean("UseNewUi", true);
                             Intent intent;
                             if (useNewUi) {
-                                intent = new Intent(
-                                        getApplicationContext(),
-                                        MainActivity2.class);
+                                intent = new Intent(getApplicationContext(), ComposeMainActivity.class);
                             } else {
                                 intent = new Intent(
                                         getApplicationContext(),

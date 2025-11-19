@@ -79,6 +79,10 @@
         <activity
             android:name="com.rohitss.uceh.UCEDefaultActivity"
             android:process=":error_activity" />
+        <activity
+            android:name=".ComposeMainActivity"
+            android:label="New Dashboard"
+            android:exported="false" />
 
         <service
             android:name=".SdServer"
