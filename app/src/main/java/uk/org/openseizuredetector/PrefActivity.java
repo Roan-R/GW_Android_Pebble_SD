@@ -41,7 +41,7 @@ import android.widget.Toast;
 import java.util.List;
 
 public class PrefActivity extends PreferenceActivity implements SharedPreferences.OnSharedPreferenceChangeListener, View.OnClickListener {
-    private String TAG = "PreferenceActivity";
+    private final String TAG = "PreferenceActivity";
     private OsdUtil mUtil;
     private boolean mPrefChanged = false;
     private Context mContext;
@@ -147,7 +147,7 @@ public class PrefActivity extends PreferenceActivity implements SharedPreference
         // if we have enabled the SMS alarm, we may need extra permissions approving.  This is handled in
         // StartUpActivity, so we exit this activity and start start-up activity.
         if (s.equals("SMSAlarm"))  {
-            if (sharedPreferences.getBoolean("SMSAlarm", false) == true) {
+            if (sharedPreferences.getBoolean("SMSAlarm", false)) {
                 mUtil.showToast("Restarting OpenSeizureDetector");
                 Log.i(TAG, "onSharedPreferenceChanged(): SMS Alarm Enabled - Restarting start-up activity to check permissions");
                 Intent i;
@@ -174,10 +174,8 @@ public class PrefActivity extends PreferenceActivity implements SharedPreference
                     startActivity(i);
                     Log.i(TAG, "onSharedPreferenceChanged() - finishing PrefActivity");
                     finish();
-                    return;
                 }
             }, 1000);
-            return;
         } else {
             // For all other preference changes we just restart SdServer so it is not as alarming for the user!
             //mUtil.showToast("Setting " + s + " Changed - restarting server");
@@ -202,7 +200,7 @@ public class PrefActivity extends PreferenceActivity implements SharedPreference
 
     @Override
     public void onRequestPermissionsResult(int requestCode,
-                                           String permissions[], int[] grantResults) {
+                                           String[] permissions, int[] grantResults) {
         Log.i(TAG, "onRequestPermissionsResult - Permission" + permissions + " = " + grantResults);
         //mUtil.showToast("Permissions Changed - restarting server");
         mUtil.stopServer();

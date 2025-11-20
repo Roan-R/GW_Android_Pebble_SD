@@ -78,7 +78,7 @@ public class FragmentOsdAlg extends FragmentOsdBaseClass {
 
             ProgressBar pb;
             Drawable pbDrawable;
-            pb = ((ProgressBar) mRootView.findViewById(R.id.powerProgressBar));
+            pb = mRootView.findViewById(R.id.powerProgressBar);
             pb.setMax(100);
             pb.setProgress((int) powerPc);
             pbDrawable = mContext.getDrawable(R.drawable.progress_bar_blue);
@@ -92,7 +92,7 @@ public class FragmentOsdAlg extends FragmentOsdBaseClass {
             ((TextView) mRootView.findViewById(R.id.spectrumTv)).setText(getString(R.string.SpectrumRatioEquals) + specRatio +
                     " (" + getString(R.string.Threshold) + "=" + mConnection.mSdServer.mSdData.alarmRatioThresh + ")");
 
-            pb = ((ProgressBar) mRootView.findViewById(R.id.spectrumProgressBar));
+            pb = mRootView.findViewById(R.id.spectrumProgressBar);
             pb.setMax(100);
             pb.setProgress((int) specPc);
             //pbDrawable = mRootView.getResources().getDrawable(R.drawable.progress_bar_blue);
@@ -110,7 +110,7 @@ public class FragmentOsdAlg extends FragmentOsdBaseClass {
             long pSeizurePc;
             pSeizurePc = (long) (mConnection.mSdServer.mSdData.mPseizure * 100);
 
-            pb = ((ProgressBar) mRootView.findViewById(R.id.pSeizureProgressBarM2));
+            pb = mRootView.findViewById(R.id.pSeizureProgressBarM2);
             pb.setMax(100);
             pb.setProgress((int) pSeizurePc);
             pbDrawable = mContext.getDrawable(R.drawable.progress_bar_blue);
@@ -123,7 +123,7 @@ public class FragmentOsdAlg extends FragmentOsdBaseClass {
 
             ////////////////////////////////////////////////////////////
             // Produce graph
-            BarChart mChart = (BarChart) mRootView.findViewById(R.id.chart1);
+            BarChart mChart = mRootView.findViewById(R.id.chart1);
             mChart.setDrawBarShadow(false);
             mChart.setNoDataTextDescription("You need to provide data for the chart.");
             mChart.setDescription("");
@@ -149,7 +149,7 @@ public class FragmentOsdAlg extends FragmentOsdBaseClass {
                             (i > mConnection.mSdServer.mSdData.alarmFreqMax)) {
                         barColours[i] = Color.GRAY;
                     } else {
-                        barColours[i] = Color.RED;
+                        barColours[i] = Color.parseColor("#FFBF69");
                     }
                 }
                 barDataSet.setColors(barColours);
@@ -176,7 +176,7 @@ public class FragmentOsdAlg extends FragmentOsdBaseClass {
             xAxis.setDrawLabels(true);
             // Note:  the default text colour is BLACK, so does not show up on black background!!!
             //  This took a lot of finding....
-            xAxis.setTextColor(Color.WHITE);
+            xAxis.setTextColor(Color.BLACK);
             xAxis.setDrawGridLines(false);
 
             YAxis yAxis = mChart.getAxisLeft();
@@ -184,7 +184,7 @@ public class FragmentOsdAlg extends FragmentOsdBaseClass {
             yAxis.setAxisMaxValue(3000f);
             yAxis.setDrawGridLines(true);
             yAxis.setDrawLabels(true);
-            yAxis.setTextColor(Color.WHITE);
+            yAxis.setTextColor(Color.BLACK);
             yAxis.setValueFormatter(new ValueFormatter() {
                 @Override
                 public String getFormattedValue(float v) {

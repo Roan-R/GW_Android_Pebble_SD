@@ -29,7 +29,7 @@ import java.util.Iterator;
 import java.util.List;
 
 public class EditEventActivity extends AppCompatActivity {
-    private String TAG = "EditEventActivity";
+    private final String TAG = "EditEventActivity";
     private Context mContext;
     private WebApiConnection mWac;
     private LogManager mLm;
@@ -38,11 +38,11 @@ public class EditEventActivity extends AppCompatActivity {
     private OsdUtil mUtil;
     private List<String> mEventTypesList = null;
     private HashMap<String, ArrayList<String>> mEventSubTypesHashMap = null;
-    private String mEventTypeStr = null;
-    private String mEventSubTypeStr = null;
+    private final String mEventTypeStr = null;
+    private final String mEventSubTypeStr = null;
     private String mEventId;
     private ArrayList<String> mEventIds; // For group editing
-    private String mEventNotes = "";
+    private final String mEventNotes = "";
     //private Date mEventDateTime;
     private RadioGroup mEventTypeRg;
     private boolean mEventTypesListChanged = false;
@@ -83,7 +83,7 @@ public class EditEventActivity extends AppCompatActivity {
         if (extras != null) {
             mEventIds = extras.getStringArrayList("eventIds");
             if (mEventIds != null && !mEventIds.isEmpty()) {
-                Log.v(TAG, "onCreate - Group Edit - eventIds=" + mEventIds.toString());
+                Log.v(TAG, "onCreate - Group Edit - eventIds=" + mEventIds);
                 mEventId = mEventIds.get(0);
             } else {
                 Log.v(TAG, "onCreate - Single Edit - eventId=" + extras.getString("eventId"));
@@ -95,9 +95,9 @@ public class EditEventActivity extends AppCompatActivity {
 
 
         Button cancelBtn =
-                (Button) findViewById(R.id.cancelBtn);
+                findViewById(R.id.cancelBtn);
         cancelBtn.setOnClickListener(onCancel);
-        Button OKBtn = (Button) findViewById(R.id.loginBtn);
+        Button OKBtn = findViewById(R.id.loginBtn);
         OKBtn.setOnClickListener(onOK);
 
         mEventTypeRg = findViewById(R.id.eventTypeRg);
@@ -146,7 +146,7 @@ public class EditEventActivity extends AppCompatActivity {
 
     private void initialiseServiceConnection() {
         mLm = mConnection.mSdServer.mLm;
-        mWac = mConnection.mSdServer.mLm.mWac;
+        mWac = LogManager.mWac;
 
         // Retrieve the JSONObject containing the standard event types.
         // Note this obscure syntax is to avoid having to create another interface, so it is worth it :)
@@ -175,7 +175,7 @@ public class EditEventActivity extends AppCompatActivity {
                             mEventSubTypesHashMap.put(key, eventSubtypesList);
                             mEventTypesListChanged = true;
                         } catch (JSONException e) {
-                            Log.e(TAG, "initialiseServiceConnection().getEventTypes Callback: Error parsing JSONObject" + e.getMessage() + e.toString());
+                            Log.e(TAG, "initialiseServiceConnection().getEventTypes Callback: Error parsing JSONObject" + e.getMessage() + e);
                         }
                     }
                     updateUi();
@@ -191,7 +191,7 @@ public class EditEventActivity extends AppCompatActivity {
                     Log.v(TAG, "initialiseServiceConnection.getEvent");
                     if (eventObj != null) {
                         mEventObj = eventObj;
-                        Log.v(TAG, "initialiseServiceConnection.getEvent:  eventObj=" + eventObj.toString());
+                        Log.v(TAG, "initialiseServiceConnection.getEvent:  eventObj=" + eventObj);
                         updateUi();
                         // FIXME: modify updateUi to use mEventObj
                     } else {
@@ -213,7 +213,7 @@ public class EditEventActivity extends AppCompatActivity {
 
         // Populate event type button group if necessary
         if (mEventTypesList != null && mEventTypesListChanged) {
-            Log.v(TAG, "updateUi: " + mEventTypesList.toString());
+            Log.v(TAG, "updateUi: " + mEventTypesList);
             mEventTypeRg.removeAllViews();
             for (String eventTypeStr : mEventTypesList) {
                 b = new RadioButton(this);
@@ -226,9 +226,9 @@ public class EditEventActivity extends AppCompatActivity {
 
         try {
             if (mEventObj != null) {
-                tv = (TextView) findViewById(R.id.eventIdTv);
+                tv = findViewById(R.id.eventIdTv);
                 tv.setText(mEventId);
-                tv = (TextView) findViewById(R.id.eventAlarmStateTv);
+                tv = findViewById(R.id.eventAlarmStateTv);
                 String alarmStateStr = mEventObj.getString("osdAlarmState");
                 try {
                     int alarmStateVal = Integer.parseInt(alarmStateStr);
@@ -237,11 +237,11 @@ public class EditEventActivity extends AppCompatActivity {
                     Log.v(TAG, "updateUi: alarmState does not parse to int so displaying it as string: " + alarmStateStr);
                 }
                 tv.setText(alarmStateStr);
-                tv = (TextView) findViewById(R.id.eventNotsTv);
+                tv = findViewById(R.id.eventNotsTv);
                 tv.setText(mEventObj.getString("desc"));
 
 
-                tv = (TextView) findViewById(R.id.eventDateTv);
+                tv = findViewById(R.id.eventDateTv);
                 try {
                     String dateStr = mEventObj.getString("dataTime");
                     Date dataTime = mUtil.string2date(dateStr);
@@ -315,7 +315,7 @@ public class EditEventActivity extends AppCompatActivity {
                 @Override
                 public void onClick(View view) {
                     //m_status=true;
-                    TextView tv = (TextView) findViewById(R.id.eventNotsTv);
+                    TextView tv = findViewById(R.id.eventNotsTv);
                     try {
                         mEventObj.put("desc", tv.getText());
                         mEventObj.put("id", mEventId);   // Add event Id to event object manually because firestore does not include it by default.
@@ -332,7 +332,7 @@ public class EditEventActivity extends AppCompatActivity {
                                 Log.v(TAG, "onOk.updateEvent");
                                 //mEventObj = eventObj;
                                 if (eventObj != null) {
-                                    Log.v(TAG, "onOk.getEvent:  eventObj=" + eventObj.toString());
+                                    Log.v(TAG, "onOk.getEvent:  eventObj=" + eventObj);
                                     mUtil.showToast("Event Updated OK");
                                     finish();
                                 } else {
@@ -343,7 +343,7 @@ public class EditEventActivity extends AppCompatActivity {
                             }
                         });
                     } catch (Exception e) {
-                        Log.e(TAG, "onOK() - ERROR: " + e.getMessage() + " : " + e.toString());
+                        Log.e(TAG, "onOK() - ERROR: " + e.getMessage() + " : " + e);
                         e.printStackTrace();
                         mUtil.showToast("Error Updating Event");
                         updateUi();
@@ -406,7 +406,7 @@ public class EditEventActivity extends AppCompatActivity {
                 @Override
                 public void onCheckedChanged(RadioGroup group, int checkedId) {
                     Log.v(TAG, "onEventTypeChange() - id=" + checkedId);
-                    RadioButton b = (RadioButton) findViewById(group.getCheckedRadioButtonId());
+                    RadioButton b = findViewById(group.getCheckedRadioButtonId());
                     String selectedEventType = b.getText().toString();
                     try {
                         mEventObj.put("type", selectedEventType);
@@ -423,7 +423,7 @@ public class EditEventActivity extends AppCompatActivity {
                 @Override
                 public void onCheckedChanged(RadioGroup group, int checkedId) {
                     Log.v(TAG, "onEventSubTypeChange() - id=" + checkedId);
-                    RadioButton b = (RadioButton) findViewById(group.getCheckedRadioButtonId());
+                    RadioButton b = findViewById(group.getCheckedRadioButtonId());
                     String selectedEventSubType = b.getText().toString();
                     try {
                         mEventObj.put("subType", selectedEventSubType);

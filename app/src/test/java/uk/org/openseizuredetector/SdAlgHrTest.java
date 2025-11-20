@@ -41,7 +41,7 @@ public class SdAlgHrTest extends TestCase {
         this.mContext = Mockito.mock(Context.class);
         mPreferenceManager = Mockito.mock(PreferenceManager.class);
         //Mockito.when(mContext.getSharedPreferences(anyString(), anyInt())).thenReturn(sharedPrefs);
-        Mockito.when(mPreferenceManager.getDefaultSharedPreferences(any())).thenReturn(sharedPrefs);
+        Mockito.when(PreferenceManager.getDefaultSharedPreferences(any())).thenReturn(sharedPrefs);
         mSdAlgHr = new SdAlgHr(mContext);
         assertNotNull(mSdAlgHr);
 

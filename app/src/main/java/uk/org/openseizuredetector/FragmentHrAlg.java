@@ -78,14 +78,14 @@ public class FragmentHrAlg extends FragmentOsdBaseClass {
         xAxis.setDrawLabels(true);
         // Note:  the default text colour is BLACK, so does not show up on black background!!!
         //  This took a lot of finding....
-        xAxis.setTextColor(Color.WHITE);
+        xAxis.setTextColor(Color.BLACK);
 
         YAxis yAxis = mLineChart.getAxisLeft();
         yAxis.setAxisMinValue(40f);
         yAxis.setAxisMaxValue(240f);
         yAxis.setDrawGridLines(true);
         yAxis.setDrawLabels(true);
-        yAxis.setTextColor(Color.WHITE);
+        yAxis.setTextColor(Color.BLACK);
         // Inhibit the decimal part of the y axis labels.
         yAxis.setValueFormatter(new ValueFormatter() {
             @Override
@@ -110,9 +110,9 @@ public class FragmentHrAlg extends FragmentOsdBaseClass {
     @Override
     protected void updateUi() {
         Log.d(TAG, "updateUi()");
-        tv = (TextView) mRootView.findViewById(R.id.fragment_hr_alg_tv1);
-        tvHr = (TextView) mRootView.findViewById(R.id.current_hr_tv);
-        tvAvgAHr = (TextView) mRootView.findViewById(R.id.adaptive_avg_hr_tv);
+        tv = mRootView.findViewById(R.id.fragment_hr_alg_tv1);
+        tvHr = mRootView.findViewById(R.id.current_hr_tv);
+        tvAvgAHr = mRootView.findViewById(R.id.adaptive_avg_hr_tv);
         if (mConnection.mBound) {
             tv.setText("Bound to Server");
 
@@ -123,12 +123,10 @@ public class FragmentHrAlg extends FragmentOsdBaseClass {
                 if (Objects.nonNull(tvAvgAHr))
                     tvAvgAHr.setText(String.valueOf((short) mConnection.mSdServer.mSdData
                             .mAdaptiveHrAverage));
-                tvCurrent.setText(new StringBuilder()
-                        .append("\nResult of checks: Adaptive Hr Alarm Standing: ")
-                        .append(mConnection.mSdServer.mSdData.mAdaptiveHrAlarmStanding)
-                        .append("\nAverage Hr Alarm Standing: ")
-                        .append(mConnection.mSdServer.mSdData.mAdaptiveHrAlarmStanding)
-                        .toString());
+                tvCurrent.setText("\nResult of checks: Adaptive Hr Alarm Standing: " +
+                        mConnection.mSdServer.mSdData.mAdaptiveHrAlarmStanding +
+                        "\nAverage Hr Alarm Standing: " +
+                        mConnection.mSdServer.mSdData.mAdaptiveHrAlarmStanding);
 
                 //switchAverages = mRootView.findViewById(R.id.hr_average_switch);
 
@@ -136,11 +134,11 @@ public class FragmentHrAlg extends FragmentOsdBaseClass {
                     //Log.v(TAG,"mSdAlgHr is not null");
                     CircBuf hrHist = mConnection.mSdServer.mSdDataSource.mSdAlgHr.getHrHistBuff();
                     int nHistArr = hrHist.getNumVals();
-                    double hrHistArr[] = hrHist.getVals();   // This gives us a simple vector of hr values to plot.
+                    double[] hrHistArr = hrHist.getVals();   // This gives us a simple vector of hr values to plot.
                     if (Objects.nonNull(hrHist) && nHistArr > 0) {
                         Log.v(TAG, "hrHist.getNumVals=" + nHistArr);
                         lineDataSet.clear();
-                        String xVals[] = new String[nHistArr];
+                        String[] xVals = new String[nHistArr];
                         for (int i = 0; i < nHistArr; i++) {
                             //Log.d(TAG,"i="+i+", HR="+hrHistArr[i]);
                             xVals[i] = String.valueOf(i);
@@ -169,7 +167,6 @@ public class FragmentHrAlg extends FragmentOsdBaseClass {
                 }
             } else {
                 tv.setText("****NOT BOUND TO SERVER***");
-                return;
             }
 
 

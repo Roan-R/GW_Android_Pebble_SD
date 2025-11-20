@@ -65,13 +65,13 @@ import java.util.TimerTask;
  * starting the main activity.
  */
 public class StartupActivity extends AppCompatActivity {
-    private static String TAG = "StartupActivity";
-    private int okColour = Color.BLUE;
-    private int warnColour = Color.MAGENTA;
-    private int alarmColour = Color.RED;
-    private int okTextColour = Color.WHITE;
-    private int warnTextColour = Color.BLACK;
-    private int alarmTextColour = Color.BLACK;
+    private static final String TAG = "StartupActivity";
+    private final int okColour = Color.parseColor("#2EC4B6");
+    private final int warnColour = Color.parseColor("#FF9F1C");
+    private final int alarmColour = Color.parseColor("#FF9F1C");
+    private final int okTextColour = Color.BLACK;
+    private final int warnTextColour = Color.BLACK;
+    private final int alarmTextColour = Color.BLACK;
 
 
     private OsdUtil mUtil;
@@ -80,8 +80,8 @@ public class StartupActivity extends AppCompatActivity {
     private boolean mStartedMainActivity = false;
     private boolean mDialogDisplayed = false;
     private Handler mHandler = new Handler();   // used to update ui from mUiTimer
-    private boolean mUsingPebbleDataSource = true;
-    private String mPebbleAppPackageName = null;
+    private final boolean mUsingPebbleDataSource = true;
+    private final String mPebbleAppPackageName = null;
     private boolean mBatteryOptDialogDisplayed = false;
     private AlertDialog mBatteryOptDialog;
     private boolean mLocationPermissions1Requested;
@@ -164,7 +164,7 @@ public class StartupActivity extends AppCompatActivity {
 
         Button b;
 
-        b = (Button) findViewById(R.id.settingsButton);
+        b = findViewById(R.id.settingsButton);
         b.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -176,7 +176,7 @@ public class StartupActivity extends AppCompatActivity {
                             PrefActivity.class);
                     startActivity(intent);
                 } catch (Exception ex) {
-                    Log.v(TAG, "exception starting settings activity " + ex.toString());
+                    Log.v(TAG, "exception starting settings activity " + ex);
                     mUtil.writeToSysLogFile("ERROR Starting Settings Activity");
                 }
 
@@ -185,7 +185,7 @@ public class StartupActivity extends AppCompatActivity {
 
         // Enable the "Install Watch App" button if we have the Pebble data source selected,
         // otherwise hide it.
-        b = (Button) findViewById(R.id.installOsdAppButton);
+        b = findViewById(R.id.installOsdAppButton);
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
         String dataSourceName = (prefs.getString("DataSource", "Phone"));
         if (dataSourceName.equals("Pebble")) {
@@ -206,7 +206,7 @@ public class StartupActivity extends AppCompatActivity {
                             i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                             startActivity(i);
                         } catch (Exception ex) {
-                            Log.i(TAG, "exception starting install watch app activity " + ex.toString());
+                            Log.i(TAG, "exception starting install watch app activity " + ex);
                             mUtil.showToast("Error Displaying Installation Instructions - try http://www.openseizuredetector.org.uk/?page_id=1894 instead");
                         }
                     }
@@ -216,7 +216,7 @@ public class StartupActivity extends AppCompatActivity {
             b.setVisibility(View.GONE);
         }
 
-        b = (Button) findViewById(R.id.instructionsButton);
+        b = findViewById(R.id.instructionsButton);
         b.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -228,14 +228,14 @@ public class StartupActivity extends AppCompatActivity {
                     i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                     startActivity(i);
                 } catch (Exception ex) {
-                    Log.v(TAG, "exception displaying instructions " + ex.toString());
+                    Log.v(TAG, "exception displaying instructions " + ex);
                     mUtil.showToast("ERROR Displaying Instructions");
                 }
 
             }
         });
 
-        b = (Button) findViewById(R.id.troubleshootingButton);
+        b = findViewById(R.id.troubleshootingButton);
         b.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -247,7 +247,7 @@ public class StartupActivity extends AppCompatActivity {
                     i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                     startActivity(i);
                 } catch (Exception ex) {
-                    Log.v(TAG, "exception displaying troubleshooting " + ex.toString());
+                    Log.v(TAG, "exception displaying troubleshooting " + ex);
                     mUtil.showToast("ERROR Displaying Troubleshooting Tips");
                 }
 
@@ -268,7 +268,7 @@ public class StartupActivity extends AppCompatActivity {
         TextView tv;
 
         String versionName = mUtil.getAppVersionName();
-        tv = (TextView) findViewById(R.id.appNameTv);
+        tv = findViewById(R.id.appNameTv);
         tv.setText("OpenSeizureDetector V" + versionName);
 
         // Display the DataSource name
@@ -278,7 +278,7 @@ public class StartupActivity extends AppCompatActivity {
         mSdDataSourceName = SP.getString("DataSource", "Pebble");
         mBleDeviceAddr = SP.getString("BLE_Device_Addr", "");
         mBleDeviceName = SP.getString("BLE_Device_Name", "");
-        tv = (TextView) findViewById(R.id.dataSourceTextView);
+        tv = findViewById(R.id.dataSourceTextView);
 
         if (mSdDataSourceName.equals("BLE")) {
             tv.setText(String.format("%s = %s (%s - %s)", getString(R.string.DataSource), mSdDataSourceName, mBleDeviceName, mBleDeviceAddr));
@@ -371,8 +371,8 @@ public class StartupActivity extends AppCompatActivity {
             }
 
             // Settings ok
-            tv = (TextView) findViewById(R.id.textItem1);
-            pb = (ProgressBar) findViewById(R.id.progressBar1);
+            tv = findViewById(R.id.textItem1);
+            pb = findViewById(R.id.progressBar1);
             if (arePermissionsOK()) {
                 Log.i(TAG,"arePermissionsOK=true");
                 Log.i(TAG,"mSdDataSourceName = "+ mSdDataSourceName);
@@ -452,8 +452,8 @@ public class StartupActivity extends AppCompatActivity {
             }
 
             if (allOk) {
-                tv = (TextView) findViewById(R.id.textItem1);
-                pb = (ProgressBar) findViewById(R.id.progressBar1);
+                tv = findViewById(R.id.textItem1);
+                pb = findViewById(R.id.progressBar1);
 
                 if (!mUtil.isServerRunning()) {
                     mUtil.writeToSysLogFile("StartupActivity.onStart() - starting server  - isServerRunning=" + mUtil.isServerRunning());
@@ -487,8 +487,8 @@ public class StartupActivity extends AppCompatActivity {
             }
 
             // Are we Bound to the Service
-            tv = (TextView) findViewById(R.id.textItem2);
-            pb = (ProgressBar) findViewById(R.id.progressBar2);
+            tv = findViewById(R.id.textItem2);
+            pb = findViewById(R.id.progressBar2);
             if (mConnection.mBound) {
                 tv.setText(getString(R.string.BoundToServiceOk));
                 tv.setBackgroundColor(okColour);
@@ -504,8 +504,8 @@ public class StartupActivity extends AppCompatActivity {
             }
 
             // Is Watch Connected?
-            tv = (TextView) findViewById(R.id.textItem3);
-            pb = (ProgressBar) findViewById(R.id.progressBar3);
+            tv = findViewById(R.id.textItem3);
+            pb = findViewById(R.id.progressBar3);
             if (mConnection.watchConnected()) {
                 tv.setText(getString(R.string.WatchConnectedOk));
                 tv.setBackgroundColor(okColour);
@@ -522,8 +522,8 @@ public class StartupActivity extends AppCompatActivity {
 
 
             // Do we have seizure detector data?
-            tv = (TextView) findViewById(R.id.textItem5);
-            pb = (ProgressBar) findViewById(R.id.progressBar5);
+            tv = findViewById(R.id.textItem5);
+            pb = findViewById(R.id.progressBar5);
             if (mConnection.hasSdData()) {
                 tv.setText(getString(R.string.SeizureDetectorDataReceived));
                 tv.setBackgroundColor(okColour);
@@ -540,8 +540,8 @@ public class StartupActivity extends AppCompatActivity {
 
 
             // Do we have seizure detector settings yet?
-            tv = (TextView) findViewById(R.id.textItem6);
-            pb = (ProgressBar) findViewById(R.id.progressBar6);
+            tv = findViewById(R.id.textItem6);
+            pb = findViewById(R.id.progressBar6);
             if (mConnection.hasSdSettings()) {
                 tv.setText(getString(R.string.SeizureDetectorSettingsReceived));
                 tv.setBackgroundColor(okColour);
@@ -578,11 +578,10 @@ public class StartupActivity extends AppCompatActivity {
                             startActivity(intent);
                             mStartedMainActivity = true;
                             finish();
-                            return;
                         } catch (Exception ex) {
                             mStartedMainActivity = false;
-                            Log.e(TAG, "exception starting main activity " + ex.toString());
-                            mUtil.writeToSysLogFile("StartupActivity.serverStatusRunnable - exception starting main activity " + ex.toString());
+                            Log.e(TAG, "exception starting main activity " + ex);
+                            mUtil.writeToSysLogFile("StartupActivity.serverStatusRunnable - exception starting main activity " + ex);
                         }
                     } else {
                         Log.v(TAG, "allOk, but already started MainActivity so not doing anything");
@@ -609,7 +608,7 @@ public class StartupActivity extends AppCompatActivity {
                     comp.getPackageName(), 0);
             return "Version: " + pinfo.versionName;
         } catch (android.content.pm.PackageManager.NameNotFoundException e) {
-            Log.e(TAG, "getVersionName Exception - " + e.toString());
+            Log.e(TAG, "getVersionName Exception - " + e);
             return null;
         }
     }
@@ -625,7 +624,7 @@ public class StartupActivity extends AppCompatActivity {
         AlertDialog FirstRunDialog;
         SharedPreferences prefs;
         Log.i(TAG, "checkFirstRun()");
-        versionName = this.getVersionName(this, StartupActivity.class);
+        versionName = getVersionName(this, StartupActivity.class);
         prefs = PreferenceManager.getDefaultSharedPreferences(this);
         storedVersionName = (prefs.getString("AppVersionName", null));
         Log.v(TAG, "storedVersionName=" + storedVersionName + ", versionName=" + versionName);
@@ -635,8 +634,7 @@ public class StartupActivity extends AppCompatActivity {
         if (storedVersionName == null || storedVersionName.length() == 0) {
             AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(
                     this);
-            final String s = new String(
-                    getString(R.string.FirstRunDlgMsg));
+            final String s = getString(R.string.FirstRunDlgMsg);
             alertDialogBuilder
                     .setTitle(getString(R.string.FirstRunDlgTitle))
                     .setMessage(Html.fromHtml(s))
@@ -681,9 +679,7 @@ public class StartupActivity extends AppCompatActivity {
             // Check for update of installed application
             AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(
                     this);
-            final String s = new String(
-                    getString(R.string.UpgradeMsg) + getString(R.string.changelog)
-            );
+            final String s = getString(R.string.UpgradeMsg) + getString(R.string.changelog);
 
             alertDialogBuilder
                     .setTitle(getString(R.string.UpdateDialogTitleTxt))
@@ -732,13 +728,12 @@ public class StartupActivity extends AppCompatActivity {
     }
 
     private void showBatteryOptimisationWarningDialog() {
-        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(
-                this);
+        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
         final SpannableString s = new SpannableString(
                 getString(R.string.battery_usage_optimisation_dialog_text)
         );
-        // This makes the links display as links, but they do not respond to clicks for some reason...
         Linkify.addLinks(s, Linkify.ALL);
+
         alertDialogBuilder
                 .setTitle(R.string.battery_usage_optimisation_dialog_title)
                 .setMessage(s)
@@ -749,10 +744,24 @@ public class StartupActivity extends AppCompatActivity {
                         mBatteryOptDialogDisplayed = false;
                     }
                 });
-        mBatteryOptDialog = alertDialogBuilder.create();
+
+        // Create the dialog ONCE
+        final AlertDialog dialog = alertDialogBuilder.create();
+
+        // Assign it to your member variable (if you need to)
+        mBatteryOptDialog = dialog;
+
         Log.i(TAG, "Displaying Update Dialog");
-        mBatteryOptDialog.show();
+
+        // Show the dialog ONCE
+        dialog.show();
         mBatteryOptDialogDisplayed = true;
+
+        // Now, get the button from the dialog you just showed
+        Button positiveButton = dialog.getButton(DialogInterface.BUTTON_POSITIVE);
+        if (positiveButton != null) {
+            positiveButton.setTextColor(Color.parseColor("#FF9F1C"));
+        }
     }
 
     /*****************************************************************************/
@@ -979,11 +988,11 @@ public class StartupActivity extends AppCompatActivity {
 
     @Override
     public void onRequestPermissionsResult(int requestCode,
-                                           String permissions[], int[] grantResults) {
+                                           String[] permissions, int[] grantResults) {
         Log.i(TAG, "onRequestPermissionsResult - requestCode="+requestCode+" nPermissions="+permissions.length);
         Log.i(TAG, "onRequestPermissionsResult: "+permissions[0]+": "+grantResults[0]);
         for (int i = 0; i < permissions.length; i++) {
-            Log.i(TAG, String.format("onRequestPermissionsResult: i="+i+", Permission " + permissions[i].toString() + " = " + grantResults[i]));
+            Log.i(TAG, String.format("onRequestPermissionsResult: i="+i+", Permission " + permissions[i] + " = " + grantResults[i]));
             //Log.i(TAG,"i="+i);
         }
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);

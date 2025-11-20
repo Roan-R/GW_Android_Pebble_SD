@@ -36,7 +36,7 @@ import android.util.Log;
  * SdWebServer expects POST requests to /data and /settings URLs to send data or watch settings.
  */
 public class SdDataSourceGarmin extends SdDataSource {
-    private String TAG = "SdDataSourceGarmin";
+    private final String TAG = "SdDataSourceGarmin";
 
     public SdDataSourceGarmin(Context context, Handler handler,
                               SdDataReceiver sdDataReceiver) {

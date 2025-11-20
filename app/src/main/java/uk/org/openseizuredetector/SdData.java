@@ -93,8 +93,8 @@ public class SdData implements Parcelable {
     public String watchSdName = "";
 
 
-    public double rawData[];
-    public double rawData3D[];
+    public double[] rawData;
+    public double[] rawData3D;
     public boolean mAdaptiveHrAlarmActive;
     public double mAdaptiveHrAlarmWindowSecs;
     public double mAdaptiveHrAlarmThresh;
@@ -122,7 +122,7 @@ public class SdData implements Parcelable {
     public long specPower;
     public long roiPower;
     public String alarmPhrase;
-    public int simpleSpec[];
+    public int[] simpleSpec;
     public boolean watchConnected = false;
     public boolean watchAppRunning = false;
     public boolean serverOK = false;
@@ -157,7 +157,7 @@ public class SdData implements Parcelable {
         Log.v(TAG, "fromJSON() - parsing jsonString - " + jsonStr);
         try {
             JSONObject jo = new JSONObject(jsonStr);
-            Log.v(TAG, "fromJSON(): jo = " + jo.toString());
+            Log.v(TAG, "fromJSON(): jo = " + jo);
             Log.v(TAG, "fromJSON(): dataTimeStr=" + jo.optString("dataTimeStr"));
             //Calendar cal = Calendar.getInstance();
             //SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddTHHmmss", Locale.UK);
@@ -206,10 +206,10 @@ public class SdData implements Parcelable {
                 mO2Sat = -1;
             }
             haveData = true;
-            Log.v(TAG, "fromJSON(): sdData = " + this.toString());
+            Log.v(TAG, "fromJSON(): sdData = " + this);
             return true;
         } catch (Exception e) {
-            Log.v(TAG, "fromJSON() - error parsing result" + e.toString());
+            Log.v(TAG, "fromJSON() - error parsing result" + e);
             haveData = false;
             return false;
         }
@@ -271,8 +271,8 @@ public class SdData implements Parcelable {
             retval = jsonObj.toString();
             Log.v(TAG, "retval rawData=" + retval);
         } catch (Exception ex) {
-            Log.v(TAG, "Error Creating Data Object - " + ex.toString());
-            retval = "Error Creating Data Object - " + ex.toString();
+            Log.v(TAG, "Error Creating Data Object - " + ex);
+            retval = "Error Creating Data Object - " + ex;
         }
 
         return (retval);
@@ -334,8 +334,8 @@ public class SdData implements Parcelable {
 
             retval = jsonObj.toString();
         } catch (Exception ex) {
-            Log.e(TAG, "toSettingsJSON(): Error Creating Data Object - " + ex.toString());
-            retval = "Error Creating Data Object - " + ex.toString();
+            Log.e(TAG, "toSettingsJSON(): Error Creating Data Object - " + ex);
+            retval = "Error Creating Data Object - " + ex;
         }
         return (retval);
     }
@@ -411,8 +411,8 @@ public class SdData implements Parcelable {
 
             retval = jsonObj.toString();
         } catch (Exception ex) {
-            Log.v(TAG, "Error Creating Data Object - " + ex.toString());
-            retval = "Error Creating Data Object - " + ex.toString();
+            Log.v(TAG, "Error Creating Data Object - " + ex);
+            retval = "Error Creating Data Object - " + ex;
         }
 
         return (retval);

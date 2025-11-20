@@ -34,7 +34,7 @@ public class FragmentSystem extends FragmentOsdBaseClass {
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         // Handle Edit Settings Button
-        ImageButton button = (ImageButton) mRootView.findViewById(R.id.settingsButton);
+        ImageButton button = mRootView.findViewById(R.id.settingsButton);
         button.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 Log.i(TAG, "settingsButton.onClick()");
@@ -44,7 +44,7 @@ public class FragmentSystem extends FragmentOsdBaseClass {
                             PrefActivity.class);
                     mContext.startActivity(prefsIntent);
                 } catch (Exception ex) {
-                    Log.i(TAG, "exception starting settings activity " + ex.toString());
+                    Log.i(TAG, "exception starting settings activity " + ex);
                 }
 
             }
@@ -57,7 +57,7 @@ public class FragmentSystem extends FragmentOsdBaseClass {
         //Log.d(TAG,"updateUi()");
         TextView tv;
 
-        tv = (TextView) mRootView.findViewById(R.id.fragment_bound_to_server_tv);
+        tv = mRootView.findViewById(R.id.fragment_bound_to_server_tv);
         if (mConnection.mBound) {
             tv.setText("Bound to Server");
             tv.setTextColor(okTextColour);
@@ -66,11 +66,11 @@ public class FragmentSystem extends FragmentOsdBaseClass {
             tv.setTextColor(warnTextColour);
             return;
         }
-        LinearLayoutCompat ll = (LinearLayoutCompat) mRootView.findViewById(R.id.fragment_ll);
+        LinearLayoutCompat ll = mRootView.findViewById(R.id.fragment_ll);
         if (mUtil.isServerRunning()) {
             ll.setBackgroundColor(okColour);
 
-            tv = (TextView) mRootView.findViewById(R.id.serverStatusTv);
+            tv = mRootView.findViewById(R.id.serverStatusTv);
             if (mConnection.mBound) {
                 if (mConnection.mSdServer.mSdDataSourceName.equals("Phone")) {
                     if (mConnection.mSdServer.mLogNDA)
@@ -89,7 +89,7 @@ public class FragmentSystem extends FragmentOsdBaseClass {
                 }
             }
             //Log.v(TAG,"UpdateUi() - displaying server IP address");
-            tv = (TextView) mRootView.findViewById(R.id.serverIpTv);
+            tv = mRootView.findViewById(R.id.serverIpTv);
             tv.setText(getString(R.string.AccessServerAt) + " http://"
                     + mUtil.getLocalIpAddress()
                     + ":8080");
@@ -98,11 +98,11 @@ public class FragmentSystem extends FragmentOsdBaseClass {
         } else {
             ll.setBackgroundColor(warnColour);
 
-            tv = (TextView) mRootView.findViewById(R.id.serverStatusTv);
+            tv = mRootView.findViewById(R.id.serverStatusTv);
             tv.setText(R.string.ServerStopped);
             tv.setBackgroundColor(warnColour);
             tv.setTextColor(warnTextColour);
-            tv = (TextView) mRootView.findViewById(R.id.serverIpTv);
+            tv = mRootView.findViewById(R.id.serverIpTv);
             tv.setText("--");
             tv.setBackgroundColor(warnColour);
             tv.setTextColor(warnTextColour);
@@ -111,7 +111,7 @@ public class FragmentSystem extends FragmentOsdBaseClass {
 
         try {
             if (mConnection.mBound) {
-                tv = (TextView) mRootView.findViewById(R.id.alarmTv);
+                tv = mRootView.findViewById(R.id.alarmTv);
                 if ((mConnection.mSdServer.mSdData.alarmState == 0)
                         && !mConnection.mSdServer.mSdData.alarmStanding
                         && !mConnection.mSdServer.mSdData.fallAlarmStanding) {
@@ -142,13 +142,13 @@ public class FragmentSystem extends FragmentOsdBaseClass {
                     tv.setTextColor(alarmTextColour);
                 }
 
-                tv = (TextView) mRootView.findViewById(R.id.data_time_tv);
+                tv = mRootView.findViewById(R.id.data_time_tv);
                 tv.setText(mConnection.mSdServer.mSdData.dataTime.format("%H:%M:%S"));
                 tv.setBackgroundColor(okColour);
                 tv.setTextColor(okTextColour);
 
 
-                tv = (TextView) mRootView.findViewById(R.id.fragment_watch_app_status_tv);
+                tv = mRootView.findViewById(R.id.fragment_watch_app_status_tv);
                 if (mConnection.mSdServer.mSdData.watchAppRunning) {
                     tv.setText(R.string.WatchAppOK);
                     tv.setBackgroundColor(okColour);
@@ -158,10 +158,10 @@ public class FragmentSystem extends FragmentOsdBaseClass {
                     tv.setBackgroundColor(warnColour);
                     tv.setTextColor(warnTextColour);
                 }
-                tv = (TextView) mRootView.findViewById(R.id.battTv);
+                tv = mRootView.findViewById(R.id.battTv);
                 tv.setText(getString(R.string.WatchBatteryEquals)
-                        + String.valueOf(mConnection.mSdServer.mSdData.batteryPc) + "% / "
-                        + String.valueOf(mConnection.mSdServer.mSdData.phoneBatteryPc) + "%");
+                        + mConnection.mSdServer.mSdData.batteryPc + "% / "
+                        + mConnection.mSdServer.mSdData.phoneBatteryPc + "%");
                 if (mConnection.mSdServer.mSdData.batteryPc <= 10) {
                     tv.setBackgroundColor(alarmColour);
                     tv.setTextColor(alarmTextColour);
@@ -174,19 +174,19 @@ public class FragmentSystem extends FragmentOsdBaseClass {
                     tv.setBackgroundColor(okColour);
                     tv.setTextColor(okTextColour);
                 }
-                tv = (TextView) mRootView.findViewById(R.id.watch_manuf_tv);
+                tv = mRootView.findViewById(R.id.watch_manuf_tv);
                 tv.setText(mConnection.mSdServer.mSdData.watchManuf);
-                tv = (TextView) mRootView.findViewById(R.id.watch_partno_tv);
+                tv = mRootView.findViewById(R.id.watch_partno_tv);
                 tv.setText(mConnection.mSdServer.mSdData.watchPartNo);
-                tv = (TextView) mRootView.findViewById(R.id.watch_fwver_tv);
+                tv = mRootView.findViewById(R.id.watch_fwver_tv);
                 tv.setText(mConnection.mSdServer.mSdData.watchFwVersion);
-                tv = (TextView) mRootView.findViewById(R.id.watch_sdname_tv);
+                tv = mRootView.findViewById(R.id.watch_sdname_tv);
                 tv.setText(mConnection.mSdServer.mSdData.watchSdName);
-                tv = (TextView) mRootView.findViewById(R.id.watch_sdver_tv);
+                tv = mRootView.findViewById(R.id.watch_sdver_tv);
                 tv.setText(mConnection.mSdServer.mSdData.watchSdVersion);
-                tv = (TextView) mRootView.findViewById(R.id.watch_batt_tv);
+                tv = mRootView.findViewById(R.id.watch_batt_tv);
                 tv.setText(mConnection.mSdServer.mSdData.batteryPc+" %");
-                tv = (TextView) mRootView.findViewById(R.id.watch_signal_tv);
+                tv = mRootView.findViewById(R.id.watch_signal_tv);
                 tv.setText(String.format("%.0f dB", mConnection.mSdServer.mSdData.watchSignalStrength));
             }
         } catch (Exception e) {

@@ -86,18 +86,18 @@ public class OsdUtil {
      * Based on http://stackoverflow.com/questions/7440473/android-how-to-check-if-the-intent-service-is-still-running-or-has-stopped-running
      */
     private static Context mContext;
-    private Handler mHandler;
-    private static String TAG = "OsdUtil";
+    private final Handler mHandler;
+    private static final String TAG = "OsdUtil";
     private boolean mLogAlarms = true;
     private boolean mLogSystem = true;
     private boolean mLogData = true;
-    private boolean mPermissionsRequested = false;
-    private boolean mSMSPermissionsRequested = false;
+    private final boolean mPermissionsRequested = false;
+    private final boolean mSMSPermissionsRequested = false;
     private static final String mSysLogTableName = "SysLog";
     //private LogManager mLm;
     static private SQLiteDatabase mSysLogDb = null;   // SQLite Database for data and log entries.
-    private final static Long mMinPruneInterval = new Long(5 * 60 * 1000); // minimum time between syslog pruning is 5 minutes
-    private static Long mLastPruneMillis = new Long(0);   // Record of the last time we pruned the syslog db.
+    private final static Long mMinPruneInterval = Long.valueOf(5 * 60 * 1000); // minimum time between syslog pruning is 5 minutes
+    private static Long mLastPruneMillis = Long.valueOf(0);   // Record of the last time we pruned the syslog db.
 
     private static int mNbound = 0;
 
@@ -171,7 +171,7 @@ public class OsdUtil {
         int nServers = 0;
         /* Log.v(TAG,"isServerRunning()...."); */
         ActivityManager manager =
-                (ActivityManager) mContext.getSystemService(mContext.ACTIVITY_SERVICE);
+                (ActivityManager) mContext.getSystemService(Context.ACTIVITY_SERVICE);
         for (ActivityManager.RunningServiceInfo service :
                 manager.getRunningServices(Integer.MAX_VALUE)) {
             //Log.v(TAG,"Service: "+service.service.getClassName());
@@ -180,11 +180,8 @@ public class OsdUtil {
                 nServers = nServers + 1;
             }
         }
-        if (nServers != 0) {
-            //Log.v(TAG, "isServerRunning() - " + nServers + " instances are running");
-            return true;
-        } else
-            return false;
+        //Log.v(TAG, "isServerRunning() - " + nServers + " instances are running");
+        return nServers != 0;
     }
 
     /**
@@ -247,8 +244,8 @@ public class OsdUtil {
                 mNbound = mNbound - 1;
                 Log.i(TAG, "OsdUtil.unBindFromServer() - mNbound = " + mNbound);
             } catch (Exception ex) {
-                Log.e(TAG, "unbindFromServer() - error unbinding service - " + ex.toString());
-                writeToSysLogFile("unbindFromServer() - error unbinding service - " + ex.toString());
+                Log.e(TAG, "unbindFromServer() - error unbinding service - " + ex);
+                writeToSysLogFile("unbindFromServer() - error unbinding service - " + ex);
                 Log.i(TAG, "OsdUtil.unBindFromServer() - mNbound = " + mNbound);
             }
         } else {
@@ -296,7 +293,7 @@ public class OsdUtil {
                             && InetAddressUtils.isIPv4Address(
                             inetAddress.getHostAddress())) {
 
-                        String ip = inetAddress.getHostAddress().toString();
+                        String ip = inetAddress.getHostAddress();
                         //Log.v(TAG,"ip---::" + ip);
                         return ip;
                     }
@@ -313,11 +310,7 @@ public class OsdUtil {
         ConnectivityManager cm = (ConnectivityManager) mContext.getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
         if (activeNetwork == null) return false;
-        if (activeNetwork.getType() == ConnectivityManager.TYPE_MOBILE) {
-            return true;
-        } else {
-            return false;
-        }
+        return activeNetwork.getType() == ConnectivityManager.TYPE_MOBILE;
     }
 
     public boolean isNetworkConnected() {
@@ -415,11 +408,11 @@ public class OsdUtil {
                     }
                     of.close();
                 } catch (Exception ex) {
-                    Log.e(TAG, "writeToLogFile - error " + ex.toString());
+                    Log.e(TAG, "writeToLogFile - error " + ex);
                     for (int i = 0; i < (ex.getStackTrace().length); i++) {
                         Log.e(TAG, "writeToLogFile - error " + ex.getStackTrace()[i]);
                     }
-                    showToast(mContext.getString(R.string.ErrorWritingLogFileWarning) + ex.toString());
+                    showToast(mContext.getString(R.string.ErrorWritingLogFileWarning) + ex);
                 }
             } else {
                 Log.e(TAG, "ERROR - Can not Write to External Folder");
@@ -439,10 +432,7 @@ public class OsdUtil {
     /* Checks if external storage is available for read and write */
     public boolean isExternalStorageWritable() {
         String state = Environment.getExternalStorageState();
-        if (Environment.MEDIA_MOUNTED.equals(state)) {
-            return true;
-        }
-        return false;
+        return Environment.MEDIA_MOUNTED.equals(state);
     }
 
     public File getDataStorageDir() {
@@ -548,7 +538,7 @@ public class OsdUtil {
                 Log.d(TAG, "table " + mSysLogTableName + " exists ok");
             }
         } catch (SQLException e) {
-            Log.e(TAG, "Failed to open Database: " + e.toString());
+            Log.e(TAG, "Failed to open Database: " + e);
             return false;
         }
         return true;
@@ -595,7 +585,7 @@ public class OsdUtil {
             pruneSysLogDb();
 
         } catch (SQLException e) {
-            Log.e(TAG, "writeLogEngryToLocalDb(): Error Writing Data: " + e.toString());
+            Log.e(TAG, "writeLogEngryToLocalDb(): Error Writing Data: " + e);
             Log.e(TAG, "SQLStr was " + SQLStr);
         }
 
@@ -679,10 +669,10 @@ public class OsdUtil {
                 resultSet.moveToFirst();
                 return (resultSet);
             } catch (SQLException e) {
-                Log.e(TAG, "SelectQueryTask.doInBackground(): Error selecting Data: " + e.toString());
+                Log.e(TAG, "SelectQueryTask.doInBackground(): Error selecting Data: " + e);
                 return (null);
             } catch (IllegalArgumentException e) {
-                Log.e(TAG, "SelectQueryTask.doInBackground(): Illegal Argument Exception: " + e.toString());
+                Log.e(TAG, "SelectQueryTask.doInBackground(): Illegal Argument Exception: " + e);
                 return (null);
             }
         }
@@ -713,7 +703,7 @@ public class OsdUtil {
                 String[] selectArgs = {endDateStr};
                 retVal = mSysLogDb.delete(mSysLogTableName, selectStr, selectArgs);
             } catch (Exception e) {
-                Log.e(TAG, "Error deleting log entries" + e.toString());
+                Log.e(TAG, "Error deleting log entries" + e);
                 retVal = 0;
             }
             if (retVal > 0) {

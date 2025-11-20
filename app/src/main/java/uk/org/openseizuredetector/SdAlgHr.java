@@ -10,7 +10,7 @@ import java.util.ArrayList;
 
 public class SdAlgHr {
     private final static String TAG = "SdAlgHr";
-    private Context mContext;
+    private final Context mContext;
     private boolean mSimpleHrAlarmActive;
     private double mSimpleHrAlarmThreshMin;
     private double mSimpleHrAlarmThreshMax;
@@ -25,9 +25,9 @@ public class SdAlgHr {
     private double mAverageHrAlarmThreshMin;
     private double mAverageHrAlarmThreshMax;
 
-    private CircBuf mAdaptiveHrBuff;
-    private CircBuf mAverageHrBuff;
-    private CircBuf mHrHist;
+    private final CircBuf mAdaptiveHrBuff;
+    private final CircBuf mAverageHrBuff;
+    private final CircBuf mHrHist;
 
     public SdAlgHr(Context context) {
         Log.i(TAG, "SdAlgHr Constructor");
@@ -36,7 +36,7 @@ public class SdAlgHr {
         mAdaptiveHrBuff = new CircBuf(mAdaptiveHrAlarmWindowDp, -1.0);
         mAverageHrBuff = new CircBuf(mAverageHrAlarmWindowDp, -1.0);
         // FIXME - this is a hard coded 3 hour period (at 5 second intervals)
-        mHrHist = new CircBuf((int) (3 * 3600 / 5), -1);
+        mHrHist = new CircBuf(3 * 3600 / 5, -1);
     }
 
     public void close() {

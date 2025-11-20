@@ -73,14 +73,14 @@ public class FragmentBatt extends FragmentOsdBaseClass {
         xAxis.setDrawLabels(true);
         // Note:  the default text colour is BLACK, so does not show up on black background!!!
         //  This took a lot of finding....
-        xAxis.setTextColor(Color.WHITE);
+        xAxis.setTextColor(Color.BLACK);
 
         YAxis yAxis = mLineChart.getAxisLeft();
         yAxis.setAxisMinValue(0f);
         yAxis.setAxisMaxValue(100f);
         yAxis.setDrawGridLines(true);
         yAxis.setDrawLabels(true);
-        yAxis.setTextColor(Color.WHITE);
+        yAxis.setTextColor(Color.BLACK);
         // Inhibit the decimal part of the y axis labels.
         yAxis.setValueFormatter(new ValueFormatter() {
             @Override
@@ -108,14 +108,14 @@ public class FragmentBatt extends FragmentOsdBaseClass {
         if (mConnection.mBound) {
 
             int nWatchBattArr = mConnection.mSdServer.mSdData.watchBattBuff.getNumVals();
-            double watchBattArr[] = mConnection.mSdServer.mSdData.watchBattBuff.getVals();   // This gives us a simple vector of hr values to plot.
+            double[] watchBattArr = mConnection.mSdServer.mSdData.watchBattBuff.getVals();   // This gives us a simple vector of hr values to plot.
             int nPhoneBattArr = mConnection.mSdServer.mSdData.phoneBattBuff.getNumVals();
-            double phoneBattArr[] = mConnection.mSdServer.mSdData.phoneBattBuff.getVals();
+            double[] phoneBattArr = mConnection.mSdServer.mSdData.phoneBattBuff.getVals();
             Log.i(TAG,"updateUi() - nWatchBattArr="+nWatchBattArr+", nPhoneBattArr="+nPhoneBattArr);
             if (Objects.nonNull(mConnection.mSdServer.mSdData.watchBattBuff) && nWatchBattArr > 0) {
                 Log.v(TAG, "hrWatchBattBuff.getNumVals=" + nWatchBattArr);
                 lineDataSet.clear();
-                String xVals[] = new String[nWatchBattArr];
+                String[] xVals = new String[nWatchBattArr];
                 for (int i = 0; i < nWatchBattArr; i++) {
                     //Log.d(TAG,"i="+i+", HR="+hrHistArr[i]);
                     xVals[i] = String.valueOf(i);

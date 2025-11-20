@@ -25,12 +25,12 @@ import fi.iki.elonen.NanoHTTPD;
  * 8080.
  */
 public class SdWebServer extends NanoHTTPD {
-    private String TAG = "WebServer";
+    private final String TAG = "WebServer";
     private SdData mSdData;
-    private SdServer mSdServer;
-    private Context mContext;
-    private Handler mHandler;
-    private OsdUtil mUtil;
+    private final SdServer mSdServer;
+    private final Context mContext;
+    private final Handler mHandler;
+    private final OsdUtil mUtil;
 
     public SdWebServer(Context context, SdData sdData, SdServer sdServer) {
         // Set the port to listen on (8080)
@@ -94,21 +94,21 @@ public class SdWebServer extends NanoHTTPD {
                             Log.v(TAG, "WebServer.serve() - GET /data - sending " + mSdData.toString());
                             answer = mSdData.toString();
                         } catch (Exception ex) {
-                            Log.v(TAG, "Error Creating Data Object - " + ex.toString());
+                            Log.v(TAG, "Error Creating Data Object - " + ex);
                             answer = "{'msg': 'Error Creating Data Object'}";
                         }
                         break;
                     case POST:
-                        Log.v(TAG, "WebServer.serve() - POST /data - receiving data from device: parameters=" + parameters.toString());
+                        Log.v(TAG, "WebServer.serve() - POST /data - receiving data from device: parameters=" + parameters);
                         Log.v(TAG, "              header=" + header.toString());
-                        Log.v(TAG, "              files=" + files.toString());
+                        Log.v(TAG, "              files=" + files);
                         String postData = files.get("postData");
                         Log.v(TAG, "              postData=" + postData);
                         if (mSdServer.mSdDataSourceName.equals("Garmin")) {
                             // Send the data to the SdDataSource so the app can pick it up.
                             if (parameters.get("dataObj") != null) {
                                 Log.v(TAG, "passing parameters to data source");
-                                answer = mSdServer.mSdDataSource.updateFromJSON(parameters.get("dataObj").toString());
+                                answer = mSdServer.mSdDataSource.updateFromJSON(parameters.get("dataObj"));
                             } else {
                                 Log.v(TAG, "Passing postData to data source");
                                 answer = mSdServer.mSdDataSource.updateFromJSON(files.get("postData"));
@@ -142,18 +142,18 @@ public class SdWebServer extends NanoHTTPD {
                              */
                             answer = mSdData.toSettingsJSON();
                         } catch (Exception ex) {
-                            Log.v(TAG, "Error Creating Data Object - " + ex.toString());
+                            Log.v(TAG, "Error Creating Data Object - " + ex);
                             answer = "{'msg': 'Error Creating Data Object'}";
                         }
                         break;
                     case POST:
-                        Log.v(TAG, "WebServer.serve() - POST /settings - receiving data from device: parameters=" + parameters.toString());
+                        Log.v(TAG, "WebServer.serve() - POST /settings - receiving data from device: parameters=" + parameters);
                         Log.v(TAG, "              header=" + header.toString());
-                        Log.v(TAG, "              files=" + files.toString());
+                        Log.v(TAG, "              files=" + files);
                         // Send the data to the SdDataSource so the app can pick it up.
                         if (parameters != null) {
                             Log.v(TAG, "passing parameters to data source");
-                            answer = mSdServer.mSdDataSource.updateFromJSON(parameters.get("dataObj").toString());
+                            answer = mSdServer.mSdDataSource.updateFromJSON(parameters.get("dataObj"));
                         } else {
                             Log.v(TAG, "Passing postData to data source");
                             answer = mSdServer.mSdDataSource.updateFromJSON(files.get("postData"));
@@ -181,7 +181,7 @@ public class SdWebServer extends NanoHTTPD {
                     answer = jsonObj.toString();
                     Log.v(TAG, "WebServer.serve() - Returning spectrum - 5" + answer);
                 } catch (Exception ex) {
-                    Log.v(TAG, "Error Creating Data Object - " + ex.toString());
+                    Log.v(TAG, "Error Creating Data Object - " + ex);
                     answer = "{'msg' : 'Error Creating Data Object'}";
                 }
                 break;
@@ -259,7 +259,7 @@ public class SdWebServer extends NanoHTTPD {
                             "text/html", jsonObj.toString());
                 } catch (Exception ex) {
                     res = new NanoHTTPD.Response(NanoHTTPD.Response.Status.OK,
-                            "text/html", "ERROR - " + ex.toString());
+                            "text/html", "ERROR - " + ex);
                 }
                 return res;
             }
@@ -274,7 +274,7 @@ public class SdWebServer extends NanoHTTPD {
                     mimeStr, ip);
             res.addHeader("Content-Length", "" + ip.available());
         } catch (IOException ex) {
-            Log.v(TAG, "serveLogFile(): Error Opening File - " + ex.toString());
+            Log.v(TAG, "serveLogFile(): Error Opening File - " + ex);
             res = new NanoHTTPD.Response("serveLogFile(): Error Opening file " + uri);
         }
         return (res);
@@ -298,7 +298,7 @@ public class SdWebServer extends NanoHTTPD {
                     mimeStr, ip);
             res.addHeader("Content-Length", "" + ip.available());
         } catch (IOException ex) {
-            Log.v(TAG, "serveFile(): Error Opening File - " + ex.toString());
+            Log.v(TAG, "serveFile(): Error Opening File - " + ex);
             res = new NanoHTTPD.Response("serveFile(): Error Opening file " + uri);
         }
         return (res);

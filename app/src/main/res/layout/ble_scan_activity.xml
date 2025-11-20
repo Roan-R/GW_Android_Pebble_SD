@@ -58,8 +58,9 @@
             android:id="@+id/startScanButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:backgroundTint="@color/colorPrimaryDark"
             android:onClick="onScanButtonClick"
-            android:text="Start Scan"/>
+            android:text="Start Scan" />
     </LinearLayout>
 
 

@@ -236,7 +236,7 @@ public final class UCEHandler {
     }
 
     public static class Builder {
-        private Context context;
+        private final Context context;
         private boolean isUCEHEnabled = true;
         private String commaSeparatedEmailAddresses;
         private boolean isTrackActivitiesEnabled = false;

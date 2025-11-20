@@ -43,27 +43,27 @@ import java.util.List;
  * Based on: https://www.journaldev.com/9976/android-date-time-picker-dialog
  */
 public class ReportSeizureActivity extends AppCompatActivity {
-    private String TAG = "ReportSeizureActivity";
+    private final String TAG = "ReportSeizureActivity";
     private Context mContext;
     private UiTimer mUiTimer;
     private LogManager mLm;
     private WebApiConnection mWac;
 
     private int mYear, mMonth, mDay, mHour, mMinute;
-    private String mMsg = "Messages";
+    private final String mMsg = "Messages";
     private SdServiceConnection mConnection;
     private OsdUtil mUtil;
     final Handler serverStatusHandler = new Handler();
     private List<String> mEventTypesList = null;
     private HashMap<String, ArrayList<String>> mEventSubTypesHashMap = null;
-    private String mEventTypeStr = null;
-    private String mEventSubTypeStr = null;
-    private String mEventNotes = "";
+    private final String mEventTypeStr = null;
+    private final String mEventSubTypeStr = null;
+    private final String mEventNotes = "";
     private RadioGroup mEventTypeRg;
     private boolean mRedrawEventSubTypesList = false;
     private boolean mRedrawEventTypesList = false;
     private RadioGroup mEventSubTypeRg;
-    private boolean mEventSubTypesListChanged = false;
+    private final boolean mEventSubTypesListChanged = false;
 
 
     @Override
@@ -103,19 +103,19 @@ public class ReportSeizureActivity extends AppCompatActivity {
         mEventSubTypeRg.setOnCheckedChangeListener(onEventSubTypeChange);
 
         Button okBtn =
-                (Button) findViewById(R.id.loginBtn);
+                findViewById(R.id.loginBtn);
         okBtn.setOnClickListener(onOk);
 
         Button cancelBtn =
-                (Button) findViewById(R.id.cancelBtn);
+                findViewById(R.id.cancelBtn);
         cancelBtn.setOnClickListener(onCancel);
 
         Button setDateBtn =
-                (Button) findViewById(R.id.select_date_button);
+                findViewById(R.id.select_date_button);
         setDateBtn.setOnClickListener(onSelectDate);
 
         Button setTimeBtn =
-                (Button) findViewById(R.id.select_time_button);
+                findViewById(R.id.select_time_button);
         setTimeBtn.setOnClickListener(onSelectTime);
 
         // Get Current Date
@@ -172,7 +172,7 @@ public class ReportSeizureActivity extends AppCompatActivity {
 
     private void initialiseServiceConnection() {
         mLm = mConnection.mSdServer.mLm;
-        mWac = mConnection.mSdServer.mLm.mWac;
+        mWac = LogManager.mWac;
 
         if (mWac.isLoggedIn()) {
 
@@ -203,7 +203,7 @@ public class ReportSeizureActivity extends AppCompatActivity {
                                 mEventSubTypesHashMap.put(key, eventSubtypesList);
                                 mRedrawEventSubTypesList = true;
                             } catch (JSONException e) {
-                                Log.e(TAG, "initialiseServiceConnection().getEventTypes Callback: Error parsing JSONObject" + e.getMessage() + e.toString());
+                                Log.e(TAG, "initialiseServiceConnection().getEventTypes Callback: Error parsing JSONObject" + e.getMessage() + e);
                             }
                         }
                         mRedrawEventTypesList = true;
@@ -233,22 +233,22 @@ public class ReportSeizureActivity extends AppCompatActivity {
         Button btn;
         RadioButton b;
 
-        tv = (TextView) findViewById(R.id.date_day_tv);
+        tv = findViewById(R.id.date_day_tv);
         tv.setText(String.format("%02d", mDay));
-        tv = (TextView) findViewById(R.id.date_mon_tv);
+        tv = findViewById(R.id.date_mon_tv);
         tv.setText(String.format("%02d", mMonth + 1));   // Month counted from zero
-        tv = (TextView) findViewById(R.id.date_year_tv);
+        tv = findViewById(R.id.date_year_tv);
         tv.setText(String.format("%04d", mYear));
-        tv = (TextView) findViewById(R.id.time_hh_tv);
+        tv = findViewById(R.id.time_hh_tv);
         tv.setText(String.format("%02d", mHour));
-        tv = (TextView) findViewById(R.id.time_mm_tv);
+        tv = findViewById(R.id.time_mm_tv);
         tv.setText(String.format("%02d", mMinute));
-        tv = (TextView) findViewById(R.id.msg_tv);
+        tv = findViewById(R.id.msg_tv);
         tv.setText(mMsg);
 
         // Populate event type button group if necessary
         if (mEventTypesList != null && mRedrawEventTypesList) {
-            Log.v(TAG, "updateUi: " + mEventTypesList.toString());
+            Log.v(TAG, "updateUi: " + mEventTypesList);
             mEventTypeRg.removeAllViews();
             for (String eventTypeStr : mEventTypesList) {
                 b = new RadioButton(this);
@@ -263,7 +263,7 @@ public class ReportSeizureActivity extends AppCompatActivity {
         // Find which seizure type is selected
         int checkedRadioButtonId = mEventTypeRg.getCheckedRadioButtonId();
         //Log.i(TAG,"updateUi(): checkedRadioButtonId="+checkedRadioButtonId);
-        b = (RadioButton) findViewById(checkedRadioButtonId);
+        b = findViewById(checkedRadioButtonId);
         if (b != null) {
             seizureTypeStr = b.getText().toString();
         }
@@ -303,20 +303,20 @@ public class ReportSeizureActivity extends AppCompatActivity {
 
                     // Read seizure type from radio buttons
                     int checkedRadioButtonId = mEventTypeRg.getCheckedRadioButtonId();
-                    b = (RadioButton) findViewById(checkedRadioButtonId);
+                    b = findViewById(checkedRadioButtonId);
                     if (b != null) {
                         seizureTypeStr = b.getText().toString();
                     }
                     Log.i(TAG, "onOk() - SeizureType=" + seizureTypeStr);
 
                     checkedRadioButtonId = mEventSubTypeRg.getCheckedRadioButtonId();
-                    b = (RadioButton) findViewById(checkedRadioButtonId);
+                    b = findViewById(checkedRadioButtonId);
                     if (b != null) {
                         seizureSubTypeStr = b.getText().toString();
                     }
                     Log.i(TAG, "onOk() - SeizureSubType=" + seizureSubTypeStr);
 
-                    TextView tv = (TextView) findViewById(R.id.eventNotesTv);
+                    TextView tv = findViewById(R.id.eventNotesTv);
                     notesStr = tv.getText().toString();
 
                     mLm.createLocalEvent(dateStr, 5, seizureTypeStr, seizureSubTypeStr, notesStr,

@@ -29,15 +29,15 @@ import java.util.Map;
 public class SdAlgNn {
     private final static String TAG = "SdAlgNn";
     private final static String MODEL_PATH = "cnn_v0.24.tflite";
-    private String mUrlBase = "https://osdApi.ddns.net";
+    private final String mUrlBase = "https://osdApi.ddns.net";
     private InterpreterApi interpreter;
-    private Context mContext;
-    private MlModelManager mMm;
+    private final Context mContext;
+    private final MlModelManager mMm;
     RequestQueue mQueue;
 
     private double mSdThresh;  // Acceleration Standard Deviation Threshold required to activate analysis (%)
     private int mModelId;   // ID of ML Model to be used (refers to information in MlModels.json for details).
-    private int mInputFormat; // ID of input format required for model (populated from MlModels.json).
+    private final int mInputFormat; // ID of input format required for model (populated from MlModels.json).
 
 
     public SdAlgNn(Context context) {
@@ -55,7 +55,7 @@ public class SdAlgNn {
             mModelId = Integer.parseInt(threshStr);
             Log.v(TAG, "SdAlgNn Constructor mModelId = " + mModelId);
         } catch (Exception ex) {
-            Log.v(TAG, "SdAlgNn Constructor - problem parsing preferences. " + ex.toString());
+            Log.v(TAG, "SdAlgNn Constructor - problem parsing preferences. " + ex);
             Toast toast = Toast.makeText(mContext, "Problem Parsing ML Algorithm Preferences", Toast.LENGTH_SHORT);
             toast.show();
         }

@@ -25,9 +25,9 @@ import java.util.Locale;
  * Based on http://www.coderzheaven.com/2013/03/13/customize-force-close-dialog-android/
  */
 public class OsdUncaughtExceptionHandler implements Thread.UncaughtExceptionHandler {
-    private Context mContext;
+    private final Context mContext;
     private static Context mStaticContext;
-    private static String reportEmail = "crashreports@openseizuredetector.org.uk";
+    private static final String reportEmail = "crashreports@openseizuredetector.org.uk";
 
     public OsdUncaughtExceptionHandler(Context context) {
         mContext = context;
@@ -40,7 +40,7 @@ public class OsdUncaughtExceptionHandler implements Thread.UncaughtExceptionHand
             StringBuilder report = new StringBuilder();
             Date curDate = new Date();
             report.append("Error Report collected on : ")
-                    .append(curDate.toString()).append('\n').append('\n');
+                    .append(curDate).append('\n').append('\n');
             report.append("System Information :").append('\n');
             addInformation(report);
             report.append('\n').append('\n');
@@ -48,7 +48,7 @@ public class OsdUncaughtExceptionHandler implements Thread.UncaughtExceptionHand
             final Writer result = new StringWriter();
             final PrintWriter printWriter = new PrintWriter(result);
             ex.printStackTrace(printWriter);
-            report.append(result.toString());
+            report.append(result);
             printWriter.close();
             report.append('\n');
             report.append("**** End of current Report ***");
@@ -139,16 +139,15 @@ public class OsdUncaughtExceptionHandler implements Thread.UncaughtExceptionHand
                                         Intent.ACTION_SEND);
                                 sendIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                                 String subject = "OpenSeizureDetector Crash report";
-                                StringBuilder body = new StringBuilder("Crash Report:");
-                                body.append('\n').append('\n');
-                                body.append(errorContent).append('\n')
-                                        .append('\n');
+                                String body = "Crash Report:" + '\n' + '\n' +
+                                        errorContent + '\n' +
+                                        '\n';
                                 // sendIntent.setType("text/plain");
                                 sendIntent.setType("message/rfc822");
                                 sendIntent.putExtra(Intent.EXTRA_EMAIL,
                                         new String[]{reportEmail});
                                 sendIntent.putExtra(Intent.EXTRA_TEXT,
-                                        body.toString());
+                                        body);
                                 sendIntent.putExtra(Intent.EXTRA_SUBJECT,
                                         subject);
                                 sendIntent.setType("message/rfc822");

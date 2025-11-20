@@ -15,6 +15,7 @@ import java.io.Reader;
 import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -22,7 +23,7 @@ import java.util.TimerTask;
  * Created by graham on 22/11/15.
  */
 public class SdDataSourceNetwork extends SdDataSource {
-    private String TAG = "SdDataSourceNetwork";
+    private final String TAG = "SdDataSourceNetwork";
     private Time mStatusTime;
     private Timer mDataUpdateTimer;
     private int mDataUpdatePeriod = 2000;
@@ -30,7 +31,7 @@ public class SdDataSourceNetwork extends SdDataSource {
     private int mReadTimeoutPeriod = 5000;
     private String mServerIP = "unknown";
 
-    private int ALARM_STATE_NETFAULT = 7;
+    private final int ALARM_STATE_NETFAULT = 7;
 
 
     public SdDataSourceNetwork(Context context, Handler handler, SdDataReceiver sdDataReceiver) {
@@ -101,7 +102,7 @@ public class SdDataSourceNetwork extends SdDataSource {
             Log.v(TAG, "updatePrefs() - mReadTimeoutPeriod = " + mReadTimeoutPeriod);
         } catch (Exception ex) {
             Log.v(TAG, "updatePrefs() - Problem parsing preferences!");
-            mUtil.writeToSysLogFile("SdDataSourceNetwork().updatePrefs() - " + ex.toString());
+            mUtil.writeToSysLogFile("SdDataSourceNetwork().updatePrefs() - " + ex);
             showToast("Problem Parsing Preferences - Something won't work");
         }
     }
@@ -132,7 +133,7 @@ public class SdDataSourceNetwork extends SdDataSource {
                     sdData.watchAppRunning = false;
                     sdData.alarmState = ALARM_STATE_NETFAULT;
                     sdData.alarmPhrase = "Warning - No Connection to Server";
-                    Log.v(TAG, "doInBackground(): No Connection to Server - sdData = " + sdData.toString());
+                    Log.v(TAG, "doInBackground(): No Connection to Server - sdData = " + sdData);
                 } else {
                     Log.v(TAG, "doInBackground - result = " + result);
                     sdData.fromJSON(result);
@@ -152,7 +153,7 @@ public class SdDataSourceNetwork extends SdDataSource {
                 sdData.watchAppRunning = false;
                 sdData.alarmState = ALARM_STATE_NETFAULT;
                 sdData.alarmPhrase = "Warning - No Connection to Server";
-                Log.v(TAG, "doInBackground(): IOException - " + e.toString());
+                Log.v(TAG, "doInBackground(): IOException - " + e);
                 return sdData;
             }
         }
@@ -186,7 +187,7 @@ public class SdDataSourceNetwork extends SdDataSource {
                     Log.v(TAG, "doInBackground(): Alarm Accepted");
                 }
             } catch (IOException e) {
-                Log.v(TAG, "doInBackground(): IOException - " + e.toString());
+                Log.v(TAG, "doInBackground(): IOException - " + e);
             }
             return "Done";
         }
@@ -235,9 +236,9 @@ public class SdDataSourceNetwork extends SdDataSource {
     }
 
     // Reads an InputStream and converts it to a String.
-    public String readInputStream(InputStream stream, int len) throws IOException, UnsupportedEncodingException {
+    public String readInputStream(InputStream stream, int len) throws IOException {
         Reader reader = null;
-        reader = new InputStreamReader(stream, "UTF-8");
+        reader = new InputStreamReader(stream, StandardCharsets.UTF_8);
         char[] buffer = new char[len];
         reader.read(buffer);
         return new String(buffer);

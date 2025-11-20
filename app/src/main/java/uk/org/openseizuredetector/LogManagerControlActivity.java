@@ -54,7 +54,7 @@ import java.util.Locale;
 import java.util.Map;
 
 public class LogManagerControlActivity extends AppCompatActivity {
-    private String TAG = "LogManagerControlActivity";
+    private final String TAG = "LogManagerControlActivity";
     private static final long GROUPING_WINDOW_MINUTES = 3;
     private static final long GROUPING_WINDOW_MS = GROUPING_WINDOW_MINUTES * 60 * 1000;
     private LogManager mLm;
@@ -67,8 +67,8 @@ public class LogManagerControlActivity extends AppCompatActivity {
     private SdServiceConnection mConnection;
     private OsdUtil mUtil;
     final Handler serverStatusHandler = new Handler();
-    private Integer mUiTimerPeriodFast = 2000;  // 2 seconds - we use fast updating while UI is blank and we are waiting for first data
-    private Integer mUiTimerPeriodSlow = 60000; // 60 seconds - once data has been received and UI populated we only update once per minute.
+    private final Integer mUiTimerPeriodFast = 2000;  // 2 seconds - we use fast updating while UI is blank and we are waiting for first data
+    private final Integer mUiTimerPeriodSlow = 60000; // 60 seconds - once data has been received and UI populated we only update once per minute.
     private boolean mUpdateSysLog = true;
     private Menu mMenu;
     private CheckBox mGroupEventsCb; // Declare the CheckBox member
@@ -123,22 +123,22 @@ public class LogManagerControlActivity extends AppCompatActivity {
                 Log.v(TAG, "menuKeyField is null - doing nothing...");
             }
         } catch (Exception e) {
-            Log.v(TAG, "menubar fiddle exception: " + e.toString());
+            Log.v(TAG, "menubar fiddle exception: " + e);
         }
 
         Button authBtn =
-                (Button) findViewById(R.id.auth_button);
+                findViewById(R.id.auth_button);
         authBtn.setOnClickListener(onAuth);
 
         Button remoteDbBtn =
-                (Button) findViewById(R.id.refresh_button);
+                findViewById(R.id.refresh_button);
         remoteDbBtn.setOnClickListener(onRefreshBtn);
 
         CheckBox includeWarningsCb =
-                (CheckBox) findViewById(R.id.include_warnings_cb);
+                findViewById(R.id.include_warnings_cb);
         includeWarningsCb.setOnCheckedChangeListener(onIncludeWarningsCb);
         CheckBox includeNDACb =
-                (CheckBox) findViewById(R.id.include_nda_cb);
+                findViewById(R.id.include_nda_cb);
         includeNDACb.setOnCheckedChangeListener(onIncludeNDACb);
 
         mGroupEventsCb = findViewById(R.id.group_events_cb);
@@ -156,10 +156,10 @@ public class LogManagerControlActivity extends AppCompatActivity {
         });
 
 
-        ListView lv = (ListView) findViewById(R.id.eventLogListView);
+        ListView lv = findViewById(R.id.eventLogListView);
         lv.setOnItemClickListener(onEventListClick);
 
-        lv = (ListView) findViewById(R.id.remoteEventsLv);
+        lv = findViewById(R.id.remoteEventsLv);
         lv.setOnItemClickListener(onRemoteEventListClick);
     }
 
@@ -236,10 +236,10 @@ public class LogManagerControlActivity extends AppCompatActivity {
         mLm = mConnection.mSdServer.mLm;
         startUiTimer(mUiTimerPeriodFast);
 
-        final CheckBox includeWarningsCb = (CheckBox) findViewById(R.id.include_warnings_cb);
-        final CheckBox includeNDACb = (CheckBox) findViewById(R.id.include_nda_cb);
+        final CheckBox includeWarningsCb = findViewById(R.id.include_warnings_cb);
+        final CheckBox includeNDACb = findViewById(R.id.include_nda_cb);
         getRemoteEvents(includeWarningsCb.isChecked(), includeNDACb.isChecked());
-        ProgressBar pb = (ProgressBar) findViewById(R.id.remoteAccessPb);
+        ProgressBar pb = findViewById(R.id.remoteAccessPb);
         pb.setIndeterminate(true);
         pb.setVisibility(View.VISIBLE);
         if (mLm != null) {
@@ -267,7 +267,7 @@ public class LogManagerControlActivity extends AppCompatActivity {
         mRemoteEventsList = null;  // clear existing data
         mGroupedRemoteEventsList = null;
         // Retrieve events from remote database
-        mLm.mWac.getEvents((JSONObject remoteEventsObj) -> {
+        LogManager.mWac.getEvents((JSONObject remoteEventsObj) -> {
             Log.v(TAG, "getRemoteEvents()");
             if (remoteEventsObj == null) {
                 Log.e(TAG, "getRemoteEvents Callback:  Error Retrieving events");
@@ -466,14 +466,14 @@ public class LogManagerControlActivity extends AppCompatActivity {
         // Local Database Information
         if (mLm != null) {
             mLm.getLocalEventsCount(true, (Long eventCount) -> {
-                TextView tv1 = (TextView) findViewById(R.id.num_local_events_tv);
+                TextView tv1 = findViewById(R.id.num_local_events_tv);
                 tv1.setText(String.format("%d", eventCount));
             });
             //mLm.getLocalDatapointsCount((Long datapointsCount) -> {
             //    TextView tv2 = (TextView) findViewById(R.id.num_local_datapoints_tv);
             //    tv2.setText(String.format("%d", datapointsCount));
             //});
-            TextView tv3 = (TextView) findViewById(R.id.nda_time_remaining_tv);
+            TextView tv3 = findViewById(R.id.nda_time_remaining_tv);
             tv3.setText(String.format("%.1f hrs", mLm.mNDATimeRemaining));
             Log.d(TAG, "mNDATimeRemaining = " + String.format("%.1f hrs", mLm.mNDATimeRemaining));
         } else {
@@ -481,7 +481,7 @@ public class LogManagerControlActivity extends AppCompatActivity {
         }
         // Local Database ListView
         if (mEventsList != null) {
-            ListView lv = (ListView) findViewById(R.id.eventLogListView);
+            ListView lv = findViewById(R.id.eventLogListView);
             ListAdapter adapter = new SimpleAdapter(LogManagerControlActivity.this, mEventsList, R.layout.log_entry_layout,
                     new String[]{"dataTime", "status", "uploaded"},
                     new int[]{R.id.event_date, R.id.event_alarmState, R.id.event_uploaded});
@@ -492,7 +492,7 @@ public class LogManagerControlActivity extends AppCompatActivity {
         }
         // SysLog ListView
         if (mSysLogList != null && mUpdateSysLog) {
-            ListView lv = (ListView) findViewById(R.id.sysLogListView);
+            ListView lv = findViewById(R.id.sysLogListView);
             ListAdapter adapter = new SimpleAdapter(LogManagerControlActivity.this, mSysLogList, R.layout.syslog_entry_layout,
                     new String[]{"dataTime", "logLevel", "dataJSON"},
                     new int[]{R.id.syslog_entry_date_tv, R.id.syslog_level_tv, R.id.syslog_entry_text_tv});
@@ -502,10 +502,10 @@ public class LogManagerControlActivity extends AppCompatActivity {
         }
         // Remote Database List View
         if (mRemoteEventsList != null) {
-            ProgressBar pb = (ProgressBar) findViewById(R.id.remoteAccessPb);
+            ProgressBar pb = findViewById(R.id.remoteAccessPb);
             pb.setIndeterminate(false);
             pb.setVisibility(View.INVISIBLE);
-            ListView lv = (ListView) findViewById(R.id.remoteEventsLv);
+            ListView lv = findViewById(R.id.remoteEventsLv);
 
             if (mGroupEventsCb.isChecked() && mGroupedRemoteEventsList != null) {
                 // Show only the first event of each group
@@ -536,9 +536,9 @@ public class LogManagerControlActivity extends AppCompatActivity {
 
         // Remote Database Information
         if (mLm != null) {
-            tv = (TextView) findViewById(R.id.authStatusTv);
-            btn = (Button) findViewById(R.id.auth_button);
-            if (mLm.mWac.isLoggedIn()) {
+            tv = findViewById(R.id.authStatusTv);
+            btn = findViewById(R.id.auth_button);
+            if (LogManager.mWac.isLoggedIn()) {
                 tv.setText(getString(R.string.logged_in_with_token));
                 btn.setText(getString(R.string.logout));
             } else {
@@ -559,9 +559,9 @@ public class LogManagerControlActivity extends AppCompatActivity {
     }  //updateUi();
 
     public void onRadioButtonClicked(View view) {
-        LinearLayout localDataLl = (LinearLayout) findViewById(R.id.local_data_ll);
-        LinearLayout sharedDataLl = (LinearLayout) findViewById(R.id.shared_data_ll);
-        LinearLayout syslogLl = (LinearLayout) findViewById(R.id.syslog_ll);
+        LinearLayout localDataLl = findViewById(R.id.local_data_ll);
+        LinearLayout sharedDataLl = findViewById(R.id.shared_data_ll);
+        LinearLayout syslogLl = findViewById(R.id.syslog_ll);
         // Is the button now checked?
         boolean checked = ((RadioButton) view).isChecked();
 
@@ -606,7 +606,7 @@ public class LogManagerControlActivity extends AppCompatActivity {
                             AuthenticateActivity.class);
                     this.startActivity(i);
                 } catch (Exception ex) {
-                    Log.i(TAG, "exception starting export activity " + ex.toString());
+                    Log.i(TAG, "exception starting export activity " + ex);
                 }
                 return true;
             case R.id.pruneDatabaseMenuItem:
@@ -621,7 +621,7 @@ public class LogManagerControlActivity extends AppCompatActivity {
                             ReportSeizureActivity.class);
                     this.startActivity(intent);
                 } catch (Exception ex) {
-                    Log.i(TAG, "exception starting Report Seizure activity " + ex.toString());
+                    Log.i(TAG, "exception starting Report Seizure activity " + ex);
                 }
                 return true;
             case R.id.action_settings:
@@ -632,7 +632,7 @@ public class LogManagerControlActivity extends AppCompatActivity {
                             PrefActivity.class);
                     this.startActivity(prefsIntent);
                 } catch (Exception ex) {
-                    Log.i(TAG, "exception starting settings activity " + ex.toString());
+                    Log.i(TAG, "exception starting settings activity " + ex);
                 }
                 return true;
             case R.id.start_stop_nda:
@@ -690,7 +690,7 @@ public class LogManagerControlActivity extends AppCompatActivity {
                         .setIcon(android.R.drawable.ic_dialog_alert)
                         .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int whichButton) {
-                                mLm.mWac.markUnverifiedEventsAsUnknown();
+                                LogManager.mWac.markUnverifiedEventsAsUnknown();
                             }
                         })
                         .setNegativeButton(android.R.string.no, null)
@@ -704,7 +704,7 @@ public class LogManagerControlActivity extends AppCompatActivity {
                         .setIcon(android.R.drawable.ic_dialog_alert)
                         .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int whichButton) {
-                                mLm.mWac.markUnverifiedEventsAsFalseAlarm();
+                                LogManager.mWac.markUnverifiedEventsAsFalseAlarm();
                             }
                         })
                         .setNegativeButton(android.R.string.no, null)
@@ -718,7 +718,7 @@ public class LogManagerControlActivity extends AppCompatActivity {
                             ExportDataActivity.class);
                     this.startActivity(i);
                 } catch (Exception ex) {
-                    Log.i(TAG, "exception starting export data activity " + ex.toString());
+                    Log.i(TAG, "exception starting export data activity " + ex);
                 }
                 return true;
             case R.id.action_about_datasharing:
@@ -969,7 +969,7 @@ public class LogManagerControlActivity extends AppCompatActivity {
             }
 
             // Convert date format to something more readable.
-            TextView tv = (TextView) v.findViewById(R.id.event_date_remote_tv);
+            TextView tv = v.findViewById(R.id.event_date_remote_tv);
             Date dataTime = null;
             String dateStr = (String) dataItem.get("dataTime");
             dataTime = mUtil.string2date(dateStr);
@@ -1001,7 +1001,7 @@ public class LogManagerControlActivity extends AppCompatActivity {
                             AuthenticateActivity.class);
                     mContext.startActivity(i);
                 } catch (Exception ex) {
-                    Log.i(TAG, "exception starting activity " + ex.toString());
+                    Log.i(TAG, "exception starting activity " + ex);
                 }
 
             }

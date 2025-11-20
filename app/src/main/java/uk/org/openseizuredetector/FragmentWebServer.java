@@ -31,12 +31,11 @@ public class FragmentWebServer extends FragmentOsdBaseClass {
     protected void updateUi() {
         Log.d(TAG, "updateUi()");
         TextView tv;
-        tv = (TextView) mRootView.findViewById(R.id.fragment_web_server_tv1);
+        tv = mRootView.findViewById(R.id.fragment_web_server_tv1);
         if (mConnection.mBound) {
             tv.setText("Bound to Server");
         } else {
             tv.setText("****NOT BOUND TO SERVER***");
-            return;
         }
 
 

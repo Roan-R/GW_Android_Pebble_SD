@@ -22,7 +22,7 @@ import android.widget.TextView;
 import java.util.HashMap;
 
 public class RemoteDbActivity extends AppCompatActivity {
-    private String TAG = "RemoteDbActivity";
+    private final String TAG = "RemoteDbActivity";
     private Context mContext;
     private UiTimer mUiTimer;
     private LogManager mLm;
@@ -30,7 +30,7 @@ public class RemoteDbActivity extends AppCompatActivity {
     private SdServiceConnection mConnection;
     private OsdUtil mUtil;
     final Handler serverStatusHandler = new Handler();
-    private String TOKEN_ID = "webApiAuthToken";
+    private final String TOKEN_ID = "webApiAuthToken";
     private String mRemtoteUrl = "https://osdapi.ddns.net/";
 
 
@@ -56,13 +56,13 @@ public class RemoteDbActivity extends AppCompatActivity {
         //mLm= new LogManager(mContext);
 
         Button authBtn =
-                (Button) findViewById(R.id.auth_button);
+                findViewById(R.id.auth_button);
         authBtn.setOnClickListener(onAuth);
         //Button pruneBtn =
         //        (Button) findViewById(R.id.pruneDatabaseBtn);
         //pruneBtn.setOnClickListener(onPruneBtn);
 
-        mWebView = (WebView) findViewById(R.id.remote_db_webview);
+        mWebView = findViewById(R.id.remote_db_webview);
         WebSettings webSettings = mWebView.getSettings();
         webSettings.setJavaScriptEnabled(true);
 
@@ -140,10 +140,10 @@ public class RemoteDbActivity extends AppCompatActivity {
 
 
         // Remote Database Information
-        tv = (TextView) findViewById(R.id.authStatusTv);
-        btn = (Button) findViewById(R.id.auth_button);
+        tv = findViewById(R.id.authStatusTv);
+        btn = findViewById(R.id.auth_button);
         if (mLm != null) {
-            if (mLm.mWac.isLoggedIn()) {
+            if (LogManager.mWac.isLoggedIn()) {
                 tv.setText("Authenticated");
                 btn.setText("Log Out");
             } else {
