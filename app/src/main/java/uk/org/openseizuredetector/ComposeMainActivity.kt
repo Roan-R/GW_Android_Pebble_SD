@@ -31,7 +31,7 @@ val CarbonBlack = Color(0xFF172121)
 val AirForceBlue = Color(0xFF6A8D92)
 val PaleOak = Color(0xFFE2D0B6)
 val PureWhite = Color(0xFFFFFFFF)
-val Yellow = Color(0xFFEEBC)
+val Yellow = Color(0xFFFFCC00)
 
 class ComposeMainActivity : ComponentActivity() {
 
