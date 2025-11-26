@@ -19,10 +19,14 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Pause
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Color as ComposeColor
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -49,6 +53,14 @@ enum class StartupState {
 class LoadingActivity : ComponentActivity() {
 
     private val TAG = "LoadingActivity"
+
+    // Color Palette
+    private val background = ComposeColor(0xFFD7FFF1)
+    private val brown = ComposeColor(0xFF664E4C)
+    private val charcoal = ComposeColor(0xFF172121)
+    private val teal = ComposeColor(0xFF6A8D92)
+    private val beige = ComposeColor(0xFFE2D0B6)
+    private val white = ComposeColor.White
 
     private lateinit var mUtil: OsdUtil
     private lateinit var mConnection: SdServiceConnection
@@ -223,38 +235,49 @@ class LoadingActivity : ComponentActivity() {
 
     @Composable
     fun LoadingUI(items: List<StartupItem>) {
-        Column(
-            modifier = Modifier.fillMaxSize().padding(16.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
-        ) {
-            Image(painter = painterResource(id = R.drawable.star_of_life_48x48), contentDescription = "App Icon")
-            Text(text = stringResource(id = R.string.app_name), style = MaterialTheme.typography.h5, modifier = Modifier.padding(top = 8.dp))
-            Text(text = stringResource(id = R.string.StartingTitle), style = MaterialTheme.typography.subtitle1, modifier = Modifier.padding(top = 4.dp, bottom = 24.dp))
+        Scaffold(
+            backgroundColor = background
+        ) { paddingValues ->
+            Column(
+                modifier = Modifier.fillMaxSize().padding(paddingValues).padding(16.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center
+            ) {
+                Image(painter = painterResource(id = R.drawable.star_of_life_48x48), contentDescription = "App Icon")
+                Text(text = stringResource(id = R.string.app_name), style = MaterialTheme.typography.h5, modifier = Modifier.padding(top = 8.dp), color = charcoal)
+                Text(text = stringResource(id = R.string.StartingTitle), style = MaterialTheme.typography.subtitle1, modifier = Modifier.padding(top = 4.dp, bottom = 24.dp), color = charcoal)
 
-            Column(modifier = Modifier.fillMaxWidth(0.8f)) {
-                items.forEach { item ->
-                    if (item.isVisible) {
-                        Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(vertical = 4.dp)) {
-                            when (item.state) {
-                                StartupItemState.PENDING -> Icon(painter = painterResource(id = android.R.drawable.ic_media_pause), contentDescription = "Pending", tint = Color.Gray)
-                                StartupItemState.RUNNING -> CircularProgressIndicator(modifier = Modifier.size(24.dp))
-                                StartupItemState.SUCCESS -> Icon(painter = painterResource(id = android.R.drawable.ic_menu_myplaces), contentDescription = "Success", tint = Color(0xFF2EC4B6))
-                                StartupItemState.FAILURE -> Icon(painter = painterResource(id = android.R.drawable.ic_menu_close_clear_cancel), contentDescription = "Failure", tint = Color.Red)
+                Column(modifier = Modifier.fillMaxWidth(0.8f)) {
+                    items.forEach { item ->
+                        if (item.isVisible) {
+                            Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(vertical = 4.dp)) {
+                                when (item.state) {
+                                    StartupItemState.PENDING -> Icon(Icons.Filled.Pause, contentDescription = "Pending", tint = beige)
+                                    StartupItemState.RUNNING -> CircularProgressIndicator(modifier = Modifier.size(24.dp), color = teal)
+                                    StartupItemState.SUCCESS -> Icon(Icons.Filled.Check, contentDescription = "Success", tint = teal)
+                                    StartupItemState.FAILURE -> Icon(Icons.Filled.Close, contentDescription = "Failure", tint = brown)
+                                }
+                                Text(text = item.text, modifier = Modifier.padding(start = 16.dp), color = charcoal)
                             }
-                            Text(text = item.text, modifier = Modifier.padding(start = 16.dp))
                         }
                     }
                 }
-            }
-            
-            Spacer(modifier = Modifier.height(24.dp))
+                
+                Spacer(modifier = Modifier.height(24.dp))
 
-            Button(onClick = { startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://www.openseizuredetector.org.uk/?page_id=1894"))) }) {
-                Text("Help")
-            }
-            Button(onClick = { startActivity(Intent(this@LoadingActivity, PrefActivity::class.java)) }) {
-                Text(stringResource(id = R.string.edit_settings))
+                Button(
+                    onClick = { startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://www.openseizuredetector.org.uk/?page_id=1894"))) },
+                    colors = ButtonDefaults.buttonColors(backgroundColor = teal, contentColor = white)
+                ) {
+                    Text("Help")
+                }
+                Button(
+                    onClick = { startActivity(Intent(this@LoadingActivity, PrefActivity::class.java)) },
+                    modifier = Modifier.padding(top = 8.dp),
+                    colors = ButtonDefaults.buttonColors(backgroundColor = teal, contentColor = white)
+                ) {
+                    Text(stringResource(id = R.string.edit_settings))
+                }
             }
         }
 
@@ -265,24 +288,34 @@ class LoadingActivity : ComponentActivity() {
                     Toast.makeText(this, "WARNING: Seizure detection may be unreliable without disabling battery optimisations.", Toast.LENGTH_LONG).show()
                     handler.post(startupRunnable)
                 },
-                title = { Text("Battery Optimizations") },
-                text = { Text("To ensure OpenSeizureDetector runs reliably, you must disable battery optimizations. Please select 'All Apps', find OpenSeizureDetector and select 'Don\'t Optimize'.") },
+                title = { Text("Battery Optimizations", color = charcoal) },
+                text = { Text("To ensure OpenSeizureDetector runs reliably, you must disable battery optimisations for the app. Click 'Disable' to go to the settings screen.", color = charcoal) },
+                backgroundColor = background,
                 confirmButton = {
-                    Button(onClick = { 
-                        showBatteryOptimizationDialog.value = false
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                            startActivity(Intent(Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS, Uri.parse("package:$packageName")))
-                        } else {
-                             handler.post(startupRunnable)
-                        }
-                    }) { Text("Open Settings") }
+                    Button(
+                        onClick = {
+                            val intent = Intent(Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS)
+                            intent.data = Uri.parse("package:$packageName")
+                            startActivity(intent)
+                            showBatteryOptimizationDialog.value = false
+                            handler.post(startupRunnable)
+                        },
+                        colors = ButtonDefaults.buttonColors(backgroundColor = teal, contentColor = white)
+                    ) {
+                        Text("Disable")
+                    }
                 },
                 dismissButton = {
-                    Button(onClick = {
-                        showBatteryOptimizationDialog.value = false
-                        Toast.makeText(this, "WARNING: Seizure detection may be unreliable without disabling battery optimisations.", Toast.LENGTH_LONG).show()
-                        handler.post(startupRunnable)
-                    }) { Text("Later") }
+                    Button(
+                        onClick = {
+                            showBatteryOptimizationDialog.value = false
+                            Toast.makeText(this, "WARNING: Seizure detection may be unreliable without disabling battery optimisations.", Toast.LENGTH_LONG).show()
+                            handler.post(startupRunnable)
+                        },
+                        colors = ButtonDefaults.buttonColors(backgroundColor = teal, contentColor = white)
+                    ) {
+                        Text("Cancel")
+                    }
                 }
             )
         }

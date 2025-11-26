@@ -32,13 +32,22 @@ import com.github.mikephil.charting.components.XAxis
 import com.github.mikephil.charting.data.Entry
 import com.github.mikephil.charting.data.LineData
 import com.github.mikephil.charting.data.LineDataSet
+import android.graphics.Color
 
 class MainActivity3 : ComponentActivity() {
 
     private val TAG = "MainActivityCompose"
-    private val okColour = ComposeColor(0xFF2EC4B6)
-    private val warnColour = ComposeColor(0xFFFF9F1C)
-    private val alarmColour = ComposeColor(0xFFE71D36)
+    // New Color Palette
+    private val background = ComposeColor(0xFFD7FFF1)
+    private val brown = ComposeColor(0xFF664E4C)
+    private val charcoal = ComposeColor(0xFF172121)
+    private val teal = ComposeColor(0xFF6A8D92)
+    private val beige = ComposeColor(0xFFE2D0B6)
+    private val white = ComposeColor.White
+
+    private val okColour = teal
+    private val warnColour = brown
+    private val alarmColour = charcoal
 
     private lateinit var mUtil: OsdUtil
     private lateinit var mConnection: SdServiceConnection
@@ -205,13 +214,16 @@ class MainActivity3 : ComponentActivity() {
     fun MainScreen() {
         val context = LocalContext.current
         Scaffold(
+            backgroundColor = background,
             topBar = {
                 TopAppBar(
                     title = { Text(versionText.value) },
                     modifier = Modifier.statusBarsPadding(),
+                    backgroundColor = charcoal,
+                    contentColor = white,
                     actions = {
                         IconButton(onClick = { showMenu.value = !showMenu.value }) {
-                            Icon(Icons.Filled.MoreVert, contentDescription = "More options")
+                            Icon(Icons.Filled.MoreVert, contentDescription = "More options", tint = white)
                         }
                         DropdownMenu(
                             expanded = showMenu.value,
@@ -372,12 +384,12 @@ class MainActivity3 : ComponentActivity() {
                         text = mainStatusText.value,
                         fontSize = 48.sp,
                         fontWeight = FontWeight.Bold,
-                        color = ComposeColor.White
+                        color = white
                     )
                     Text(
                         text = mainStatusDetails.value,
                         fontSize = 16.sp,
-                        color = ComposeColor.White,
+                        color = white,
                         textAlign = TextAlign.Center,
                         modifier = Modifier.padding(top = 4.dp)
                     )
@@ -387,7 +399,7 @@ class MainActivity3 : ComponentActivity() {
             Text(
                 text = watchConnectionText.value,
                 fontSize = 16.sp,
-                color = watchConnectionColor.value,
+                color = if (watchConnectionColor.value == okColour) charcoal else warnColour,
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier.padding(vertical = 8.dp)
             )
@@ -404,26 +416,40 @@ class MainActivity3 : ComponentActivity() {
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     Box(contentAlignment = Alignment.Center) {
                         CircularProgressIndicator(
-                            progress = watchBatteryPercentage.value,
+                            progress = 1f,
                             modifier = Modifier.size(120.dp),
+                            color = beige,
                             strokeWidth = 10.dp
                         )
-                        Text(text = "${(watchBatteryPercentage.value * 100).toInt()}%", fontSize = 22.sp)
+                        CircularProgressIndicator(
+                            progress = watchBatteryPercentage.value,
+                            modifier = Modifier.size(120.dp),
+                            color = teal,
+                            strokeWidth = 10.dp
+                        )
+                        Text(text = "${(watchBatteryPercentage.value * 100).toInt()}%", fontSize = 22.sp, color = charcoal)
                     }
-                    Text("Watch", modifier = Modifier.padding(top = 8.dp))
+                    Text("Watch", modifier = Modifier.padding(top = 8.dp), color = charcoal)
                 }
 
                 // Phone Battery
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     Box(contentAlignment = Alignment.Center) {
                         CircularProgressIndicator(
-                            progress = phoneBatteryPercentage.value,
+                            progress = 1f,
                             modifier = Modifier.size(120.dp),
+                            color = beige,
                             strokeWidth = 10.dp
                         )
-                        Text(text = "${(phoneBatteryPercentage.value * 100).toInt()}%", fontSize = 22.sp)
+                        CircularProgressIndicator(
+                            progress = phoneBatteryPercentage.value,
+                            modifier = Modifier.size(120.dp),
+                            color = teal,
+                            strokeWidth = 10.dp
+                        )
+                        Text(text = "${(phoneBatteryPercentage.value * 100).toInt()}%", fontSize = 22.sp, color = charcoal)
                     }
-                    Text("Phone", modifier = Modifier.padding(top = 8.dp))
+                    Text("Phone", modifier = Modifier.padding(top = 8.dp), color = charcoal)
                 }
             }
 
@@ -449,7 +475,13 @@ class MainActivity3 : ComponentActivity() {
                             }
                         }, 
                         enabled = acceptAlarmButtonEnabled.value,
-                        modifier = Modifier.weight(1f).padding(horizontal = 4.dp)
+                        modifier = Modifier.weight(1f).padding(horizontal = 4.dp),
+                        colors = ButtonDefaults.buttonColors(
+                            backgroundColor = teal,
+                            contentColor = white,
+                            disabledBackgroundColor = beige,
+                            disabledContentColor = charcoal
+                        )
                     ) {
                         Text(text = acceptAlarmButtonText.value)
                     }
@@ -460,7 +492,13 @@ class MainActivity3 : ComponentActivity() {
                             }
                         }, 
                         enabled = manualAlarmButtonEnabled.value,
-                        modifier = Modifier.weight(1f).padding(horizontal = 4.dp)
+                        modifier = Modifier.weight(1f).padding(horizontal = 4.dp),
+                        colors = ButtonDefaults.buttonColors(
+                            backgroundColor = teal,
+                            contentColor = white,
+                            disabledBackgroundColor = beige,
+                            disabledContentColor = charcoal
+                        )
                     ) {
                         Text("Manual Alarm")
                     }
@@ -472,7 +510,13 @@ class MainActivity3 : ComponentActivity() {
                         }
                     },
                     enabled = true, // Always enabled
-                    modifier = Modifier.fillMaxWidth().padding(horizontal = 4.dp)
+                    modifier = Modifier.fillMaxWidth().padding(horizontal = 4.dp),
+                    colors = ButtonDefaults.buttonColors(
+                        backgroundColor = teal,
+                        contentColor = white,
+                        disabledBackgroundColor = beige,
+                        disabledContentColor = charcoal
+                    )
                 ) {
                     Text(if (muteAlarmButtonEnabled.value) "Unmute Alarm" else "Mute Alarm")
                 }
@@ -492,7 +536,8 @@ class MainActivity3 : ComponentActivity() {
                 Text(
                     text = "Heart Rate: ${data.last().toInt()}",
                     fontSize = 20.sp,
-                    fontWeight = FontWeight.Bold
+                    fontWeight = FontWeight.Bold,
+                    color = charcoal
                 )
                 AndroidView(
                     modifier = Modifier.fillMaxSize(),
@@ -507,6 +552,8 @@ class MainActivity3 : ComponentActivity() {
                             setTouchEnabled(true)
                             isDragEnabled = true
                             setScaleEnabled(true)
+                            xAxis.textColor = Color.parseColor("#172121")
+                            axisLeft.textColor = Color.parseColor("#172121")
                         }
                     },
                     update = { chart ->
@@ -515,7 +562,7 @@ class MainActivity3 : ComponentActivity() {
                         }
                         val xVals = data.indices.map { it.toString() }
                         val dataSet = LineDataSet(entries, "Heart Rate").apply {
-                            color = android.graphics.Color.RED
+                            color = Color.parseColor("#6A8D92") // Teal
                             setDrawValues(false)
                             setDrawCircles(false)
                             lineWidth = 2f
