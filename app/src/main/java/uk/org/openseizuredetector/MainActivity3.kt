@@ -26,6 +26,12 @@ import androidx.compose.ui.unit.sp
 import uk.org.openseizuredetector.ui.theme.OpenSeizureDetectorTheme
 import java.util.Timer
 import java.util.TimerTask
+import androidx.compose.ui.viewinterop.AndroidView
+import com.github.mikephil.charting.charts.LineChart
+import com.github.mikephil.charting.components.XAxis
+import com.github.mikephil.charting.data.Entry
+import com.github.mikephil.charting.data.LineData
+import com.github.mikephil.charting.data.LineDataSet
 
 class MainActivity3 : ComponentActivity() {
 
@@ -43,14 +49,17 @@ class MainActivity3 : ComponentActivity() {
     private val mainStatusText = mutableStateOf("...")
     private val mainStatusColor = mutableStateOf(warnColour)
     private val mainStatusDetails = mutableStateOf("Connecting to service...")
-    private val watchBatteryText = mutableStateOf("Watch: --%")
-    private val phoneBatteryText = mutableStateOf("Phone: --%")
+    private val watchBatteryPercentage = mutableStateOf(0f)
+    private val phoneBatteryPercentage = mutableStateOf(0f)
+    private val heartRateHistory = mutableStateListOf<Float>()
     private val watchConnectionText = mutableStateOf("Watch: disconnected")
     private val watchConnectionColor = mutableStateOf(warnColour)
 
     private val acceptAlarmButtonText = mutableStateOf("Accept Alarm")
     private val acceptAlarmButtonEnabled = mutableStateOf(false)
     private val manualAlarmButtonEnabled = mutableStateOf(true)
+    private val muteAlarmButtonEnabled = mutableStateOf(false)
+
 
     // Menu and Dialog states
     private val versionText = mutableStateOf("")
@@ -126,8 +135,17 @@ class MainActivity3 : ComponentActivity() {
             val data = server.mSdData
 
             // Update Battery and Connection Status
-            watchBatteryText.value = "Watch: ${if(data.batteryPc > 0) "${data.batteryPc}%" else "--"}"
-            phoneBatteryText.value = "Phone: ${data.phoneBatteryPc}%"
+            watchBatteryPercentage.value = if (data.batteryPc > 0) data.batteryPc / 100f else 0f
+            phoneBatteryPercentage.value = data.phoneBatteryPc / 100f
+
+            if (data.mAdaptiveHrBuf != null) {
+                val history = data.mAdaptiveHrBuf.vals
+                if (history != null) {
+                    heartRateHistory.clear()
+                    heartRateHistory.addAll(history.map { it.toFloat() }.takeLast(120))
+                }
+            }
+
             if (data.watchAppRunning) {
                 watchConnectionText.value = "Watch: Connected"
                 watchConnectionColor.value = okColour
@@ -178,6 +196,7 @@ class MainActivity3 : ComponentActivity() {
                 acceptAlarmButtonText.value = "Accept Alarm"
                 acceptAlarmButtonEnabled.value = server.isLatchAlarms() || data.mFallActive
             }
+            muteAlarmButtonEnabled.value = server.isAudibleCancelled
         }
     }
 
@@ -336,93 +355,175 @@ class MainActivity3 : ComponentActivity() {
                 .padding(8.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            // Top status row
+            // Main Status Display
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 8.dp),
+                backgroundColor = mainStatusColor.value,
+                shape = MaterialTheme.shapes.medium
+            ) {
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center,
+                    modifier = Modifier.padding(16.dp)
+                ) {
+                    Text(
+                        text = mainStatusText.value,
+                        fontSize = 48.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = ComposeColor.White
+                    )
+                    Text(
+                        text = mainStatusDetails.value,
+                        fontSize = 16.sp,
+                        color = ComposeColor.White,
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier.padding(top = 4.dp)
+                    )
+                }
+            }
+            
+            Text(
+                text = watchConnectionText.value,
+                fontSize = 16.sp,
+                color = watchConnectionColor.value,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.padding(vertical = 8.dp)
+            )
+
+            // Battery and Connection Status Row
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(8.dp),
-                horizontalArrangement = Arrangement.SpaceBetween,
+                horizontalArrangement = Arrangement.SpaceAround,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Text(text = watchBatteryText.value, fontSize = 16.sp)
-                Text(
-                    text = watchConnectionText.value, 
-                    fontSize = 16.sp, 
-                    color = watchConnectionColor.value, 
-                    fontWeight = FontWeight.Bold
-                )
-                Text(text = phoneBatteryText.value, fontSize = 16.sp)
-            }
-
-            // Main Status Display
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .weight(1f),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Center
-            ) {
-                Card(
-                    modifier = Modifier.fillMaxWidth(0.8f).aspectRatio(1f),
-                    backgroundColor = mainStatusColor.value,
-                    shape = MaterialTheme.shapes.medium
-                ) {
-                    Column(
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.Center,
-                        modifier = Modifier.padding(16.dp)
-                    ) {
-                        Text(
-                            text = mainStatusText.value,
-                            fontSize = 64.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = ComposeColor.White
+                // Watch Battery
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    Box(contentAlignment = Alignment.Center) {
+                        CircularProgressIndicator(
+                            progress = watchBatteryPercentage.value,
+                            modifier = Modifier.size(120.dp),
+                            strokeWidth = 10.dp
                         )
-                        Text(
-                            text = mainStatusDetails.value,
-                            fontSize = 18.sp,
-                            color = ComposeColor.White,
-                            textAlign = TextAlign.Center,
-                            modifier = Modifier.padding(top = 8.dp)
-                        )
+                        Text(text = "${(watchBatteryPercentage.value * 100).toInt()}%", fontSize = 22.sp)
                     }
+                    Text("Watch", modifier = Modifier.padding(top = 8.dp))
+                }
+
+                // Phone Battery
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    Box(contentAlignment = Alignment.Center) {
+                        CircularProgressIndicator(
+                            progress = phoneBatteryPercentage.value,
+                            modifier = Modifier.size(120.dp),
+                            strokeWidth = 10.dp
+                        )
+                        Text(text = "${(phoneBatteryPercentage.value * 100).toInt()}%", fontSize = 22.sp)
+                    }
+                    Text("Phone", modifier = Modifier.padding(top = 8.dp))
                 }
             }
+
+            HeartRateChart(data = heartRateHistory, modifier = Modifier.weight(1f))
 
             // Action Buttons
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(bottom = 16.dp),
-                horizontalArrangement = Arrangement.SpaceEvenly
-            ) {
-                Button(
-                    onClick = { 
-                        if (mConnection.mBound) {
-                            if ((mConnection.mSdServer.mSmsTimer != null) && (mConnection.mSdServer.mSmsTimer.mTimeLeft > 0)) {
-                                mUtil.showToast(getString(R.string.SMSAlarmCancelledMsg))
-                                mConnection.mSdServer.stopSmsTimer()
-                            } else {
-                                mConnection.mSdServer.acceptAlarm()
+            Column(modifier = Modifier.fillMaxWidth()) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(bottom = 8.dp),
+                    horizontalArrangement = Arrangement.SpaceEvenly
+                ) {
+                    Button(
+                        onClick = { 
+                            if (mConnection.mBound) {
+                                if ((mConnection.mSdServer.mSmsTimer != null) && (mConnection.mSdServer.mSmsTimer.mTimeLeft > 0)) {
+                                    mUtil.showToast(getString(R.string.SMSAlarmCancelledMsg))
+                                    mConnection.mSdServer.stopSmsTimer()
+                                } else {
+                                    mConnection.mSdServer.acceptAlarm()
+                                }
                             }
-                        }
-                    }, 
-                    enabled = acceptAlarmButtonEnabled.value,
-                    modifier = Modifier.weight(1f).padding(horizontal = 4.dp)
-                ) {
-                    Text(text = acceptAlarmButtonText.value)
+                        }, 
+                        enabled = acceptAlarmButtonEnabled.value,
+                        modifier = Modifier.weight(1f).padding(horizontal = 4.dp)
+                    ) {
+                        Text(text = acceptAlarmButtonText.value)
+                    }
+                    Button(
+                        onClick = { 
+                            if (mConnection.mBound) {
+                                mConnection.mSdServer.raiseManualAlarm()
+                            }
+                        }, 
+                        enabled = manualAlarmButtonEnabled.value,
+                        modifier = Modifier.weight(1f).padding(horizontal = 4.dp)
+                    ) {
+                        Text("Manual Alarm")
+                    }
                 }
                 Button(
-                    onClick = { 
+                    onClick = {
                         if (mConnection.mBound) {
-                            mConnection.mSdServer.raiseManualAlarm()
+                            mConnection.mSdServer.cancelAudible()
                         }
-                    }, 
-                    enabled = manualAlarmButtonEnabled.value,
-                    modifier = Modifier.weight(1f).padding(horizontal = 4.dp)
+                    },
+                    enabled = true, // Always enabled
+                    modifier = Modifier.fillMaxWidth().padding(horizontal = 4.dp)
                 ) {
-                    Text("Manual Alarm")
+                    Text(if (muteAlarmButtonEnabled.value) "Unmute Alarm" else "Mute Alarm")
                 }
+            }
+        }
+    }
+
+    @Composable
+    fun HeartRateChart(data: List<Float>, modifier: Modifier = Modifier) {
+        if (data.isNotEmpty()) {
+            Column(
+                modifier = modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 8.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text(
+                    text = "Heart Rate: ${data.last().toInt()}",
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.Bold
+                )
+                AndroidView(
+                    modifier = Modifier.fillMaxSize(),
+                    factory = {
+                        LineChart(it).apply {
+                            setDescription("")
+                            legend.isEnabled = false
+                            xAxis.position = XAxis.XAxisPosition.BOTTOM
+                            xAxis.setDrawGridLines(false)
+                            axisLeft.setDrawGridLines(false)
+                            axisRight.isEnabled = false
+                            setTouchEnabled(true)
+                            isDragEnabled = true
+                            setScaleEnabled(true)
+                        }
+                    },
+                    update = { chart ->
+                        val entries = data.mapIndexed { index, value ->
+                            Entry(value, index)
+                        }
+                        val xVals = data.indices.map { it.toString() }
+                        val dataSet = LineDataSet(entries, "Heart Rate").apply {
+                            color = android.graphics.Color.RED
+                            setDrawValues(false)
+                            setDrawCircles(false)
+                            lineWidth = 2f
+                        }
+                        chart.data = LineData(xVals, listOf(dataSet))
+                        chart.invalidate()
+                    }
+                )
             }
         }
     }
