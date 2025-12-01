@@ -227,80 +227,85 @@ class MainActivity3 : ComponentActivity() {
                         }
                         DropdownMenu(
                             expanded = showMenu.value,
-                            onDismissRequest = { showMenu.value = false }
+                            onDismissRequest = { showMenu.value = false },
+                            modifier = Modifier.width(200.dp)
                         ) {
-                            DropdownMenuItem(onClick = { 
-                                if (mConnection.mBound) mConnection.mSdServer.mSdDataSource.installWatchApp()
-                                showMenu.value = false
-                            }) { Text("Install Watch App") }
+                             Surface(shape = MaterialTheme.shapes.medium, color = background) {
+                                Column {
+                                    DropdownMenuItem(onClick = { 
+                                        if (mConnection.mBound) mConnection.mSdServer.mSdDataSource.installWatchApp()
+                                        showMenu.value = false
+                                    }) { Text("Install Watch App", color = charcoal) }
 
-                            DropdownMenuItem(onClick = { 
-                                if (mConnection.mBound) mConnection.mSdServer.acceptAlarm()
-                                showMenu.value = false
-                            }) { Text("Accept Alarm") }
+                                    DropdownMenuItem(onClick = { 
+                                        if (mConnection.mBound) mConnection.mSdServer.acceptAlarm()
+                                        showMenu.value = false
+                                    }) { Text("Accept Alarm", color = charcoal) }
 
-                            DropdownMenuItem(onClick = { 
-                                mUtil.stopServer()
-                                serverStatusHandler.postDelayed({ mUtil.startServer() }, 1000)
-                                showMenu.value = false
-                            }) { Text("Restart Service") }
+                                    DropdownMenuItem(onClick = { 
+                                        mUtil.stopServer()
+                                        serverStatusHandler.postDelayed({ mUtil.startServer() }, 1000)
+                                        showMenu.value = false
+                                    }) { Text("Restart Service", color = charcoal) }
 
-                            Divider()
+                                    Divider(color = teal)
 
-                            DropdownMenuItem(onClick = { 
-                                if (mConnection.mBound) mConnection.mSdServer.alarmBeep()
-                                showMenu.value = false
-                            }) { Text("Test Alarm Beep") }
+                                    DropdownMenuItem(onClick = { 
+                                        if (mConnection.mBound) mConnection.mSdServer.alarmBeep()
+                                        showMenu.value = false
+                                    }) { Text("Test Alarm Beep", color = charcoal) }
 
-                            DropdownMenuItem(onClick = { 
-                                if (mConnection.mBound) mConnection.mSdServer.warningBeep()
-                                showMenu.value = false
-                            }) { Text("Test Warning Beep") }
+                                    DropdownMenuItem(onClick = { 
+                                        if (mConnection.mBound) mConnection.mSdServer.warningBeep()
+                                        showMenu.value = false
+                                    }) { Text("Test Warning Beep", color = charcoal) }
 
-                            DropdownMenuItem(onClick = { 
-                                if (mConnection.mBound) mConnection.mSdServer.sendSMSAlarm()
-                                showMenu.value = false
-                            }) { Text("Test SMS Alarm") }
+                                    DropdownMenuItem(onClick = { 
+                                        if (mConnection.mBound) mConnection.mSdServer.sendSMSAlarm()
+                                        showMenu.value = false
+                                    }) { Text("Test SMS Alarm", color = charcoal) }
 
-                            Divider()
+                                    Divider(color = teal)
 
-                            DropdownMenuItem(onClick = { 
-                                startActivity(Intent(context, AuthenticateActivity::class.java))
-                                showMenu.value = false
-                            }) { Text("Data Sharing Login") }
+                                    DropdownMenuItem(onClick = { 
+                                        startActivity(Intent(context, AuthenticateActivity::class.java))
+                                        showMenu.value = false
+                                    }) { Text("Data Sharing Login", color = charcoal) }
 
-                            DropdownMenuItem(onClick = { 
-                                showDataSharingDialog.value = true
-                                showMenu.value = false
-                            }) { Text("About Data Sharing") }
+                                    DropdownMenuItem(onClick = { 
+                                        showDataSharingDialog.value = true
+                                        showMenu.value = false
+                                    }) { Text("About Data Sharing", color = charcoal) }
 
-                            DropdownMenuItem(onClick = { 
-                                startActivity(Intent(context, LogManagerControlActivity::class.java))
-                                showMenu.value = false
-                            }) { Text("Log Manager") }
+                                    DropdownMenuItem(onClick = { 
+                                        startActivity(Intent(context, LogManagerControlActivity::class.java))
+                                        showMenu.value = false
+                                    }) { Text("Log Manager", color = charcoal) }
 
-                            DropdownMenuItem(onClick = { 
-                                startActivity(Intent(context, ReportSeizureActivity::class.java))
-                                showMenu.value = false
-                             }) { Text("Report Seizure") }
+                                    DropdownMenuItem(onClick = { 
+                                        startActivity(Intent(context, ReportSeizureActivity::class.java))
+                                        showMenu.value = false
+                                     }) { Text("Report Seizure", color = charcoal) }
 
-                            Divider()
+                                    Divider(color = teal)
 
-                            DropdownMenuItem(onClick = { 
-                                startActivity(Intent(context, PrefActivity::class.java))
-                                showMenu.value = false
-                            }) { Text("Settings") }
+                                    DropdownMenuItem(onClick = { 
+                                        startActivity(Intent(context, PrefActivity::class.java))
+                                        showMenu.value = false
+                                    }) { Text("Settings", color = charcoal) }
 
-                            DropdownMenuItem(onClick = { 
-                                showAboutDialog.value = true
-                                showMenu.value = false
-                            }) { Text("About") }
+                                    DropdownMenuItem(onClick = { 
+                                        showAboutDialog.value = true
+                                        showMenu.value = false
+                                    }) { Text("About", color = charcoal) }
 
-                            DropdownMenuItem(onClick = { 
-                                mUtil.unbindFromServer(applicationContext, mConnection)
-                                mUtil.stopServer()
-                                finish()
-                            }) { Text("Exit") }
+                                    DropdownMenuItem(onClick = { 
+                                        mUtil.unbindFromServer(applicationContext, mConnection)
+                                        mUtil.stopServer()
+                                        finish()
+                                    }) { Text("Exit", color = charcoal) }
+                                }
+                            }
                         }
                     }
                 )
