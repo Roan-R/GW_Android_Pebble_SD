@@ -289,23 +289,9 @@ class LoadingActivity : ComponentActivity() {
                     handler.post(startupRunnable)
                 },
                 title = { Text("Battery Optimizations", color = charcoal) },
-                text = { Text("To ensure OpenSeizureDetector runs reliably, you must disable battery optimisations for the app. Click 'Disable' to go to the settings screen.", color = charcoal) },
+                text = { Text("To ensure OpenSeizureDetector runs reliably, please disable battery optimisations for the app in your phone settings.", color = charcoal) },
                 backgroundColor = background,
                 confirmButton = {
-                    Button(
-                        onClick = {
-                            val intent = Intent(Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS)
-                            intent.data = Uri.parse("package:$packageName")
-                            startActivity(intent)
-                            showBatteryOptimizationDialog.value = false
-                            handler.post(startupRunnable)
-                        },
-                        colors = ButtonDefaults.buttonColors(backgroundColor = teal, contentColor = white)
-                    ) {
-                        Text("Disable")
-                    }
-                },
-                dismissButton = {
                     Button(
                         onClick = {
                             showBatteryOptimizationDialog.value = false
@@ -314,7 +300,7 @@ class LoadingActivity : ComponentActivity() {
                         },
                         colors = ButtonDefaults.buttonColors(backgroundColor = teal, contentColor = white)
                     ) {
-                        Text("Cancel")
+                        Text("OK")
                     }
                 }
             )
