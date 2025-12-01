@@ -13,18 +13,16 @@ private val DarkColorPalette = darkColors(
 )
 
 private val LightColorPalette = lightColors(
-    primary = Purple500,
-    primaryVariant = Purple700,
-    secondary = Teal200
-
-    /* Other default colors to override
-    background = Color.White,
-    surface = Color.White,
-    onPrimary = Color.White,
-    onSecondary = Color.Black,
-    onBackground = Color.Black,
-    onSurface = Color.Black,
-    */
+    primary = OsdTeal,
+    primaryVariant = OsdCharcoal,
+    secondary = OsdBrown,
+    background = OsdBackground,
+    surface = OsdBackground,
+    onPrimary = OsdWhite,
+    onSecondary = OsdWhite,
+    onBackground = OsdCharcoal,
+    onSurface = OsdCharcoal,
+    error = OsdBrown
 )
 
 @Composable
@@ -33,7 +31,7 @@ fun OpenSeizureDetectorTheme(
     content: @Composable () -> Unit
 ) {
     val colors = if (darkTheme) {
-        DarkColorPalette
+        DarkColorPalette // TODO: Define a proper dark theme palette
     } else {
         LightColorPalette
     }
