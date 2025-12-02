@@ -27,6 +27,7 @@ import uk.org.openseizuredetector.ui.theme.OpenSeizureDetectorTheme
 import java.util.Timer
 import java.util.TimerTask
 import androidx.compose.ui.viewinterop.AndroidView
+import androidx.core.view.WindowCompat
 import com.github.mikephil.charting.charts.LineChart
 import com.github.mikephil.charting.components.XAxis
 import com.github.mikephil.charting.data.Entry
@@ -86,6 +87,7 @@ class MainActivity3 : ComponentActivity() {
         mUtil.writeToSysLogFile("MainActivity.onCreate() - Compose")
 
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+        WindowCompat.setDecorFitsSystemWindows(window, false)
 
         val actionStr = intent.action
         if (actionStr == "showDataSharingDialog") {
@@ -312,7 +314,7 @@ class MainActivity3 : ComponentActivity() {
             }
         ) {
             MainLayout(
-                modifier = Modifier.padding(it)
+                modifier = Modifier.padding(it).navigationBarsPadding()
             )
         }
         if (showAboutDialog.value) {
