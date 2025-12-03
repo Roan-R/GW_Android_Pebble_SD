@@ -12,7 +12,6 @@ import android.os.CountDownTimer;
 import android.os.Handler;
 import android.os.IBinder;
 
-import androidx.core.graphics.Insets;
 import androidx.core.view.MenuCompat;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
@@ -20,7 +19,6 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -603,7 +601,7 @@ public class LogManagerControlActivity extends AppCompatActivity {
                 try {
                     Intent i = new Intent(
                             getApplicationContext(),
-                            AuthenticateActivity.class);
+                            AuthenticateActivity2.class);
                     this.startActivity(i);
                 } catch (Exception ex) {
                     Log.i(TAG, "exception starting export activity " + ex.toString());
@@ -738,7 +736,7 @@ public class LogManagerControlActivity extends AppCompatActivity {
                 public void onClick(View view) {
                     Log.v(TAG, "onAuth");
                     Intent i;
-                    i = new Intent(mContext, AuthenticateActivity.class);
+                    i = new Intent(mContext, AuthenticateActivity2.class);
                     startActivity(i);
                 }
             };
@@ -998,7 +996,7 @@ public class LogManagerControlActivity extends AppCompatActivity {
                 try {
                     Intent i = new Intent(
                             LogManagerControlActivity.this,
-                            AuthenticateActivity.class);
+                            AuthenticateActivity2.class);
                     mContext.startActivity(i);
                 } catch (Exception ex) {
                     Log.i(TAG, "exception starting activity " + ex.toString());

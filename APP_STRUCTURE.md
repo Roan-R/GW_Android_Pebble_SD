@@ -40,7 +40,7 @@ There are several ways the service stops:
 - `MainActivity`: Legacy UI retained for backward compatibility (optionally used if `UseNewUi` is false).
 - `PrefActivity`: Preferences editor (headers + fragments defined in `res/xml/*prefs.xml`).
 - `BLEScanActivity`: Discovers and selects BLE devices when using BLE/BLE2 data source.
-- `AuthenticateActivity`: Handles login for data sharing / remote API.
+- `AuthenticateActivity2`: Handles login for data sharing / remote API.
 - `LogManagerControlActivity`, `ExportDataActivity`, `RemoteDbActivity`: Data sharing, viewing, exporting, pruning local DB.
 - `ReportSeizureActivity`, `EditEventActivity`: Manual event reporting / editing.
 
@@ -265,7 +265,7 @@ Heart rate buffering uses `CircBuf` windows for simple/adaptive thresholding; se
 - Timers: `FaultTimer`, `CheckEventsTimer`, SMS countdown (`SmsTimer`), latch alarm timer, etc., each controlling asynchronous transitions.
 
 ## 13. Data Sharing Flow
-1. User authenticates (`AuthenticateActivity`) -> obtains token stored in preferences.
+1. User authenticates (`AuthenticateActivity2`) -> obtains token stored in preferences.
 2. `LogManager` packages events (timestamped, with retention pruning) and attempts periodic uploads (`remoteLogPeriod`).
 3. Unvalidated remote events prompt UI reminders (`FragmentDataSharing`).
 

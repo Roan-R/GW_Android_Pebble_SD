@@ -159,7 +159,7 @@ public class RemoteDbActivity extends AppCompatActivity {
                 public void onClick(View view) {
                     Log.v(TAG, "onAuth");
                     Intent i;
-                    i = new Intent(mContext, AuthenticateActivity.class);
+                    i = new Intent(mContext, AuthenticateActivity2.class);
                     startActivity(i);
                 }
             };

@@ -338,7 +338,7 @@ public class MainActivity extends AppCompatActivity {
                 try {
                     Intent i = new Intent(
                             MainActivity.this,
-                            AuthenticateActivity.class);
+                            AuthenticateActivity2.class);
                     this.startActivity(i);
                 } catch (Exception ex) {
                     Log.i(TAG, "exception starting export activity " + ex.toString());
@@ -1169,7 +1169,7 @@ public class MainActivity extends AppCompatActivity {
                 try {
                     Intent i = new Intent(
                             MainActivity.this,
-                            AuthenticateActivity.class);
+                            AuthenticateActivity2.class);
                     mContext.startActivity(i);
                 } catch (Exception ex) {
                     Log.i(TAG, "exception starting activity " + ex.toString());

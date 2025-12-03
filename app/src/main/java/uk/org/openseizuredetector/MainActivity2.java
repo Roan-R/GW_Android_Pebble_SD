@@ -20,20 +20,16 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.util.Log;
-import android.util.TypedValue;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
-import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.rohitss.uceh.UCEHandler;
 
 import java.util.Objects;
-import java.util.Timer;
-import java.util.TimerTask;
 
 public class MainActivity2 extends AppCompatActivity {
     private String TAG = "MainActivity2";
@@ -269,7 +265,7 @@ public class MainActivity2 extends AppCompatActivity {
                 try {
                     Intent i = new Intent(
                             MainActivity2.this,
-                            AuthenticateActivity.class);
+                            AuthenticateActivity2.class);
                     this.startActivity(i);
                 } catch (Exception ex) {
                     Log.i(TAG, "exception starting export activity " + ex.toString());
@@ -456,7 +452,7 @@ public class MainActivity2 extends AppCompatActivity {
                 try {
                     Intent i = new Intent(
                             MainActivity2.this,
-                            AuthenticateActivity.class);
+                            AuthenticateActivity2.class);
                     mContext.startActivity(i);
                 } catch (Exception ex) {
                     Log.i(TAG, "exception starting activity " + ex.toString());

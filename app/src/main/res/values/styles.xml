@@ -10,6 +10,12 @@
         -->
     </style>
 
+    <!-- Theme for the AuthenticateActivity2 -->
+    <style name="AppTheme.Authenticate" parent="AppTheme">
+        <item name="colorPrimary">#6A8D92</item>
+        <item name="android:statusBarColor">#D7FFF1</item>
+        <item name="android:windowLightStatusBar">true</item>
+    </style>
 
 </resources>
 

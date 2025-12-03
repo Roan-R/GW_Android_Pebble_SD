@@ -72,7 +72,6 @@ import java.io.IOException;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.List;
-import java.util.Timer;
 
 /**
  * Based on example at:
@@ -1827,7 +1826,7 @@ public class SdServer extends Service implements SdDataReceiver {
         PendingIntent contentIntent =
                 PendingIntent.getActivity(getApplicationContext(),
                         0, i, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
-        Intent loginIntent = new Intent(getApplicationContext(), AuthenticateActivity.class);
+        Intent loginIntent = new Intent(getApplicationContext(), AuthenticateActivity2.class);
         loginIntent.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
         PendingIntent loginPendingIntent =
                 PendingIntent.getActivity(getApplicationContext(),

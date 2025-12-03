@@ -68,7 +68,7 @@
             android:label="@string/title_activity_ml_model_manager"
             android:theme="@style/AppTheme" />
             -->
-        <activity android:name=".AuthenticateActivity" /> <!-- @android:style/Theme.Holo.Light" -->
+        <activity android:name=".AuthenticateActivity2" android:theme="@style/AppTheme.Authenticate"/> <!-- @android:style/Theme.Holo.Light" -->
         <activity android:name=".BLEScanActivity" />
         <activity android:name=".ExportDataActivity" /> <!-- android:usesCleartextTraffic="true" -->
         <activity

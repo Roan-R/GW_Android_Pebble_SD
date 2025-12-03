@@ -243,7 +243,7 @@ class LoadingActivity : ComponentActivity() {
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center
             ) {
-                Image(painter = painterResource(id = R.drawable.star_of_life_48x48), contentDescription = "App Icon")
+                Image(painter = painterResource(id = R.drawable.seizewatchlogo), contentDescription = "App Icon")
                 Text(text = stringResource(id = R.string.app_name), style = MaterialTheme.typography.h5, modifier = Modifier.padding(top = 8.dp), color = charcoal)
                 Text(text = stringResource(id = R.string.StartingTitle), style = MaterialTheme.typography.subtitle1, modifier = Modifier.padding(top = 4.dp, bottom = 24.dp), color = charcoal)
 
@@ -289,7 +289,7 @@ class LoadingActivity : ComponentActivity() {
                     handler.post(startupRunnable)
                 },
                 title = { Text("Battery Optimizations", color = charcoal) },
-                text = { Text("To ensure OpenSeizureDetector runs reliably, please disable battery optimisations for the app in your phone settings.", color = charcoal) },
+                text = { Text("To ensure SeizeWatch runs reliably, please disable battery optimisations for the app in your phone settings.", color = charcoal) },
                 backgroundColor = background,
                 confirmButton = {
                     Button(
