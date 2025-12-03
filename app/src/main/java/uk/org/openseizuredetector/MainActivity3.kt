@@ -1,6 +1,7 @@
 package uk.org.openseizuredetector
 
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -22,21 +23,20 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import uk.org.openseizuredetector.ui.theme.OpenSeizureDetectorTheme
+import java.util.Timer
+import java.util.TimerTask
 import androidx.compose.ui.viewinterop.AndroidView
-import androidx.core.graphics.toColorInt
-import androidx.core.net.toUri
 import com.github.mikephil.charting.charts.LineChart
 import com.github.mikephil.charting.components.XAxis
 import com.github.mikephil.charting.data.Entry
 import com.github.mikephil.charting.data.LineData
 import com.github.mikephil.charting.data.LineDataSet
-import uk.org.openseizuredetector.ui.theme.OpenSeizureDetectorTheme
-import java.util.Timer
-import java.util.TimerTask
+import android.graphics.Color
 
 class MainActivity3 : ComponentActivity() {
 
-    private val tag = "MainActivityCompose"
+    private val TAG = "MainActivityCompose"
     // New Color Palette
     private val background = ComposeColor(0xFFD7FFF1)
     private val brown = ComposeColor(0xFF664E4C)
@@ -58,8 +58,8 @@ class MainActivity3 : ComponentActivity() {
     private val mainStatusText = mutableStateOf("...")
     private val mainStatusColor = mutableStateOf(warnColour)
     private val mainStatusDetails = mutableStateOf("Connecting to service...")
-    private val watchBatteryPercentage = mutableFloatStateOf(0f)
-    private val phoneBatteryPercentage = mutableFloatStateOf(0f)
+    private val watchBatteryPercentage = mutableStateOf(0f)
+    private val phoneBatteryPercentage = mutableStateOf(0f)
     private val heartRateHistory = mutableStateListOf<Float>()
     private val watchConnectionText = mutableStateOf("Watch: disconnected")
     private val watchConnectionColor = mutableStateOf(warnColour)
@@ -79,7 +79,7 @@ class MainActivity3 : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        Log.i(tag, "onCreate()")
+        Log.i(TAG, "onCreate()");
 
         mUtil = OsdUtil(applicationContext, serverStatusHandler)
         mConnection = SdServiceConnection(applicationContext)
@@ -109,7 +109,7 @@ class MainActivity3 : ComponentActivity() {
 
     override fun onStart() {
         super.onStart()
-        Log.i(tag, "onStart()")
+        Log.i(TAG, "onStart()");
         mUtil.writeToSysLogFile("MainActivity.onStart() - Compose")
         versionText.value = getString(R.string.AppTitleText) + " " + mUtil.getAppVersionName()
 
@@ -125,7 +125,7 @@ class MainActivity3 : ComponentActivity() {
 
     override fun onStop() {
         super.onStop()
-        Log.i(tag, "onStop() - unbinding from server")
+        Log.i(TAG, "onStop() - unbinding from server")
         mUtil.writeToSysLogFile("MainActivity.onStop() - Compose")
         mUtil.unbindFromServer(applicationContext, mConnection)
         mUiTimer?.cancel()
@@ -144,8 +144,8 @@ class MainActivity3 : ComponentActivity() {
             val data = server.mSdData
 
             // Update Battery and Connection Status
-            watchBatteryPercentage.floatValue = if (data.batteryPc > 0) data.batteryPc / 100f else 0f
-            phoneBatteryPercentage.floatValue = data.phoneBatteryPc / 100f
+            watchBatteryPercentage.value = if (data.batteryPc > 0) data.batteryPc / 100f else 0f
+            phoneBatteryPercentage.value = data.phoneBatteryPc / 100f
 
             if (data.mAdaptiveHrBuf != null) {
                 val history = data.mAdaptiveHrBuf.vals
@@ -203,7 +203,7 @@ class MainActivity3 : ComponentActivity() {
                 acceptAlarmButtonEnabled.value = true
             } else {
                 acceptAlarmButtonText.value = "Accept Alarm"
-                acceptAlarmButtonEnabled.value = server.isLatchAlarms || data.mFallActive
+                acceptAlarmButtonEnabled.value = server.isLatchAlarms() || data.mFallActive
             }
             muteAlarmButtonEnabled.value = server.isAudibleCancelled
         }
@@ -268,7 +268,7 @@ class MainActivity3 : ComponentActivity() {
                                     Divider(color = teal)
 
                                     DropdownMenuItem(onClick = { 
-                                        startActivity(Intent(context, AuthenticateActivity2::class.java))
+                                        startActivity(Intent(context, AuthenticateActivity::class.java))
                                         showMenu.value = false
                                     }) { Text("Data Sharing Login", color = charcoal) }
 
@@ -331,7 +331,7 @@ class MainActivity3 : ComponentActivity() {
             text = { Text("The Open Source Seizure Detector.") },
             confirmButton = {
                 Button(onClick = { 
-                    startActivity(Intent(Intent.ACTION_VIEW, OsdUtil.PRIVACY_POLICY_URL.toUri()))
+                    startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(OsdUtil.PRIVACY_POLICY_URL)))
                     onDismiss() 
                 }) {
                     Text("Privacy Policy")
@@ -351,7 +351,7 @@ class MainActivity3 : ComponentActivity() {
             text = { Text("Information about data sharing...")},
             confirmButton = {
                 Button(onClick = { 
-                    startActivity(Intent(this, AuthenticateActivity2::class.java))
+                    startActivity(Intent(this, AuthenticateActivity::class.java))
                     onDismiss() 
                 }) {
                     Text("Login")
@@ -427,12 +427,12 @@ class MainActivity3 : ComponentActivity() {
                             strokeWidth = 10.dp
                         )
                         CircularProgressIndicator(
-                            progress = watchBatteryPercentage.floatValue,
+                            progress = watchBatteryPercentage.value,
                             modifier = Modifier.size(120.dp),
                             color = teal,
                             strokeWidth = 10.dp
                         )
-                        Text(text = "${(watchBatteryPercentage.floatValue * 100).toInt()}%", fontSize = 22.sp, color = charcoal)
+                        Text(text = "${(watchBatteryPercentage.value * 100).toInt()}%", fontSize = 22.sp, color = charcoal)
                     }
                     Text("Watch", modifier = Modifier.padding(top = 8.dp), color = charcoal)
                 }
@@ -447,12 +447,12 @@ class MainActivity3 : ComponentActivity() {
                             strokeWidth = 10.dp
                         )
                         CircularProgressIndicator(
-                            progress = phoneBatteryPercentage.floatValue,
+                            progress = phoneBatteryPercentage.value,
                             modifier = Modifier.size(120.dp),
                             color = teal,
                             strokeWidth = 10.dp
                         )
-                        Text(text = "${(phoneBatteryPercentage.floatValue * 100).toInt()}%", fontSize = 22.sp, color = charcoal)
+                        Text(text = "${(phoneBatteryPercentage.value * 100).toInt()}%", fontSize = 22.sp, color = charcoal)
                     }
                     Text("Phone", modifier = Modifier.padding(top = 8.dp), color = charcoal)
                 }
@@ -557,8 +557,8 @@ class MainActivity3 : ComponentActivity() {
                             setTouchEnabled(true)
                             isDragEnabled = true
                             setScaleEnabled(true)
-                            xAxis.textColor = "#172121".toColorInt()
-                            axisLeft.textColor = "#172121".toColorInt()
+                            xAxis.textColor = Color.parseColor("#172121")
+                            axisLeft.textColor = Color.parseColor("#172121")
                         }
                     },
                     update = { chart ->
@@ -567,7 +567,7 @@ class MainActivity3 : ComponentActivity() {
                         }
                         val xVals = data.indices.map { it.toString() }
                         val dataSet = LineDataSet(entries, "Heart Rate").apply {
-                            color = "#6A8D92".toColorInt() // Teal
+                            color = Color.parseColor("#6A8D92") // Teal
                             setDrawValues(false)
                             setDrawCircles(false)
                             lineWidth = 2f
