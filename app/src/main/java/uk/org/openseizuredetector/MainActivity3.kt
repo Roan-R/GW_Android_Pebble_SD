@@ -285,7 +285,7 @@ class MainActivity3 : ComponentActivity() {
 //                                    }) { Text("About Data Sharing", color = charcoal) } //took 'about data sharing' tab out
 
                                     DropdownMenuItem(onClick = { 
-                                        startActivity(Intent(context, LogManagerControlActivity::class.java))
+                                        startActivity(Intent(context, LogManagerComposeActivity::class.java))
                                         showMenu.value = false
                                     }) { Text("Log Manager", color = charcoal) }
 
