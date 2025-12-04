@@ -1,6 +1,7 @@
 package uk.org.openseizuredetector
 
 import android.content.Intent
+import android.graphics.Color
 import android.net.Uri
 import android.os.Bundle
 import android.os.Handler
@@ -9,23 +10,27 @@ import android.util.Log
 import android.view.WindowManager
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color as ComposeColor
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import uk.org.openseizuredetector.ui.theme.OpenSeizureDetectorTheme
-import java.util.Timer
-import java.util.TimerTask
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.view.WindowCompat
 import com.github.mikephil.charting.charts.LineChart
@@ -33,20 +38,31 @@ import com.github.mikephil.charting.components.XAxis
 import com.github.mikephil.charting.data.Entry
 import com.github.mikephil.charting.data.LineData
 import com.github.mikephil.charting.data.LineDataSet
-import android.graphics.Color
+import uk.org.openseizuredetector.ui.theme.OpenSeizureDetectorTheme
+import java.util.Timer
+import java.util.TimerTask
 
 class MainActivity3 : ComponentActivity() {
 
-    private val TAG = "MainActivityCompose"
+    private val tag = "MainActivityCompose"
     // New Color Palette
-    private val background = ComposeColor(0xFFD7FFF1)
+    private val background = ComposeColor(0xFFE0EDEA)
     private val brown = ComposeColor(0xFF664E4C)
     private val charcoal = ComposeColor(0xFF172121)
     private val teal = ComposeColor(0xFF6A8D92)
+    private val muteBlue = ComposeColor(0xFF6DC5DB)
     private val beige = ComposeColor(0xFFE2D0B6)
     private val white = ComposeColor.White
 
-    private val okColour = teal
+    // Heart Rate Legend Colors
+    private val normalHrBlue = ComposeColor(0xFF2d8bba)
+    private val elevatedHrPurple = ComposeColor(0xFFcb6ce6)
+    private val seizureHrRed = ComposeColor(0xFFff5757)
+    
+    private val okStatusBackground = ComposeColor(0xFFb3d3d8)
+    private val okStatusText = ComposeColor(0xFF063d59)
+
+    private val okColour = okStatusBackground
     private val warnColour = brown
     private val alarmColour = charcoal
 
@@ -65,12 +81,9 @@ class MainActivity3 : ComponentActivity() {
     private val watchConnectionText = mutableStateOf("Watch: disconnected")
     private val watchConnectionColor = mutableStateOf(warnColour)
 
-    private val acceptAlarmButtonText = mutableStateOf("Accept Alarm")
-    private val acceptAlarmButtonEnabled = mutableStateOf(false)
     private val manualAlarmButtonEnabled = mutableStateOf(true)
     private val muteAlarmButtonEnabled = mutableStateOf(false)
-
-
+    
     // Menu and Dialog states
     private val versionText = mutableStateOf("")
     private val showMenu = mutableStateOf(false)
@@ -80,7 +93,7 @@ class MainActivity3 : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        Log.i(TAG, "onCreate()");
+        Log.i(tag, "onCreate()");
 
         mUtil = OsdUtil(applicationContext, serverStatusHandler)
         mConnection = SdServiceConnection(applicationContext)
@@ -111,7 +124,7 @@ class MainActivity3 : ComponentActivity() {
 
     override fun onStart() {
         super.onStart()
-        Log.i(TAG, "onStart()");
+        Log.i(tag, "onStart()");
         mUtil.writeToSysLogFile("MainActivity.onStart() - Compose")
         versionText.value = getString(R.string.AppTitleText) + " " + mUtil.getAppVersionName()
 
@@ -127,7 +140,7 @@ class MainActivity3 : ComponentActivity() {
 
     override fun onStop() {
         super.onStop()
-        Log.i(TAG, "onStop() - unbinding from server")
+        Log.i(tag, "onStop() - unbinding from server")
         mUtil.writeToSysLogFile("MainActivity.onStop() - Compose")
         mUtil.unbindFromServer(applicationContext, mConnection)
         mUiTimer?.cancel()
@@ -195,18 +208,10 @@ class MainActivity3 : ComponentActivity() {
                 else -> {
                     mainStatusText.value = "OK"
                     mainStatusColor.value = okColour
-                    mainStatusDetails.value = "System is monitoring."
+                    mainStatusDetails.value = "System is monitoring"
                 }
             }
             
-            // Update button state
-            if ((server.mSmsTimer != null) && (server.mSmsTimer.mTimeLeft > 0)) {
-                acceptAlarmButtonText.value = "Cancel SMS (${server.mSmsTimer.mTimeLeft / 1000}s)"
-                acceptAlarmButtonEnabled.value = true
-            } else {
-                acceptAlarmButtonText.value = "Accept Alarm"
-                acceptAlarmButtonEnabled.value = server.isLatchAlarms() || data.mFallActive
-            }
             muteAlarmButtonEnabled.value = server.isAudibleCancelled
         }
     }
@@ -219,13 +224,13 @@ class MainActivity3 : ComponentActivity() {
             backgroundColor = background,
             topBar = {
                 TopAppBar(
-                    title = { Text(versionText.value) },
+                    title = { },
                     modifier = Modifier.statusBarsPadding(),
-                    backgroundColor = charcoal,
-                    contentColor = white,
+                    backgroundColor = ComposeColor.Transparent,
+                    elevation = 0.dp,
                     actions = {
                         IconButton(onClick = { showMenu.value = !showMenu.value }) {
-                            Icon(Icons.Filled.MoreVert, contentDescription = "More options", tint = white)
+                            Icon(Icons.Filled.MoreVert, contentDescription = "More options", tint = okStatusText)
                         }
                         DropdownMenu(
                             expanded = showMenu.value,
@@ -280,7 +285,7 @@ class MainActivity3 : ComponentActivity() {
 //                                    }) { Text("About Data Sharing", color = charcoal) } //took 'about data sharing' tab out
 
                                     DropdownMenuItem(onClick = { 
-                                        startActivity(Intent(context, LogManagerComposeActivity::class.java))
+                                        startActivity(Intent(context, LogManagerControlActivity::class.java))
                                         showMenu.value = false
                                     }) { Text("Log Manager", color = charcoal) }
 
@@ -329,7 +334,7 @@ class MainActivity3 : ComponentActivity() {
     fun AboutDialog(onDismiss: () -> Unit) {
         AlertDialog(
             onDismissRequest = onDismiss,
-            title = { Text("OpenSeizureDetector V${mUtil.getAppVersionName()}") },
+            title = { Text("SeizeWatch V${mUtil.getAppVersionName()}") },
             text = { Text("The Open Source Seizure Detector.") },
             confirmButton = {
                 Button(onClick = { 
@@ -365,7 +370,6 @@ class MainActivity3 : ComponentActivity() {
         )
     }
 
-
     @Composable
     fun MainLayout(modifier: Modifier = Modifier) {
         Column(
@@ -374,32 +378,105 @@ class MainActivity3 : ComponentActivity() {
                 .padding(8.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
+            // Add the logo here
+            Row(modifier = Modifier.fillMaxWidth().height(60.dp)) {
+                Image(
+                    painter = painterResource(id = R.drawable.croppedlogo),
+                    contentDescription = "Seize Watch Logo",
+                    modifier = Modifier
+                        .size(120.dp)
+                        .offset(y = (-60).dp) // Move the logo up
+                        .offset(x = (10).dp)
+                )
+            }
+
             // Main Status Display
             Card(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(vertical = 8.dp),
+                    .padding(start = 32.dp, end = 32.dp, bottom = 10.dp),
                 backgroundColor = mainStatusColor.value,
-                shape = MaterialTheme.shapes.medium
+                shape = CircleShape
             ) {
                 Column(
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.Center,
-                    modifier = Modifier.padding(16.dp)
+                    modifier = Modifier.padding(vertical = 8.dp) // Adjusted padding
                 ) {
+                    val textColor = if (mainStatusColor.value == okColour) okStatusText else white
                     Text(
                         text = mainStatusText.value,
-                        fontSize = 48.sp,
+                        fontSize = 36.sp, // Smaller font
                         fontWeight = FontWeight.Bold,
-                        color = white
+                        color = textColor
                     )
                     Text(
                         text = mainStatusDetails.value,
                         fontSize = 16.sp,
-                        color = white,
-                        textAlign = TextAlign.Center,
-                        modifier = Modifier.padding(top = 4.dp)
+                        color = textColor,
+                        textAlign = TextAlign.Center
                     )
+                }
+            }
+
+            Spacer(modifier = Modifier.height(8.dp))
+            
+            HeartRateChart(data = heartRateHistory, modifier = Modifier.weight(1f))
+
+            // Heart Rate Legend
+            Row(
+                modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 12.dp),
+                horizontalArrangement = Arrangement.Center
+            ) {
+                LegendItem(color = normalHrBlue, text = "Normal")
+                Spacer(Modifier.width(24.dp))
+                LegendItem(color = elevatedHrPurple, text = "Elevated")
+                Spacer(Modifier.width(24.dp))
+                LegendItem(color = seizureHrRed, text = "Seizure Warning")
+            }
+
+            // Action Buttons
+            Column(modifier = Modifier.fillMaxWidth()) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 32.dp, vertical = 8.dp),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    Button(
+                        onClick = { 
+                            if (mConnection.mBound) {
+                                mConnection.mSdServer.raiseManualAlarm()
+                            }
+                        }, 
+                        enabled = manualAlarmButtonEnabled.value,
+                        modifier = Modifier.weight(1f).padding(horizontal = 4.dp).height(56.dp),
+                        colors = ButtonDefaults.buttonColors(
+                            backgroundColor = teal,
+                            contentColor = white,
+                            disabledBackgroundColor = beige,
+                            disabledContentColor = charcoal
+                        )
+                    ) {
+                        Text("MANUAL ALARM")
+                    }
+                    Button(
+                        onClick = {
+                            if (mConnection.mBound) {
+                                mConnection.mSdServer.cancelAudible()
+                            }
+                        },
+                        enabled = true, // Always enabled
+                        modifier = Modifier.weight(1f).padding(horizontal = 4.dp).height(56.dp),
+                        colors = ButtonDefaults.buttonColors(
+                            backgroundColor = muteBlue,
+                            contentColor = white,
+                            disabledBackgroundColor = beige,
+                            disabledContentColor = charcoal
+                        )
+                    ) {
+                        Text(if (muteAlarmButtonEnabled.value) "UNMUTE ALARM" else "MUTE ALARM")
+                    }
                 }
             }
             
@@ -408,7 +485,7 @@ class MainActivity3 : ComponentActivity() {
                 fontSize = 16.sp,
                 color = if (watchConnectionColor.value == okColour) charcoal else warnColour,
                 fontWeight = FontWeight.Bold,
-                modifier = Modifier.padding(vertical = 8.dp)
+                modifier = Modifier.padding(top = 24.dp, bottom = 8.dp)
             )
 
             // Battery and Connection Status Row
@@ -416,7 +493,7 @@ class MainActivity3 : ComponentActivity() {
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(8.dp),
-                horizontalArrangement = Arrangement.SpaceAround,
+                horizontalArrangement = Arrangement.Center,
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 // Watch Battery
@@ -424,13 +501,13 @@ class MainActivity3 : ComponentActivity() {
                     Box(contentAlignment = Alignment.Center) {
                         CircularProgressIndicator(
                             progress = 1f,
-                            modifier = Modifier.size(120.dp),
+                            modifier = Modifier.size(100.dp),
                             color = beige,
                             strokeWidth = 10.dp
                         )
                         CircularProgressIndicator(
                             progress = watchBatteryPercentage.value,
-                            modifier = Modifier.size(120.dp),
+                            modifier = Modifier.size(100.dp),
                             color = teal,
                             strokeWidth = 10.dp
                         )
@@ -439,18 +516,20 @@ class MainActivity3 : ComponentActivity() {
                     Text("Watch", modifier = Modifier.padding(top = 8.dp), color = charcoal)
                 }
 
+                Spacer(modifier = Modifier.width(48.dp))
+
                 // Phone Battery
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     Box(contentAlignment = Alignment.Center) {
                         CircularProgressIndicator(
                             progress = 1f,
-                            modifier = Modifier.size(120.dp),
+                            modifier = Modifier.size(100.dp),
                             color = beige,
                             strokeWidth = 10.dp
                         )
                         CircularProgressIndicator(
                             progress = phoneBatteryPercentage.value,
-                            modifier = Modifier.size(120.dp),
+                            modifier = Modifier.size(100.dp),
                             color = teal,
                             strokeWidth = 10.dp
                         )
@@ -459,75 +538,15 @@ class MainActivity3 : ComponentActivity() {
                     Text("Phone", modifier = Modifier.padding(top = 8.dp), color = charcoal)
                 }
             }
+        }
+    }
 
-            HeartRateChart(data = heartRateHistory, modifier = Modifier.weight(1f))
-
-            // Action Buttons
-            Column(modifier = Modifier.fillMaxWidth()) {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(bottom = 8.dp),
-                    horizontalArrangement = Arrangement.SpaceEvenly
-                ) {
-                    Button(
-                        onClick = { 
-                            if (mConnection.mBound) {
-                                if ((mConnection.mSdServer.mSmsTimer != null) && (mConnection.mSdServer.mSmsTimer.mTimeLeft > 0)) {
-                                    mUtil.showToast(getString(R.string.SMSAlarmCancelledMsg))
-                                    mConnection.mSdServer.stopSmsTimer()
-                                } else {
-                                    mConnection.mSdServer.acceptAlarm()
-                                }
-                            }
-                        }, 
-                        enabled = acceptAlarmButtonEnabled.value,
-                        modifier = Modifier.weight(1f).padding(horizontal = 4.dp),
-                        colors = ButtonDefaults.buttonColors(
-                            backgroundColor = teal,
-                            contentColor = white,
-                            disabledBackgroundColor = beige,
-                            disabledContentColor = charcoal
-                        )
-                    ) {
-                        Text(text = acceptAlarmButtonText.value)
-                    }
-                    Button(
-                        onClick = { 
-                            if (mConnection.mBound) {
-                                mConnection.mSdServer.raiseManualAlarm()
-                            }
-                        }, 
-                        enabled = manualAlarmButtonEnabled.value,
-                        modifier = Modifier.weight(1f).padding(horizontal = 4.dp),
-                        colors = ButtonDefaults.buttonColors(
-                            backgroundColor = teal,
-                            contentColor = white,
-                            disabledBackgroundColor = beige,
-                            disabledContentColor = charcoal
-                        )
-                    ) {
-                        Text("Manual Alarm")
-                    }
-                }
-                Button(
-                    onClick = {
-                        if (mConnection.mBound) {
-                            mConnection.mSdServer.cancelAudible()
-                        }
-                    },
-                    enabled = true, // Always enabled
-                    modifier = Modifier.fillMaxWidth().padding(horizontal = 4.dp),
-                    colors = ButtonDefaults.buttonColors(
-                        backgroundColor = teal,
-                        contentColor = white,
-                        disabledBackgroundColor = beige,
-                        disabledContentColor = charcoal
-                    )
-                ) {
-                    Text(if (muteAlarmButtonEnabled.value) "Unmute Alarm" else "Mute Alarm")
-                }
-            }
+    @Composable
+    fun LegendItem(color: ComposeColor, text: String) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Box(modifier = Modifier.size(16.dp).background(color, CircleShape))
+            Spacer(modifier = Modifier.width(8.dp))
+            Text(text = text, fontSize = 16.sp, color = charcoal)
         }
     }
 
@@ -537,24 +556,31 @@ class MainActivity3 : ComponentActivity() {
             Column(
                 modifier = modifier
                     .fillMaxWidth()
-                    .padding(vertical = 8.dp),
+                    .padding(vertical = 8.dp, horizontal = 48.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(
                     text = "Heart Rate: ${data.last().toInt()}",
-                    fontSize = 20.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = charcoal
+                    fontSize = 28.sp,
+                    fontWeight = FontWeight.SemiBold,
+                    fontFamily = FontFamily.SansSerif,
+                    fontStyle = FontStyle.Normal,
+                    color = okStatusText
                 )
+                Spacer(modifier = Modifier.height(16.dp))
                 AndroidView(
-                    modifier = Modifier.fillMaxSize(),
+                    modifier = Modifier.weight(1f).fillMaxWidth(),
                     factory = {
                         LineChart(it).apply {
+                            setBackgroundColor(Color.TRANSPARENT)
+                            setDrawGridBackground(false)
                             setDescription("")
                             legend.isEnabled = false
                             xAxis.position = XAxis.XAxisPosition.BOTTOM
                             xAxis.setDrawGridLines(false)
-                            axisLeft.setDrawGridLines(false)
+                            axisLeft.setDrawGridLines(true)
+                            axisLeft.gridColor = Color.LTGRAY
+                            axisLeft.setDrawAxisLine(false)
                             axisRight.isEnabled = false
                             setTouchEnabled(true)
                             isDragEnabled = true
@@ -568,8 +594,16 @@ class MainActivity3 : ComponentActivity() {
                             Entry(value, index)
                         }
                         val xVals = data.indices.map { it.toString() }
+
+                        val lastHr = data.lastOrNull() ?: 0f
+                        val lineColor = when {
+                            lastHr <= 80 -> normalHrBlue.value.toInt()
+                            lastHr <= 100 -> elevatedHrPurple.value.toInt()
+                            else -> seizureHrRed.value.toInt()
+                        }
+
                         val dataSet = LineDataSet(entries, "Heart Rate").apply {
-                            color = Color.parseColor("#6A8D92") // Teal
+                            color = lineColor
                             setDrawValues(false)
                             setDrawCircles(false)
                             lineWidth = 2f
@@ -578,6 +612,9 @@ class MainActivity3 : ComponentActivity() {
                         chart.invalidate()
                     }
                 )
+                Text(text = "Time", fontSize = 12.sp, fontStyle = FontStyle.Italic, color = charcoal)
+
+
             }
         }
     }
