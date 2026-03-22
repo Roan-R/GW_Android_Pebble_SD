@@ -1,7 +1,11 @@
 package uk.org.openseizuredetector
 
 import android.content.Intent
+import android.content.SharedPreferences
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.clickable
@@ -38,10 +42,19 @@ enum class SettingsPage {
     Network
 }
 
-class PrefActivity : ComponentActivity() {
+class PrefActivity : ComponentActivity(), SharedPreferences.OnSharedPreferenceChangeListener {
+    private val TAG = "PrefActivity"
+    private lateinit var mUtil: OsdUtil
+    private val mHandler = Handler(Looper.getMainLooper())
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        mUtil = OsdUtil(this, mHandler)
         WindowCompat.setDecorFitsSystemWindows(window, false)
+        
+        val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this)
+        sharedPreferences.registerOnSharedPreferenceChangeListener(this)
+
         setContent {
             OpenSeizureDetectorTheme {
                 var currentScreen by remember { mutableStateOf(SettingsPage.Main) }
@@ -56,6 +69,22 @@ class PrefActivity : ComponentActivity() {
                     SettingsPage.Network -> NetworkSettingsScreen { currentScreen = SettingsPage.Main }
                 }
             }
+        }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this)
+        sharedPreferences.unregisterOnSharedPreferenceChangeListener(this)
+    }
+
+    override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences?, key: String?) {
+        Log.i(TAG, "onSharedPreferenceChanged: key=$key")
+        // Restart the server to apply new settings, similar to the legacy PrefActivity.java logic
+        if (mUtil.isServerRunning) {
+            Log.i(TAG, "Restarting SdServer to apply changes...")
+            mUtil.stopServer()
+            mHandler.postDelayed({ mUtil.startServer() }, 1000)
         }
     }
 
@@ -421,6 +450,83 @@ class PrefActivity : ComponentActivity() {
             }
         ) { paddingValues ->
             LazyColumn(modifier = Modifier.padding(paddingValues)) {
+                // --- Algorithm Selection ---
+                item { CategoryHeader(title = stringResource(R.string.AlgorithmSelectionTitle)) }
+                item {
+                    CheckBoxPreference(
+                        key = "OsdAlarmActive",
+                        title = stringResource(R.string.OsdAlarmEnabledTitle),
+                        summary = stringResource(R.string.OsdAlarmEnabledSummary),
+                        defaultValue = true,
+                        sharedPreferences = sharedPreferences
+                    )
+                }
+                item {
+                    CheckBoxPreference(
+                        key = "FlapAlarmActive",
+                        title = "Enable Flap Alarm",
+                        summary = "Enable the experimental alarm to detect arm 'flapping' motion",
+                        defaultValue = true,
+                        sharedPreferences = sharedPreferences
+                    )
+                }
+                item {
+                    CheckBoxPreference(
+                        key = "CnnAlarmActive",
+                        title = stringResource(R.string.CnnAlarmEnabledTitle),
+                        summary = stringResource(R.string.CnnAlarmEnabledSummary),
+                        defaultValue = false,
+                        sharedPreferences = sharedPreferences
+                    )
+                }
+                item {
+                    CheckBoxPreference(
+                        key = "HRAlarmActive",
+                        title = stringResource(R.string.HRAlarmEnabledTitle),
+                        summary = stringResource(R.string.HRAlarmEnabledSummary),
+                        defaultValue = false,
+                        sharedPreferences = sharedPreferences
+                    )
+                }
+                item {
+                    CheckBoxPreference(
+                        key = "HRAdaptiveAlarmActive",
+                        title = stringResource(R.string.HRAdaptiveAlarmEnabledTitle),
+                        summary = stringResource(R.string.HRAlarmEnabledSummary),
+                        defaultValue = false,
+                        sharedPreferences = sharedPreferences
+                    )
+                }
+                item {
+                    CheckBoxPreference(
+                        key = "HRAverageAlarmActive",
+                        title = stringResource(R.string.HRAverageAlarmEnabledTitle),
+                        summary = stringResource(R.string.HRAverageAlarmEnabledSummary),
+                        defaultValue = false,
+                        sharedPreferences = sharedPreferences
+                    )
+                }
+                item {
+                    CheckBoxPreference(
+                        key = "O2SatAlarmActive",
+                        title = stringResource(R.string.O2Sat_enabled_title),
+                        summary = stringResource(R.string.O2Sat_enabled_summary),
+                        defaultValue = false,
+                        sharedPreferences = sharedPreferences
+                    )
+                }
+                item {
+                    CheckBoxPreference(
+                        key = "FallActive",
+                        title = stringResource(R.string.fall_detect_active_title),
+                        summary = "",
+                        defaultValue = false,
+                        sharedPreferences = sharedPreferences
+                    )
+                }
+
+                // --- OSD Shaking Settings ---
+                item { CategoryHeader(title = stringResource(R.string.SeizureDetectorSettingsTitle)) }
                 item {
                     EditTextPreference(
                         key = "WarnTime",
@@ -477,6 +583,246 @@ class PrefActivity : ComponentActivity() {
                         title = stringResource(R.string.AlarmFreqMaxTitle),
                         summary = stringResource(R.string.AlarmFreqMaxSummary),
                         defaultValue = "8",
+                        sharedPreferences = sharedPreferences,
+                        keyboardType = KeyboardType.Number
+                    )
+                }
+
+                // --- Flap Alarm Settings ---
+                item { CategoryHeader(title = "Flap Alarm Settings") }
+                item {
+                    EditTextPreference(
+                        key = "FlapAlarmThresh",
+                        title = "Flap Alarm Threshold",
+                        summary = "Flap Alarm Threshold",
+                        defaultValue = "5000",
+                        sharedPreferences = sharedPreferences,
+                        keyboardType = KeyboardType.Number
+                    )
+                }
+                item {
+                    EditTextPreference(
+                        key = "FlapAlarmRatioThresh",
+                        title = "Flap Alarm Ratio Threshold",
+                        summary = "Flap Alarm Ratio Threshold",
+                        defaultValue = "90",
+                        sharedPreferences = sharedPreferences,
+                        keyboardType = KeyboardType.Number
+                    )
+                }
+                item {
+                    EditTextPreference(
+                        key = "FlapAlarmFreqMin",
+                        title = stringResource(R.string.AlarmFreqMinTitle),
+                        summary = stringResource(R.string.AlarmFreqMinSummary),
+                        defaultValue = "2",
+                        sharedPreferences = sharedPreferences,
+                        keyboardType = KeyboardType.Number
+                    )
+                }
+                item {
+                    EditTextPreference(
+                        key = "FlapAlarmFreqMax",
+                        title = stringResource(R.string.AlarmFreqMaxTitle),
+                        summary = stringResource(R.string.AlarmFreqMaxSummary),
+                        defaultValue = "4",
+                        sharedPreferences = sharedPreferences,
+                        keyboardType = KeyboardType.Number
+                    )
+                }
+
+                // --- Machine Learning Settings ---
+                item { CategoryHeader(title = stringResource(R.string.ml_sd_settings_title)) }
+                item {
+                    EditTextPreference(
+                        key = "CnnAlarmThreshold",
+                        title = stringResource(R.string.ml_sd_threshold_title),
+                        summary = stringResource(R.string.ml_sd_threshold_summary),
+                        defaultValue = "5",
+                        sharedPreferences = sharedPreferences,
+                        keyboardType = KeyboardType.Number
+                    )
+                }
+
+                // --- Heart Rate Settings ---
+                item { CategoryHeader(title = stringResource(R.string.HeartRateAlarmSettingsTitle)) }
+                item {
+                    CheckBoxPreference(
+                        key = "HrFrozenAlarm",
+                        title = stringResource(R.string.HrFrozenTitle),
+                        summary = stringResource(R.string.HrFrozenSummary),
+                        defaultValue = true,
+                        sharedPreferences = sharedPreferences
+                    )
+                }
+                item {
+                    CheckBoxPreference(
+                        key = "HRNullAsAlarm",
+                        title = stringResource(R.string.HRNullAlarmTitle),
+                        summary = stringResource(R.string.HRNullAlarmSummary),
+                        defaultValue = false,
+                        sharedPreferences = sharedPreferences
+                    )
+                }
+                item {
+                    EditTextPreference(
+                        key = "HRThreshMin",
+                        title = stringResource(R.string.HRThreshMinTitle),
+                        summary = stringResource(R.string.HRThreshMinSummary),
+                        defaultValue = "40",
+                        sharedPreferences = sharedPreferences,
+                        keyboardType = KeyboardType.Number
+                    )
+                }
+                item {
+                    EditTextPreference(
+                        key = "HRThreshMax",
+                        title = stringResource(R.string.HRThreshMaxTitle),
+                        summary = stringResource(R.string.HRThreshMaxSummary),
+                        defaultValue = "150",
+                        sharedPreferences = sharedPreferences,
+                        keyboardType = KeyboardType.Number
+                    )
+                }
+
+                // --- Heart Rate Adaptive ---
+                item { CategoryHeader(title = stringResource(R.string.HeartRateAdaptiveAlarmSettingsTitle)) }
+                item {
+                    EditTextPreference(
+                        key = "HRAdaptiveAlarmWindowSecs",
+                        title = stringResource(R.string.HRAdaptiveAlarmWindowTitle),
+                        summary = stringResource(R.string.HRAdaptiveAlarmWindowSummary),
+                        defaultValue = "30",
+                        sharedPreferences = sharedPreferences,
+                        keyboardType = KeyboardType.Number
+                    )
+                }
+                item {
+                    EditTextPreference(
+                        key = "HRAdaptiveAlarmThresh",
+                        title = stringResource(R.string.HRAdaptiveThreshTitle),
+                        summary = stringResource(R.string.HRAdaptiveThreshSummary),
+                        defaultValue = "20",
+                        sharedPreferences = sharedPreferences,
+                        keyboardType = KeyboardType.Number
+                    )
+                }
+
+                // --- Heart Rate Average ---
+                item { CategoryHeader(title = stringResource(R.string.HeartRateAverageAlarmSettingsTitle)) }
+                item {
+                    EditTextPreference(
+                        key = "HRAverageAlarmThreshMin",
+                        title = stringResource(R.string.HRAverageThreshMinTitle),
+                        summary = stringResource(R.string.HRAverageThreshMinSummary),
+                        defaultValue = "40",
+                        sharedPreferences = sharedPreferences,
+                        keyboardType = KeyboardType.Number
+                    )
+                }
+                item {
+                    EditTextPreference(
+                        key = "HRAverageAlarmThreshMax",
+                        title = stringResource(R.string.HRAverageThreshMaxTitle),
+                        summary = stringResource(R.string.HRAverageThreshMaxSummary),
+                        defaultValue = "120",
+                        sharedPreferences = sharedPreferences,
+                        keyboardType = KeyboardType.Number
+                    )
+                }
+                item {
+                    EditTextPreference(
+                        key = "HRAverageAlarmWindowSecs",
+                        title = stringResource(R.string.HRAverageAlarmWindowTitle),
+                        summary = stringResource(R.string.HRAverageAlarmWindowSummary),
+                        defaultValue = "120",
+                        sharedPreferences = sharedPreferences,
+                        keyboardType = KeyboardType.Number
+                    )
+                }
+
+                // --- O2 Saturation ---
+                item { CategoryHeader(title = stringResource(R.string.O2SatSettingsTitle)) }
+                item {
+                    CheckBoxPreference(
+                        key = "O2SatNullAsAlarm",
+                        title = stringResource(R.string.O2SatNullAlarmTitle),
+                        summary = stringResource(R.string.O2SatNullAlarmSummary),
+                        defaultValue = false,
+                        sharedPreferences = sharedPreferences
+                    )
+                }
+                item {
+                    EditTextPreference(
+                        key = "O2SatThreshMin",
+                        title = stringResource(R.string.O2SatThreshMinTitle),
+                        summary = stringResource(R.string.O2SatThreshMinSummary),
+                        defaultValue = "80",
+                        sharedPreferences = sharedPreferences,
+                        keyboardType = KeyboardType.Number
+                    )
+                }
+
+                // --- Fall Detection ---
+                item { CategoryHeader(title = stringResource(R.string.fall_detect_title)) }
+                item {
+                    EditTextPreference(
+                        key = "FallThreshMin",
+                        title = stringResource(R.string.fall_thresh_min_title),
+                        summary = "",
+                        defaultValue = "1500",
+                        sharedPreferences = sharedPreferences,
+                        keyboardType = KeyboardType.Number
+                    )
+                }
+                item {
+                    EditTextPreference(
+                        key = "FallThreshMax",
+                        title = stringResource(R.string.fall_thresh_max_title),
+                        summary = "",
+                        defaultValue = "3500",
+                        sharedPreferences = sharedPreferences,
+                        keyboardType = KeyboardType.Number
+                    )
+                }
+                item {
+                    EditTextPreference(
+                        key = "FallWindow",
+                        title = stringResource(R.string.fall_window_title),
+                        summary = "",
+                        defaultValue = "1500",
+                        sharedPreferences = sharedPreferences,
+                        keyboardType = KeyboardType.Number
+                    )
+                }
+
+                // --- Fidget Detector ---
+                item { CategoryHeader(title = stringResource(R.string.FidgetSettingsTitle)) }
+                item {
+                    CheckBoxPreference(
+                        key = "FidgetDetectorEnabled",
+                        title = stringResource(R.string.FidgetDetectorEnabledTitle),
+                        summary = stringResource(R.string.FidgetDetectorEnabledSummary),
+                        defaultValue = false,
+                        sharedPreferences = sharedPreferences
+                    )
+                }
+                item {
+                    EditTextPreference(
+                        key = "FidgetDetectorThreshold",
+                        title = stringResource(R.string.FidgetDetectorThresholdTitle),
+                        summary = stringResource(R.string.FidgetDetectorThresholdSummary),
+                        defaultValue = "0.6",
+                        sharedPreferences = sharedPreferences,
+                        keyboardType = KeyboardType.Number
+                    )
+                }
+                item {
+                    EditTextPreference(
+                        key = "FidgetDetectorPeriod",
+                        title = stringResource(R.string.FidgetDetectorPeriodTitle),
+                        summary = stringResource(R.string.FidgetDetectorPeriodSummary),
+                        defaultValue = "20",
                         sharedPreferences = sharedPreferences,
                         keyboardType = KeyboardType.Number
                     )

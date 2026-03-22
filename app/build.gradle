@@ -78,6 +78,7 @@ dependencies {
     implementation 'androidx.navigation:navigation-ui:2.7.6'
     implementation 'androidx.core:core-ktx:1.17.0'
     implementation 'androidx.preference:preference-ktx:1.2.1'
+    implementation 'androidx.core:core-ktx:1.18.0'
 
     // Jetpack Compose
     def composeBom = platform('androidx.compose:compose-bom:2024.06.00')

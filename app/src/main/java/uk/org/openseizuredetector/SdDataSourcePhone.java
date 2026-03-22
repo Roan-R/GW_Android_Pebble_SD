@@ -24,15 +24,11 @@
 package uk.org.openseizuredetector;
 
 import android.content.Context;
-import android.content.Intent;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
-import android.os.Binder;
 import android.os.Handler;
-import android.os.IBinder;
-import android.os.PowerManager;
 import android.preference.PreferenceManager;
 import android.util.Log;
 
@@ -52,12 +48,8 @@ public class SdDataSourcePhone extends SdDataSource implements SensorEventListen
     private int mMode = 0;   // 0=check data rate, 1=running
     private SensorEvent mStartEvent = null;
     private long mStartTs = 0;
-    public double mSampleFreq = 0;
 
     private boolean mUseNextSample = true;
-
-
-    private PowerManager.WakeLock mWakeLock;
 
 
     public SdDataSourcePhone(Context context, Handler handler,
@@ -67,6 +59,12 @@ public class SdDataSourcePhone extends SdDataSource implements SensorEventListen
         // Set default settings from XML files (mContext is set by super().
         PreferenceManager.setDefaultValues(mContext,
                 R.xml.network_passive_datasource_prefs, true);
+    }
+
+    @Override
+    public void updatePrefs() {
+        Log.i(TAG, "updatePrefs()");
+        super.updatePrefs(); // This loads mFallActive and other common settings
     }
 
 
@@ -89,7 +87,9 @@ public class SdDataSourcePhone extends SdDataSource implements SensorEventListen
     public void stop() {
         Log.i(TAG, "stop()");
         mUtil.writeToSysLogFile("SdDataSourcePhone.stop()");
-        mSensorManager.unregisterListener(this);
+        if (mSensorManager != null) {
+            mSensorManager.unregisterListener(this);
+        }
 
         super.stop();
     }
@@ -101,88 +101,57 @@ public class SdDataSourcePhone extends SdDataSource implements SensorEventListen
             // we initially start in mMode=0, which calculates the sample frequency returned by the sensor, then enters mMode=1, which is normal operation.
             if (mMode == 0) {
                 if (mStartEvent == null) {
-                    Log.v(TAG, "onSensorChanged(): mMode=0 - Starting Sample Rate Check - mNSamp = " + mSdData.mNsamp);
-                    Log.v(TAG, "onSensorChanged(): saving initial event data");
+                    Log.v(TAG, "onSensorChanged(): mMode=0 - Starting Sample Rate Check");
                     mStartEvent = event;
                     mStartTs = event.timestamp;
                     mSdData.mNsamp = 0;
                 } else {
                     mSdData.mNsamp++;
                 }
-                Log.v(TAG, "onSensorChanged - mMode=" + mMode + " mNSamp=" + mSdData.mNsamp);
-                if (mSdData.mNsamp >= mSdData.rawData.length) {
-                    Log.v(TAG, "onSensorChanged(): Collected Data = final TimeStamp=" + event.timestamp + ", initial TimeStamp=" + mStartTs);
+                if (mSdData.mNsamp >= 250) {
                     double dT = 1e-9 * (event.timestamp - mStartTs);
                     mSdData.mSampleFreq = (int) (mSdData.mNsamp / dT);
                     mSdData.haveSettings = true;
-                    Log.v(TAG, "onSensorChanged(): Collected data for " + dT + " sec - calculated sample rate as " + mSampleFreq + " Hz");
+                    Log.i(TAG, "onSensorChanged(): Calculated sample rate as " + mSdData.mSampleFreq + " Hz");
                     mMode = 1;
                     mSdData.mNsamp = 0;
                     mStartTs = event.timestamp;
                 }
             } else if (mMode == 1) {
-                // The phone gives us 50 Hz sample frequency so we do a crude factor of 2 downsampling.
+                // The phone gives us ~50 Hz sample frequency so we do a factor of 2 downsampling to get ~25Hz.
                 if (mUseNextSample) {
                     mUseNextSample = false;
-                    // mMode=1 is normal operation - collect NSAMP accelerometer data samples, then analyse them by calling doAnalysis().
                     float x = event.values[0];
                     float y = event.values[1];
                     float z = event.values[2];
-                    //Log.v(TAG,"Accelerometer Data Received: x="+x+", y="+y+", z="+z);
-                    mSdData.rawData[mSdData.mNsamp] = sqrt(x * x + y * y + z * z);
-                    mSdData.rawData3D[3 * mSdData.mNsamp] = x;
-                    mSdData.rawData3D[3 * mSdData.mNsamp + 1] = y;
-                    mSdData.rawData3D[3 * mSdData.mNsamp + 2] = z;
+                    
+                    // Convert magnitude from m/s^2 to milli-g (1g = 1000 mg)
+                    double mag = 1000.0 * sqrt(x * x + y * y + z * z) / 9.81;
+                    
+                    mSdData.rawData[mSdData.mNsamp] = mag;
+                    mSdData.rawData3D[3 * mSdData.mNsamp] = 1000.0f * x / 9.81f;
+                    mSdData.rawData3D[3 * mSdData.mNsamp + 1] = 1000.0f * y / 9.81f;
+                    mSdData.rawData3D[3 * mSdData.mNsamp + 2] = 1000.0f * z / 9.81f;
+                    
                     mSdData.mNsamp++;
+                    
                     if (mSdData.mNsamp == mSdData.rawData.length) {
-                        // Calculate the sample frequency for this sample, but do not change mSampleFreq, which is used for
-                        // analysis - this is because sometimes you get a very long delay (e.g. when disconnecting debugger),
-                        // which gives a very low frequency which can make us run off the end of arrays in doAnalysis().
-                        // FIXME - we should do some sort of check and disregard samples with long delays in them.
-                        double dT = 1e-9 * (event.timestamp - mStartTs);
-                        int sampleFreq = (int) (mSdData.mNsamp / dT);
-                        Log.v(TAG, "onSensorChanged(): Collected " + mSdData.mNsamp + " data points in " + dT + " sec (=" + sampleFreq + " Hz) - analysing...");
-                        // DownSample from the 50Hz received frequency to 25Hz and convert to mg.
-                        // FIXME - we should really do this properly rather than assume we are really receiving data at 50Hz.
-                        for (int i = 0; i < mSdData.mNsamp; i++) {
-                            mSdData.rawData[i / 2] = 1000. * mSdData.rawData[i] / 9.81;
-                            mSdData.rawData3D[i / 2] = 1000. * mSdData.rawData3D[i] / 9.81;
-                            mSdData.rawData3D[i / 2 + 1] = 1000. * mSdData.rawData3D[i + 1] / 9.81;
-                            mSdData.rawData3D[i / 2 + 2] = 1000. * mSdData.rawData3D[i + 2] / 9.81;
-                            //Log.v(TAG,"i="+i+", rawData="+mSdData.rawData[i]+","+mSdData.rawData[i/2]);
-                        }
-                        mSdData.mNsamp /= 2;
-
-                        // Set HR and O2Sat values to fault value (-1) to avoid alarms if the user enables HR or O2Sat alarms.
+                        // Set HR and O2Sat values to fault value (-1) to avoid alarms.
                         mSdData.mHR = -1;
                         mSdData.mO2Sat = -1;
                         doAnalysis();
                         mSdData.mNsamp = 0;
                         mStartTs = event.timestamp;
-                    } else if (mSdData.mNsamp > mSdData.rawData.length) {
-                        Log.v(TAG, "onSensorChanged(): Received data during analysis - ignoring sample");
                     }
-
                 } else {
                     mUseNextSample = true;
                 }
-            } else {
-                Log.v(TAG, "onSensorChanged(): ERROR - Mode " + mMode + " unrecognised");
             }
-
         }
-
     }
 
     @Override
     public void onAccuracyChanged(Sensor sensor, int accuracy) {
         Log.v(TAG, "onAccuracyChanged()");
     }
-
-
 }
-
-
-
-
-
