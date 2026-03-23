@@ -22,6 +22,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color as ComposeColor
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -590,31 +591,44 @@ class MainActivity3 : ComponentActivity() {
                         }
                     },
                     update = { chart ->
-                        val entries = data.mapIndexed { index, value ->
-                            Entry(value, index)
-                        }
-                        val xVals = data.indices.map { it.toString() }
+                        if (data.size > 1) {
+                            val xVals = ArrayList<String>()
+                            val entries = ArrayList<Entry>()
+                            
+                            data.forEachIndexed { index, value ->
+                                xVals.add(index.toString())
+                                entries.add(Entry(value, index))
+                            }
 
-                        val lastHr = data.lastOrNull() ?: 0f
-                        val lineColor = when {
-                            lastHr <= 80 -> normalHrBlue.value.toInt()
-                            lastHr <= 100 -> elevatedHrPurple.value.toInt()
-                            else -> seizureHrRed.value.toInt()
-                        }
+                            val lastHr = data.lastOrNull() ?: 0f
+                            val lineColor = when {
+                                lastHr <= 80 -> normalHrBlue.toArgb()
+                                lastHr <= 100 -> elevatedHrPurple.toArgb()
+                                else -> seizureHrRed.toArgb()
+                            }
 
-                        val dataSet = LineDataSet(entries, "Heart Rate").apply {
-                            color = lineColor
-                            setDrawValues(false)
-                            setDrawCircles(false)
-                            lineWidth = 2f
+                            val dataSet = LineDataSet(entries, "HR History")
+                            dataSet.setDrawCircles(true)
+                            dataSet.setCircleColor(lineColor)
+                            dataSet.setCircleSize(3f)
+                            dataSet.setDrawValues(false)
+                            
+                            // Line Settings
+                            dataSet.setColor(lineColor)
+                            dataSet.setLineWidth(3f)
+                            dataSet.setDrawCubic(true)
+                            dataSet.setCubicIntensity(0.15f)
+
+                            val lineData = LineData(xVals, listOf(dataSet))
+                            chart.data = lineData
+                            
+                            chart.setVisibleXRangeMaximum(60f)
+                            chart.moveViewToX((data.size - 1).toFloat())
+                            chart.invalidate()
                         }
-                        chart.data = LineData(xVals, listOf(dataSet))
-                        chart.invalidate()
                     }
                 )
                 Text(text = "Time", fontSize = 12.sp, fontStyle = FontStyle.Italic, color = charcoal)
-
-
             }
         }
     }

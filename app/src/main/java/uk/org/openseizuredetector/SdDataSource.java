@@ -500,6 +500,7 @@ public abstract class SdDataSource {
         try {
             // FIXME - Use specified sampleFreq, not this hard coded one
             mSampleFreq = 25;
+            mSdData.mSampleFreq = mSampleFreq;
             double freqRes = 1.0 * mSampleFreq / mSdData.mNsamp;
             Log.v(TAG, "doAnalysis(): mSampleFreq=" + mSampleFreq + " mNSamp=" + mSdData.mNsamp + ": freqRes=" + freqRes);
             Log.v(TAG, "doAnalysis(): rawData=" + Arrays.toString(mSdData.rawData));
@@ -895,6 +896,7 @@ public abstract class SdDataSource {
                     Log.d(TAG, "check_fall() ****FALL DETECTED***** minAcc=" + minAcc + ", maxAcc=" + maxAcc);
                     Log.d(TAG, "check_fall() - ****FALL DETECTED****");
                     mSdData.fallAlarmStanding = true;
+                    mSdData.alarmState = 3;
                     mSdData.alarmCause = mSdData.alarmCause + "FALL ";
                     return;
                 }
