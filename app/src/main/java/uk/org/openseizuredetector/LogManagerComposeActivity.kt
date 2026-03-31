@@ -17,6 +17,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -192,6 +193,7 @@ class LogManagerComposeActivity : ComponentActivity() {
 
     @Composable
     fun LogManagerScreen() {
+        val context = LocalContext.current
         // LaunchedEffect to handle filter changes for Remote Events
         LaunchedEffect(includeWarnings.value, includeNda.value) {
             fetchRemoteEvents()
@@ -219,10 +221,20 @@ class LogManagerComposeActivity : ComponentActivity() {
                 Text(String.format("%.1f hrs", ndaTimeRemaining.value), color = MyCharcoal)
             }
 
+            Button(
+                onClick = {
+                    val intent = Intent(context, ExportDataActivity::class.java)
+                    context.startActivity(intent)
+                },
+                colors = ButtonDefaults.buttonColors(backgroundColor = MyTeal),
+                modifier = Modifier.padding(top = 8.dp)
+            ) {
+                Text(stringResource(R.string.export_data), color = MyWhite)
+            }
+
             Spacer(modifier = Modifier.height(16.dp))
 
             // --- View Selection (Radio Buttons) ---
-            // Changed to Column for vertical stacking
             Column(
                 modifier = Modifier.fillMaxWidth()
             ) {
