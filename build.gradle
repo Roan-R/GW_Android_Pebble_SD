@@ -1,4 +1,3 @@
-// Top-level build file where you can add configuration options common to all sub-projects/modules.
 buildscript {
     ext {
         kotlin_version = '2.2.0'
@@ -6,27 +5,23 @@ buildscript {
     repositories {
         google()
         mavenCentral()
+        maven { url "https://chaquo.com/maven" }
     }
     dependencies {
+        // Updated to your current project version
         classpath 'com.android.tools.build:gradle:8.13.0'
         classpath 'com.google.gms:google-services:4.3.15'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
         classpath "org.jetbrains.kotlin:compose-compiler-gradle-plugin:$kotlin_version"
+        classpath 'com.chaquo.python:gradle:17.0.0'
     }
 }
+
 allprojects {
-    tasks.withType(JavaCompile) {
-        options.compilerArgs << "-Xlint:unchecked" << "-Xlint:deprecation"
-    }
-}
-
-
-dependencies {
-}
-
-if (hasProperty('buildScan')) {
-    buildScan {
-        termsOfServiceUrl = 'https://gradle.com/terms-of-service'
-        termsOfServiceAgree = 'yes'
+    repositories {
+        google()
+        mavenCentral()
+        maven { url "https://chaquo.com/maven" }
+        maven { url 'https://jitpack.io' }
     }
 }

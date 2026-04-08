@@ -244,7 +244,8 @@ public class SdServer extends Service implements SdDataReceiver {
             showNotification(0);
         }
 
-
+        // Wake up the ML Pipeline
+        loadPretrainedBrain();
     }
 
     /**
@@ -614,6 +615,38 @@ public class SdServer extends Service implements SdDataReceiver {
     public void onSdDataReceived(SdData sdData) {
         Log.v(TAG, "onSdDataReceived() - " + sdData.toString());
         Log.v(TAG, "onSdDataReceived(), sdData.fallAlarmStanding=" + sdData.fallAlarmStanding);
+
+        // ─────────────────────────────────────────────
+        // NEW MACHINE LEARNING BRIDGE
+        // ─────────────────────────────────────────────
+        try {
+            com.chaquo.python.Python py = com.chaquo.python.Python.getInstance();
+            com.chaquo.python.PyObject module = py.getModule("main_pipeline");
+
+            // Grab the raw data using the exact variable names from SdData.java
+            double currentHr = sdData.mHR;
+            double[] accelArray = sdData.rawData;
+
+            // Pass it to Python
+            com.chaquo.python.PyObject pyResult = module.callAttr("detect_live_window", currentHr, accelArray);
+            String mlStatus = pyResult.toString();
+
+            Log.i("PythonLive", "ML Pipeline Score: " + mlStatus);
+
+            // Override OSD's native alarm states based on our ML prediction
+            if (mlStatus.equals("ALARM")) {
+                sdData.alarmState = 2;
+                sdData.alarmPhrase = "ML ALARM";
+            } else if (mlStatus.equals("WARNING")) {
+                sdData.alarmState = 1;
+                sdData.alarmPhrase = "ML WARNING";
+            } else if (mlStatus.equals("OK") && sdData.alarmState < 3) {
+                sdData.alarmState = 0; // Clear alarms if ML says we are OK (leave Fall/Manual alarms alone)
+            }
+        } catch (Exception e) {
+            Log.e("PythonLive", "ML Pipeline Error: " + e.getMessage());
+        }
+        // ─────────────────────────────────────────────
 
         if (sdData.alarmState == 0) {
             if ((!mLatchAlarms) ||
@@ -1862,6 +1895,43 @@ public class SdServer extends Service implements SdDataReceiver {
             }
         }
         return (false);
+    }
+    private void loadPretrainedBrain() {
+        Log.i(TAG, "loadPretrainedBrain() - Initializing Python ML Model");
+        try {
+            android.content.res.AssetManager assetManager = getApplicationContext().getAssets();
+            java.io.File pretrainDir = new java.io.File(getApplicationContext().getFilesDir(), "pretraining");
+            if (!pretrainDir.exists()) pretrainDir.mkdirs();
+
+            // Copy .f32 and .json files to internal storage so Python can read them
+            String[] files = assetManager.list("pretraining");
+            if (files != null) {
+                for (String filename : files) {
+                    java.io.File out = new java.io.File(pretrainDir, filename);
+                    try (java.io.InputStream in = assetManager.open("pretraining/" + filename);
+                         java.io.OutputStream outStream = new java.io.FileOutputStream(out)) {
+                        byte[] buffer = new byte[1024];
+                        int read;
+                        while ((read = in.read(buffer)) != -1) {
+                            outStream.write(buffer, 0, read);
+                        }
+                    }
+                }
+            }
+
+            // Start Chaquopy and initialize the live model
+            if (!com.chaquo.python.Python.isStarted()) {
+                com.chaquo.python.Python.start(new com.chaquo.python.android.AndroidPlatform(getApplicationContext()));
+            }
+            com.chaquo.python.Python py = com.chaquo.python.Python.getInstance();
+            com.chaquo.python.PyObject module = py.getModule("main_pipeline");
+
+            com.chaquo.python.PyObject result = module.callAttr("init_live_model", pretrainDir.getAbsolutePath());
+            Log.i(TAG, "PythonLive Initialization: " + result.toString());
+
+        } catch (Exception e) {
+            Log.e(TAG, "Failed to load Python ML brain", e);
+        }
     }
 }
 
