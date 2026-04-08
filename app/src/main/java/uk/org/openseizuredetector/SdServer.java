@@ -39,6 +39,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.location.Location;
 import android.media.AudioManager;
 import android.media.ToneGenerator;
@@ -226,8 +227,12 @@ public class SdServer extends Service implements SdDataReceiver {
         if (Build.VERSION.SDK_INT >= 26) {
             NotificationChannel channel = new NotificationChannel(mNotChId,
                     mNotChName,
-                    NotificationManager.IMPORTANCE_DEFAULT);
+                    NotificationManager.IMPORTANCE_HIGH);
             channel.setDescription(mNotChDesc);
+            channel.enableLights(true);
+            channel.setLightColor(Color.RED);
+            channel.enableVibration(true);
+            channel.setLockscreenVisibility(Notification.VISIBILITY_PUBLIC);
             mNM.createNotificationChannel(channel);
         }
 
@@ -546,14 +551,25 @@ public class SdServer extends Service implements SdDataReceiver {
             smsStr = "Phone Call Alarm Active";
         }
         if (mNotificationBuilder != null) {
-            mNotification = mNotificationBuilder.setContentIntent(contentIntent)
+            mNotificationBuilder.setContentIntent(contentIntent)
                     .setSmallIcon(iconId)
                     .setColor(0x00ffffff)
                     .setAutoCancel(false)
                     .setContentTitle(titleStr)
                     .setContentText(smsStr)
-                    .setOnlyAlertOnce(true)
-                    .build();
+                    .setOnlyAlertOnce(true);
+
+            if (alarmLevel == 2) {
+                mNotificationBuilder.setPriority(NotificationCompat.PRIORITY_MAX)
+                        .setCategory(NotificationCompat.CATEGORY_ALARM)
+                        .setFullScreenIntent(contentIntent, true);
+            } else {
+                mNotificationBuilder.setPriority(NotificationCompat.PRIORITY_DEFAULT)
+                        .setFullScreenIntent(null, false);
+            }
+
+            mNotification = mNotificationBuilder.build();
+
             if (mMp3Alarm) {
                 if (soundUri != null) {
                     Log.v(TAG, "showNotification - setting Notification Sound to " + soundUri.toString());
@@ -1864,6 +1880,3 @@ public class SdServer extends Service implements SdDataReceiver {
         return (false);
     }
 }
-
-
-

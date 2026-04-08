@@ -305,7 +305,7 @@ public abstract class SdDataSource {
             String dataTypeStr = dataObject.getString("dataType");
             Log.v(TAG, "updateFromJSON - dataType=" + dataTypeStr);
             if (dataTypeStr.equals("raw")) {
-                Log.v(TAG, "updateFromJSON - processing raw data");
+                Log.v(TAG, "updateFrom JSON - processing raw data");
                 try {
                     mSdData.mHR = dataObject.getDouble("HR");
                 } catch (JSONException e) {
