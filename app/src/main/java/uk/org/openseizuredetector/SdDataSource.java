@@ -305,7 +305,7 @@ public abstract class SdDataSource {
             String dataTypeStr = dataObject.getString("dataType");
             Log.v(TAG, "updateFromJSON - dataType=" + dataTypeStr);
             if (dataTypeStr.equals("raw")) {
-                Log.v(TAG, "updateFromJSON - processing raw data");
+                Log.v(TAG, "updateFrom JSON - processing raw data");
                 try {
                     mSdData.mHR = dataObject.getDouble("HR");
                 } catch (JSONException e) {
@@ -709,7 +709,7 @@ public abstract class SdDataSource {
         if (mSdData.specPower == 0)
             mSdData.specPower = 1;
         Log.v(TAG, "alarmCheck() - roiPower=" + mSdData.roiPower + " specPower=" + mSdData.specPower + " ratio=" + 10 * mSdData.roiPower / mSdData.specPower);
-
+//taking this out
         if (mSdData.mOsdAlarmActive) {
             // Is the current set of data representing an alarm state?
             if ((mSdData.roiPower > mAlarmThresh) && ((10 * mSdData.roiPower / mSdData.specPower) > mAlarmRatioThresh)) {
@@ -717,7 +717,7 @@ public abstract class SdDataSource {
                 mSdData.alarmCause = mSdData.alarmCause + "OsdAlg ";
             }
         }
-
+//take out above this
         if (mSdData.mFlapAlarmActive) {
             if (flapDetected) {
                 inAlarm = true;
