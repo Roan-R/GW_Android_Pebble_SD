@@ -1,0 +1,27 @@
+# Add one seizure event per line using the same 24-hour timestamp format as the data.
+# Only the first column is required. Any extra columns are ignored by the code.
+seizure_time,note~
+2025-12-03 20:36:00,startle 
+2025-12-03 20:37:00,startle
+2025-12-04 05:31:00,TC 1:11mins start
+2025-12-04 05:32:00,TC 1:11mins end
+2025-12-04 11:50:00,TC 4mins start
+2025-12-04 11:51:00,TC 4mins pt.2
+2025-12-04 11:52:00,TC 4mins pt.3
+2025-12-04 11:53:00,TC 4mins pt.4
+2025-12-04 11:54:00,TC 4mins end
+2025-12-04 12:06:00,startle
+2025-12-04 13:17:00,startle
+2025-12-04 21:08:00,startle
+2025-12-04 21:14:00,startle
+2025-12-05 08:57:00,focal stiff start
+2026-04-01 10:42:09,startle
+2026-04-01 10:45:00,startle
+2026-04-01 13:26:00,startle (big)
+2026-04-01 20:00:00,TC 1min start
+2026-04-01 20:01:00,TC 1min end
+2026-04-02 11:47:00,startle
+2026-04-03 06:10:00,startle (big)
+2026-04-03 06:38:00,startle (big)
+2026-04-03 07:18:00,startle
+2026-04-03 11:31:00,startle 

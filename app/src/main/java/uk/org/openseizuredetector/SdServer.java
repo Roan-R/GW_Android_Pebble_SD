@@ -74,6 +74,9 @@ import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.List;
 
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
 /**
  * Based on example at:
  * http://stackoverflow.com/questions/14309256/using-nanohttpd-in-android
@@ -160,6 +163,11 @@ public class SdServer extends Service implements SdDataReceiver {
 
     public LogManager mLm;
     private boolean mUseNewUi;
+
+    private ExecutorService mlExecutor = Executors.newSingleThreadExecutor();
+    // NEW: The Bouncer flag to prevent traffic jams
+    private java.util.concurrent.atomic.AtomicBoolean isMlProcessing = new java.util.concurrent.atomic.AtomicBoolean(false);
+
 
     /**
      * class to handle binding the MainApp activity to this service
@@ -478,6 +486,12 @@ public class SdServer extends Service implements SdDataReceiver {
             mLm.close();
         }
 
+        // Stop the Machine Learning Background Thread
+        if (mlExecutor != null) {
+            Log.d(TAG, "onDestroy(): shutting down ML Executor");
+            mlExecutor.shutdown();
+        }
+
         super.onDestroy();
 
     }
@@ -628,42 +642,71 @@ public class SdServer extends Service implements SdDataReceiver {
      *
      * @param sdData
      */
-    public void onSdDataReceived(SdData sdData) {
+    public void onSdDataReceived(final SdData sdData) {
         Log.v(TAG, "onSdDataReceived() - " + sdData.toString());
-        Log.v(TAG, "onSdDataReceived(), sdData.fallAlarmStanding=" + sdData.fallAlarmStanding);
 
-        // ─────────────────────────────────────────────
-        // NEW MACHINE LEARNING BRIDGE
-        // ─────────────────────────────────────────────
-        try {
-            com.chaquo.python.Python py = com.chaquo.python.Python.getInstance();
-            com.chaquo.python.PyObject module = py.getModule("main_pipeline");
-
-            // Grab the raw data using the exact variable names from SdData.java
-            double currentHr = sdData.mHR;
-            double[] accelArray = sdData.rawData;
-
-            // Pass it to Python
-            com.chaquo.python.PyObject pyResult = module.callAttr("detect_live_window", currentHr, accelArray);
-            String mlStatus = pyResult.toString();
-
-            Log.i("PythonLive", "ML Pipeline Score: " + mlStatus);
-
-            // Override OSD's native alarm states based on our ML prediction
-            if (mlStatus.equals("ALARM")) {
-                sdData.alarmState = 2;
-                sdData.alarmPhrase = "ML ALARM";
-            } else if (mlStatus.equals("WARNING")) {
-                sdData.alarmState = 1;
-                sdData.alarmPhrase = "ML WARNING";
-            } else if (mlStatus.equals("OK") && sdData.alarmState < 3) {
-                sdData.alarmState = 0; // Clear alarms if ML says we are OK (leave Fall/Manual alarms alone)
-            }
-        } catch (Exception e) {
-            Log.e("PythonLive", "ML Pipeline Error: " + e.getMessage());
+        // 1. THE BOUNCER: If Python is still busy with the last window, skip it to prevent lag!
+        if (isMlProcessing.get()) {
+            Log.w("PythonLive", "ML Pipeline is busy, dropping this frame to maintain real-time speed.");
+            finishProcessingAlarms(sdData); // Let the standard Java algorithm handle this second
+            return;
         }
-        // ─────────────────────────────────────────────
 
+        // 2. Lock the door so no other data gets in
+        isMlProcessing.set(true);
+
+        mlExecutor.execute(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    com.chaquo.python.Python py = com.chaquo.python.Python.getInstance();
+                    com.chaquo.python.PyObject module = py.getModule("main_pipeline");
+
+                    double currentHr = sdData.mHR;
+                    double[] accelArray = sdData.rawData;
+
+                    com.chaquo.python.PyObject pyResult = module.callAttr("detect_live_window", currentHr, accelArray);
+                    String rawResult = pyResult.toString();
+
+                    // Split the comma-separated string from Python so we just get the word
+                    String[] parts = rawResult.split(",");
+                    String mlStatus = parts[0];
+
+                    // The full scores will still print in Logcat for your testing!
+                    Log.i("PythonLive", "ML Output: " + rawResult);
+
+                    // JUST SET THE STATE INTEGER AND THE CAUSE SUBTITLE.
+                    if (mlStatus.equals("ALARM")) {
+                        sdData.alarmState = 2;
+                        sdData.alarmCause = "New Algorithm";
+                    } else if (mlStatus.equals("WARNING")) {
+                        sdData.alarmState = 1;
+                        sdData.alarmCause = "New Algorithm";
+                    } else if (mlStatus.equals("OK") && sdData.alarmState < 3) {
+                        sdData.alarmState = 0;
+                        sdData.alarmCause = "New Algorithm";
+                    }
+
+                } catch (Exception e) {
+                    Log.e("PythonLive", "ML Pipeline Error: " + e.getMessage());
+                } finally {
+                    // 3. UNLOCK the door so the next window can be processed
+                    isMlProcessing.set(false);
+                }
+
+                // 4. Hand back to the Main Thread
+                mHandler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        finishProcessingAlarms(sdData);
+                    }
+                });
+            }
+        });
+    }
+
+    private void finishProcessingAlarms(SdData sdData) {
+        // This runs safely on the Main Thread so it can trigger sounds, UI updates, and SMS
         if (sdData.alarmState == 0) {
             if ((!mLatchAlarms) ||
                     (mLatchAlarms &&
@@ -682,17 +725,22 @@ public class SdServer extends Service implements SdDataReceiver {
             showNotification(0);
         }
         // Handle warning alarm state
+        // Handle warning alarm state
         if (sdData.alarmState == 1) {
             if ((!mLatchAlarms) ||
                     (mLatchAlarms &&
                             (!mSdData.alarmStanding && !mSdData.fallAlarmStanding))) {
-                sdData.alarmPhrase = "WARNING";
+
+                // Only apply the old name if the ML model hasn't already named it
+                if (!"New Algorithm".equals(sdData.alarmCause)) {
+                    sdData.alarmCause = "Old Algorithm";
+                }
+
                 sdData.alarmStanding = false;
                 sdData.fallAlarmStanding = false;
             }
             if (mLogAlarms) {
                 Log.v(TAG, "WARNING - Logging to SD Card");
-                //writeAlarmToSD();
             } else {
                 Log.v(TAG, "WARNING");
             }
@@ -700,12 +748,20 @@ public class SdServer extends Service implements SdDataReceiver {
             showNotification(1);
         }
         // respond to normal alarms (2) and manual alarms (5)
+        // respond to normal alarms (2) and manual alarms (5)
         if ((sdData.alarmState == 2) || (sdData.alarmState == 5)) {
-            sdData.alarmPhrase = "ALARM";
+
+            // Differentiate between Manual, New ML, and Old Algorithm
+            if (sdData.alarmState == 5) {
+                sdData.alarmPhrase = "MANUAL ALARM";
+                sdData.alarmCause = "Manual Button Pressed";
+            } else if (!"New Algorithm".equals(sdData.alarmCause)) {
+                sdData.alarmCause = "Old Algorithm";
+            }
+
             sdData.alarmStanding = true;
             if (mLogAlarms) {
                 Log.v(TAG, "***ALARM*** - Logging to SD Card");
-                //writeAlarmToSD();
             } else {
                 Log.v(TAG, "***ALARM***");
             }
@@ -714,28 +770,8 @@ public class SdServer extends Service implements SdDataReceiver {
             showNotification(2);
             // Display MainActvity
             showMainActivity();
-            // Send SMS Alarm.
-            if (mSMSAlarm) {
-                Time tnow = new Time(Time.getCurrentTimezone());
-                tnow.setToNow();
-                // limit SMS alarms to one per minute
-                if ((tnow.toMillis(false)
-                        - mSMSTime.toMillis(false))
-                        > 60000) {
-                    sendSMSAlarm();
-                    sendPhoneAlarm();
-                    mSMSTime = tnow;
-                } else {
-                    mUtil.showToast(getString(R.string.SMSAlarmAlreadySentMsg));
-                    Log.v(TAG, "SMS Alarm already sent - not re-sending");
-                }
-            } else {
-                mUtil.showToast(getString(R.string.SMSAlarmDisabledNotSendingMsg));
-                Log.v(TAG, "mSMSAlarm is false - not sending");
-            }
-            Log.v(TAG,"calling startLatchTimer()");
-            startLatchTimer();
         }
+
         // Handle fall alarm
         Log.v(TAG, "sdData.fallAlarmStanding=" + sdData.fallAlarmStanding);
         if ((sdData.alarmState == 3) || (sdData.fallAlarmStanding)) {
