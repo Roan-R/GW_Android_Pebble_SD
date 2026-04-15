@@ -540,6 +540,7 @@ public abstract class SdDataSource {
             for (int i = nMin; i < nMax; i++) {
                 roiPower = roiPower + getMagnitude(fft, i);
             }
+
             roiPower = roiPower / (nMax - nMin);
             double roiRatio = 10 * roiPower / specPower;
 
@@ -620,9 +621,10 @@ public abstract class SdDataSource {
 
     /**
      * flapCheck() - Performs the same analysis as the main OSD algorithm, but over a narrow
-     *  frequency band to detect a flapping arm movement.
-     *  returns True if in an alarm state, or false if ok.
-     *  FIXME - we should generalise the OSD algorithm to allow several ROIs and thresholds to be
+     * frequency band to detect a flapping arm movement.
+     * returns True if in an alarm state, or false if ok.
+     *
+     * FIXME - we should generalise the OSD algorithm to allow several ROIs and thresholds to be
      *          specified, rather than doing this separately like this.
      */
     protected boolean flapCheck() {
@@ -1048,6 +1050,7 @@ public abstract class SdDataSource {
                     }
                 }
             }
+
         } catch(Exception e) {
         Log.e(TAG,"faultCheck - Exception: "+e.toString());
         Log.e(TAG,e.getMessage());

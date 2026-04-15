@@ -19,6 +19,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.DatePicker;
+import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
@@ -117,6 +118,9 @@ public class ReportSeizureActivity extends AppCompatActivity {
         Button setTimeBtn =
                 (Button) findViewById(R.id.select_time_button);
         setTimeBtn.setOnClickListener(onSelectTime);
+
+        Button bulkImportBtn = (Button) findViewById(R.id.bulkImportBtn);
+        bulkImportBtn.setOnClickListener(onBulkImport);
 
         // Get Current Date
         final Calendar c = Calendar.getInstance();
@@ -325,6 +329,47 @@ public class ReportSeizureActivity extends AppCompatActivity {
                     finish();
                 }
             };
+
+    View.OnClickListener onBulkImport = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            EditText bulkInput = findViewById(R.id.bulkSeizureInput);
+            String input = bulkInput.getText().toString();
+            if (input.isEmpty()) {
+                mUtil.showToast("Please enter seizure data.");
+                return;
+            }
+
+            String[] lines = input.split("\n");
+            int count = 0;
+            String settingsJson = mConnection.mBound ? mConnection.mSdServer.mSdData.toSettingsJSON() : null;
+
+            for (String line : lines) {
+                line = line.trim();
+                if (line.isEmpty() || line.startsWith("#") || line.startsWith("seizure_time")) {
+                    continue;
+                }
+
+                String[] parts = line.split(",", 2);
+                if (parts.length >= 1) {
+                    String timestamp = parts[0].trim();
+                    String note = (parts.length > 1) ? parts[1].trim() : "";
+                    
+                    // Simple validation of timestamp format (YYYY-MM-DD HH:MM:SS)
+                    if (timestamp.matches("\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2}")) {
+                        if (mLm.createLocalEvent(timestamp, 5, "Manual", "Bulk Import", note, settingsJson)) {
+                            count++;
+                        }
+                    }
+                }
+            }
+            mUtil.showToast("Imported " + count + " seizure events.");
+            if (count > 0) {
+                finish();
+            }
+        }
+    };
+
     View.OnClickListener onCancel =
             new View.OnClickListener() {
                 @Override

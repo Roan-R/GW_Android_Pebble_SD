@@ -55,7 +55,7 @@ class LoadingActivity : ComponentActivity() {
     private val TAG = "LoadingActivity"
 
     // Color Palette
-    private val background = ComposeColor(0xFFD7FFF1)
+    private val background = ComposeColor(0xFFE0EDEA)
     private val brown = ComposeColor(0xFF664E4C)
     private val charcoal = ComposeColor(0xFF172121)
     private val teal = ComposeColor(0xFF6A8D92)
