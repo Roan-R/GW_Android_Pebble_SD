@@ -6,42 +6,56 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
+    android:background="#E0EDEA"
     tools:context="uk.org.openseizuredetector.LogManager">
 
     <LinearLayout
         android:id="@+id/export_data_content_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:padding="16dp">
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Export Local Data"
-            android:textStyle="bold" />
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:textColor="#172121"
+            android:textStyle="bold"
+            android:layout_marginBottom="16dp" />
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="End Date/Time (dd-mm-yyyy hh:mm)" />
+            android:text="End Date/Time (dd-mm-yyyy hh:mm)"
+            android:textColor="#172121" />
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal">
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginBottom="8dp">
 
             <EditText
                 android:id="@+id/endDateText"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                android:layout_weight="1"
                 android:ems="10"
-                android:text="(end date)" />
+                android:background="#d9d6d2"
+                android:padding="8dp"
+                android:text="(End Date)"
+                android:textColor="#172121" />
 
             <Button
                 android:id="@+id/dateBtn"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Select Date" />
+                android:layout_marginStart="8dp"
+                android:text="Select Date"
+                android:backgroundTint="#6A8D92" />
 
 
         </LinearLayout>
@@ -49,20 +63,28 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal">
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginBottom="16dp">
 
             <EditText
                 android:id="@+id/endTimeText"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                android:layout_weight="1"
                 android:ems="10"
-                android:text="(end time)" />
+                android:background="#d9d6d2"
+                android:padding="8dp"
+                android:text="(End Time)"
+                android:textColor="#172121" />
 
             <Button
                 android:id="@+id/timeBtn"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Select Time" />
+                android:layout_marginStart="8dp"
+                android:text="Select Time"
+                android:backgroundTint="#6A8D92" />
 
 
         </LinearLayout>
@@ -70,31 +92,40 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Duration (hrs)" />
+            android:text="Duration (hrs)"
+            android:textColor="#172121" />
 
         <EditText
             android:id="@+id/durationText"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:ems="10"
+            android:background="#d9d6d2"
+            android:padding="8dp"
             android:inputType="numberDecimal"
-            android:text="1.0" />
+            android:text="1.0"
+            android:textColor="#172121"
+            android:layout_marginBottom="24dp" />
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal">
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
 
             <Button
                 android:id="@+id/exportBtn"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:text="Export Data" />
+                android:layout_weight="1"
+                android:text="Export Data"
+                android:backgroundTint="#6A8D92" />
 
             <ProgressBar
                 android:id="@+id/exportPb"
                 android:layout_width="wrap_content"
-                android:layout_height="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
                 android:visibility="invisible" />
         </LinearLayout>
 

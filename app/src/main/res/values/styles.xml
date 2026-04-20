@@ -2,21 +2,23 @@
 
     <!-- Base application theme. -->
     <style name="AppTheme" parent="Theme.MaterialComponents.DayNight">
-        <!-- Customize your theme here.
-        <item name="colorPrimary">@color/colorPrimary</item>
-        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
-        <item name="colorAccent">@color/colorAccent</item>
-        <item name="android:textColorPrimary">#a0a0a0</item>
-        -->
+        <!-- Main Palette -->
+        <item name="colorPrimary">#6A8D92</item>
+        <item name="colorPrimaryVariant">#4E6E73</item>
+        <item name="colorOnPrimary">#FFFFFF</item>
+        
+        <!-- Background and Surfaces -->
+        <item name="android:windowBackground">#E0EDEA</item>
+        <item name="colorSurface">#FFFFFF</item>
+        
+        <!-- Text Colors -->
+        <item name="android:textColorPrimary">#172121</item>
     </style>
 
     <!-- Theme for the AuthenticateActivity2 -->
     <style name="AppTheme.Authenticate" parent="AppTheme">
-        <item name="colorPrimary">#6A8D92</item>
         <item name="android:statusBarColor">#D7FFF1</item>
         <item name="android:windowLightStatusBar">true</item>
     </style>
 
 </resources>
-
-
