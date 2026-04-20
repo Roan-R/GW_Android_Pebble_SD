@@ -172,66 +172,6 @@ class MainActivity3 : ComponentActivity() {
         }
     }
 
-    private fun runPipelineDiagnostic() {
-        mainStatusText.value = "SIMULATING"
-        mainStatusColor.value = teal
-        mainStatusDetails.value = "Testing extended dataset on live model..."
-        manualAlarmButtonEnabled.value = false
-
-        Thread {
-            try {
-                // 1. Copy CSV Data
-                prepareTestData()
-
-                // 2. Copy Pretraining Files (The Brain)
-                val pretrainDir = File(filesDir, "pretraining")
-                if (!pretrainDir.exists()) pretrainDir.mkdirs()
-                val assetManager = applicationContext.assets
-                assetManager.list("pretraining")?.forEach { filename ->
-                    File(pretrainDir, filename).outputStream().use { output ->
-                        assetManager.open("pretraining/$filename").copyTo(output)
-                    }
-                }
-
-                // 3. Start Python
-                if (!com.chaquo.python.Python.isStarted()) {
-                    com.chaquo.python.Python.start(com.chaquo.python.android.AndroidPlatform(this))
-                }
-
-                val py = com.chaquo.python.Python.getInstance()
-                val mainModule = py.getModule("main_pipeline")
-
-                val dataPath = File(filesDir, "data").absolutePath
-                val pretrainPath = pretrainDir.absolutePath
-
-                // 4. Run the Simulator!
-                val result = mainModule.callAttr("simulate_watch_from_csv", dataPath, pretrainPath)
-
-                runOnUiThread {
-                    Log.i("PythonLive", result.toString())
-                    mainStatusText.value = "DONE"
-                    mainStatusColor.value = okColour
-                    mainStatusDetails.value = "Simulation Complete"
-                    manualAlarmButtonEnabled.value = true
-
-                    AlertDialog.Builder(this)
-                        .setTitle("Live Simulation Results")
-                        .setMessage(result.toString())
-                        .setPositiveButton("OK", null)
-                        .show()
-                }
-            } catch (e: Exception) {
-                runOnUiThread {
-                    Log.e("PythonLive", "Error: ${e.message}")
-                    mainStatusText.value = "ERROR"
-                    mainStatusColor.value = alarmColour
-                    mainStatusDetails.value = "Simulation Failed: ${e.localizedMessage}"
-                    manualAlarmButtonEnabled.value = true
-                }
-            }
-        }.start()
-    }
-
     private fun updateServerStatus() {
         serverStatusHandler.post {
             if (!mConnection.mBound) {
@@ -397,19 +337,6 @@ class MainActivity3 : ComponentActivity() {
                                         mUtil.stopServer()
                                         finish()
                                     }) { Text("Exit", color = charcoal) }
-
-                                    DropdownMenuItem(onClick = {
-                                        // 1. Close the menu immediately
-                                        showMenu.value = false
-
-                                        // 2. Use a Handler to wait 200ms for the menu animation to finish
-                                        // before starting the heavy Python work
-                                        android.os.Handler(android.os.Looper.getMainLooper()).postDelayed({
-                                            runPipelineDiagnostic()
-                                        }, 200)
-                                    }) {
-                                        Text("Run Diagnostic Test", color = charcoal, fontWeight = FontWeight.Bold)
-                                    }
 
                                     Divider(color = teal)
                                 }
