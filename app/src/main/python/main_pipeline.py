@@ -52,6 +52,9 @@ def init_live_model(pretraining_dir):
     _consecutive_alarms = 0
     _last_ema_score = 0.0
 
+    if _latent_bank is not None and _live_mlp is not None:
+            return "SUCCESS: ML Brain already in memory. Fast reboot complete."
+
     try:
         bank_path = os.path.join(pretraining_dir, "scn8a_latent_bank.f32")
         _latent_bank = np.fromfile(bank_path, dtype=np.float32).reshape(-1, 16)

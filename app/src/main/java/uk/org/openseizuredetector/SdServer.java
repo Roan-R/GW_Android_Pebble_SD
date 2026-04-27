@@ -675,16 +675,22 @@ public class SdServer extends Service implements SdDataReceiver {
                     // The full scores will still print in Logcat for your testing!
                     Log.i("PythonLive", "ML Output: " + rawResult);
 
-                    // JUST SET THE STATE INTEGER AND THE CAUSE SUBTITLE.
-                    if (mlStatus.equals("ALARM")) {
-                        sdData.alarmState = 2;
-                        sdData.alarmCause = "New Algorithm";
-                    } else if (mlStatus.equals("WARNING")) {
-                        sdData.alarmState = 1;
-                        sdData.alarmCause = "New Algorithm";
-                    } else if (mlStatus.equals("OK") && sdData.alarmState < 3) {
-                        sdData.alarmState = 0;
-                        sdData.alarmCause = "New Algorithm";
+                    // 1. PROTECT HARDWARE ALARMS: Do not let ML overwrite Falls or Manual buttons
+                    if (sdData.alarmState == 3 || sdData.alarmState == 5) {
+                        Log.i("PythonLive", "Fall or Manual Alarm detected by hardware! Bypassing ML overwrite.");
+                    }
+                    // 2. ML LOGIC: Only alter the state if it is standard movement data
+                    else {
+                        if (mlStatus.equals("ALARM")) {
+                            sdData.alarmState = 2;
+                            sdData.alarmCause = "New Algorithm";
+                        } else if (mlStatus.equals("WARNING")) {
+                            sdData.alarmState = 1;
+                            sdData.alarmCause = "New Algorithm";
+                        } else if (mlStatus.equals("OK")) {
+                            sdData.alarmState = 0;
+                            sdData.alarmCause = "New Algorithm";
+                        }
                     }
 
                 } catch (Exception e) {
